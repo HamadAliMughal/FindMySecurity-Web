@@ -99,7 +99,7 @@ export default function Hero() {
         .map((option) => (
           <div
             key={option}
-            className="px-4 py-2 hover:bg-red-500 hover:text-white cursor-pointer"
+            className="px-4 py-2 hover:bg-red-500 hover:text-white cursor-pointer text-sm"
             onClick={() => handleSelect(field, option)}
           >
             {option}
@@ -107,9 +107,8 @@ export default function Hero() {
         ))}
     </div>
   );
-
   return (
-    <section className="relative w-full h-screen flex items-center justify-center text-center bg-gray-900 text-white">
+    <section className="relative w-full h-screen flex flex-col items-center justify-center text-center bg-gray-900 text-white px-4 md:px-8">
       {/* Background Image */}
       <div className="absolute inset-0">
         <Image
@@ -117,121 +116,47 @@ export default function Hero() {
           alt="Hero Background"
           layout="fill"
           objectFit="cover"
-          className="opacity-60"
+          className="opacity-50"
         />
       </div>
 
       {/* Search Bar */}
-      <div className="flex items-center z-10 space-x-4 bg-gray-300 p-6 rounded-lg">
-        {Object.keys(options).map((field, index) => {
-          const typedField = field as keyof SearchValues; // Type assertion
+      <div className="relative z-10 bg-gray-300 p-6 rounded-lg w-full max-w-5xl">
+        <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-4">
+          Find Your Ideal Security Job
+        </h2>
 
-          return (
-            <div key={typedField} className="relative">
-              <input
-                type="text"
-                placeholder={typedField.replace(/([A-Z])/g, " $1").trim()}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg placeholder-white w-48"
-                value={searchValues[typedField]}
-                onChange={(e) =>
-                  setSearchValues({ ...searchValues, [typedField]: e.target.value })
-                }
-                onFocus={() => setOpenDropdown(typedField)}
-              />
-              {openDropdown === typedField && renderDropdown(typedField)}
-              {index < Object.keys(options).length - 1 && (
-                <span className="text-black text-lg">→</span>
-              )}
-            </div>
-          );
-        })}
+        {/* Inputs Grid + Button (Inline on Desktop, Stacked on Mobile) */}
+        <div className="flex flex-col sm:flex-row flex-wrap gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 flex-grow">
+            {Object.keys(options).map((field) => {
+              const typedField = field as keyof SearchValues;
 
-        {/* Circular "GO" Button */}
-        <button className="bg-red-600 text-white w-12 h-12 flex items-center justify-center rounded-full font-bold">
-          GO
-        </button>
+              return (
+                <div key={typedField} className="relative">
+                  <input
+                    type="text"
+                    placeholder={typedField.replace(/([A-Z])/g, " $1").trim()}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg placeholder-white w-full text-sm"
+                    value={searchValues[typedField]}
+                    onChange={(e) =>
+                      setSearchValues({ ...searchValues, [typedField]: e.target.value })
+                    }
+                    onFocus={() => setOpenDropdown(typedField)}
+                  />
+                  {openDropdown === typedField && renderDropdown(typedField)}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="flex justify-center sm:justify-end w-full sm:w-auto">
+            <button className="bg-red-600 text-white px-2 py-1 rounded-full text-lg font-bold w-full sm:w-auto">
+              GO
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );
 }
-
-// "use client"; // Only needed if you use hooks in Next.js 13+
-
-// import Image from "next/image";
-
-// export default function Hero() {
-//   return (
-//     <section className="relative w-full h-screen flex items-center justify-center text-center bg-gray-900 text-white">
-//       {/* Background Image */}
-//       <div className="absolute inset-0">
-//         <Image
-//           src="/images/hero-bg.jpg" // Change this to your image
-//           alt="Hero Background"
-//           layout="fill"
-//           objectFit="cover"
-//           className="opacity-60"
-//         />
-//       </div>
-
-//       {/* Content */}
-//       <div className="flex items-center z-10 space-x-4 bg-gray-300 p-6 rounded-lg">
-//   {/* Search Fields */}
-//   <div className="flex items-center space-x-2">
-//     <input
-//       type="text"
-//       placeholder="I am Looking for"
-//       className="bg-red-600 text-white px-4 py-2 rounded-lg placeholder-white"
-//     />
-//     <span className="text-black text-lg">→</span>
-
-//     <input
-//       type="text"
-//       placeholder="Job Title"
-//       className="bg-red-600 text-white px-4 py-2 rounded-lg placeholder-white"
-//     />
-//     <span className="text-black text-lg">→</span>
-
-//     <input
-//       type="text"
-//       placeholder="Years of Experience"
-//       className="bg-red-600 text-white px-4 py-2 rounded-lg placeholder-white"
-//     />
-//     <span className="text-black text-lg">→</span>
-
-//     <input
-//       type="text"
-//       placeholder="Post Code"
-//       className="bg-red-600 text-white px-4 py-2 rounded-lg placeholder-white"
-//     />
-//     <span className="text-black text-lg">→</span>
-
-//     <input
-//       type="text"
-//       placeholder="Location"
-//       className="bg-red-600 text-white px-4 py-2 rounded-lg placeholder-white"
-//     />
-//   </div>
-
-//   {/* Circular "GO" Button */}
-//   <button className="bg-red-600 text-white w-12 h-12 flex items-center justify-center rounded-full font-bold">
-//     GO
-//   </button>
-// </div>
-
-//       {/* <div className="relative z-10 max-w-2xl">
-//         <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-//           Secure Your Digital World
-//         </h1>
-//         <p className="text-lg sm:text-xl mb-6">
-//           Protect your data with our top-notch security solutions.
-//         </p>
-//         <a
-//           href="#"
-//           className="px-6 py-3 bg-blue-500 hover:bg-blue-700 rounded-lg text-white font-semibold transition duration-300"
-//         >
-//           Get Started
-//         </a>
-//       </div> */}
-//     </section>
-//   );
-// }

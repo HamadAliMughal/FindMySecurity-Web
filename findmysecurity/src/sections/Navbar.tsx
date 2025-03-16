@@ -19,9 +19,12 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-black bg-opacity-90 backdrop-blur-md px-38 text-white fixed top-0 left-0 shadow-md z-50 w-full ">
-      <div className="container mx-auto px-6 py-5 flex items-center justify-between">
-        {/* Logo */}
+    // <nav className="bg-black bg-opacity-90 backdrop-blur-md px-38 text-white fixed top-0 left-0 shadow-md z-50 w-full ">
+    //   <div className="container mx-auto px-6 py-5 flex items-center justify-between">
+    <nav className="bg-black bg-opacity-90 backdrop-blur-md px-0 md:px-38 text-white fixed top-0 left-0 shadow-md z-50 w-full">
+    <div className="container mx-auto px-6 py-5 flex items-center justify-between">
+    
+      {/* Logo */}
         <Link href="/" className="text-3xl font-bold">
           FindMySecurity
         </Link>
