@@ -9,7 +9,11 @@ import "./page-globals.css";
 export default function SignupPage() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const router = useRouter();
-
+  const handleSubmit = () => {
+  
+    console.log("Form submitted:");
+    router.push("/registration");
+  };
   return (
     <div className="flex flex-col h-screen justify-center items-center bg-white">
       {/* Top Navigation Bar */}
@@ -59,7 +63,7 @@ export default function SignupPage() {
         </div>
 
         {/* Register Button */}
-        <button className="w-full bg-black text-white py-2 rounded-md font-semibold hover:opacity-80">
+        <button  onClick={handleSubmit} className="w-full bg-black text-white py-2 rounded-md font-semibold hover:opacity-80">
           Register
         </button>
       </div>
