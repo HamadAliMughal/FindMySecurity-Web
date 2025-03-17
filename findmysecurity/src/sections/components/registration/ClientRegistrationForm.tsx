@@ -4,7 +4,12 @@ import { useState } from "react";
 import { FaUser, FaEnvelope, FaLock, FaMapMarkerAlt, FaCity, FaCodeBranch } from "react-icons/fa";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 
-const ClientGeneralForm = () => {
+interface ClientGeneralFormProps {
+  id: number;
+  title: string;
+}
+
+const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -43,7 +48,7 @@ const ClientGeneralForm = () => {
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-md">
-      <h2 className="text-2xl font-bold text-center mb-4 text-black">Free Registration</h2>
+      <h2 className="text-2xl font-bold text-center mb-4 text-black">Free Registration For {title}</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Email Address */}
