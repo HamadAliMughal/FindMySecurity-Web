@@ -1,8 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronDown, ChevronRight, Menu, X } from "@deemlol/next-icons";
-import { FaLock } from "react-icons/fa";
+import Icons from '../constants/icons/icons'
 
 export default function Navbar() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -34,7 +33,7 @@ export default function Navbar() {
           className="md:hidden text-white text-3xl"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
-          {mobileMenuOpen ? <X /> : <Menu />}
+          {mobileMenuOpen ? <Icons.X /> : <Icons.Menu />}
         </button>
 
         {/* Desktop Menu */}
@@ -45,7 +44,7 @@ export default function Navbar() {
               className="flex items-center hover:text-gray-400"
               onClick={() => toggleDropdown("platform")}
             >
-              Platform <ChevronDown className="h-6 w-6 ml-1" />
+              Platform <Icons.ChevronDown className="h-6 w-6 ml-1" />
             </button>
             {openDropdown === "platform" && (
               <div className="absolute left-0 mt-2 bg-white text-black rounded shadow-lg border w-56 z-50">
@@ -65,7 +64,7 @@ export default function Navbar() {
               className="flex items-center hover:text-gray-400"
               onClick={() => toggleDropdown("solution")}
             >
-              Solution <ChevronDown className="h-6 w-6 ml-1" />
+              Solution <Icons.ChevronDown className="h-6 w-6 ml-1" />
             </button>
             {openDropdown === "solution" && (
               <div className="absolute left-0 mt-2 bg-white text-black rounded shadow-lg border w-72 z-50">
@@ -76,7 +75,7 @@ export default function Navbar() {
                     onClick={() => toggleSubDropdown("corporate-security")}
                   >
                     Corporate & Executive Security
-                    <ChevronRight className="h-5 w-5" />
+                    <Icons.ChevronRight className="h-5 w-5" />
                   </button>
 
                   {openSubDropdown === "corporate-security" && (
@@ -100,17 +99,129 @@ export default function Navbar() {
                   )}
                 </div>
 
-                <Link href="/solution/physical-security-manned-guarding" className="block px-4 py-2 hover:bg-gray-200">
-                  Physical Security & Manned Guarding
-                </Link>
-                <Link href="/solution/specialist-security-roles" className="block px-4 py-2 hover:bg-gray-200">
-                  Specialist Security Roles
-                </Link>
-                <Link href="/solution/surveillance-monitoring" className="block px-4 py-2 hover:bg-gray-200">
-                  Surveillance & Monitoring
-                </Link>
+                <div className="relative">
+                  <button
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-200 flex justify-between items-center"
+                    onClick={() => toggleSubDropdown("physical-security")}
+                  >
+                    Physical Security & Manned Guarding
+                    <Icons.ChevronRight className="h-5 w-5" />
+                  </button>
+                  {openSubDropdown === "physical-security" && (
+                    <div className="absolute left-full top-0 ml-2 bg-white text-black rounded shadow-lg border w-72 z-50">
+                      <Link href="/solution/security-officer" className="block px-4 py-2 hover:bg-gray-200">
+                        Security Officer
+                      </Link>
+                      <Link href="/solution/retail-security-officer" className="block px-4 py-2 hover:bg-gray-200">
+                        Retail Security Officer
+                      </Link>
+                      <Link href="/solution/corporate-security-officer" className="block px-4 py-2 hover:bg-gray-200">
+                        Corporate Security Officer
+                      </Link>
+                      <Link href="/solution/door-supervisor" className="block px-4 py-2 hover:bg-gray-200">
+                        Door Supervisor
+                      </Link>
+                      <Link href="/solution/event-security-officer" className="block px-4 py-2 hover:bg-gray-200">
+                        Event Security Officer
+                      </Link>
+                      <Link href="/solution/mobile-patrol-officer" className="block px-4 py-2 hover:bg-gray-200">
+                        Mobile Patrol Officer
+                      </Link>
+                      <Link href="/solution/loss-prevention-officer" className="block px-4 py-2 hover:bg-gray-200">
+                        Loss Prevention Officer
+                      </Link>
+                      <Link href="/solution/access-control-officer" className="block px-4 py-2 hover:bg-gray-200">
+                        Access Control Officer
+                      </Link>
+                    </div>
+                  )}
+                </div>
+                <div className="relative"> 
+        <button
+          className="block w-full text-left px-4 py-2 hover:bg-gray-200 flex justify-between items-center"
+          onClick={() => toggleSubDropdown("specialist-security")}
+        >
+          Specialist Security Roles
+          <Icons.ChevronRight className="h-5 w-5" />
+        </button>
+        {openSubDropdown === "specialist-security" && (
+          <div className="absolute left-full top-0 ml-2 bg-white text-black rounded shadow-lg border w-72 z-50">
+            <Link href="/solution/close-protection-officer" className="block px-4 py-2 hover:bg-gray-200">
+              Close Protection Officer (CPO)
+            </Link>
+            <Link href="/solution/maritime-security-officer" className="block px-4 py-2 hover:bg-gray-200">
+              Maritime Security Officer (MSO)
+            </Link>
+            <Link href="/solution/aviation-security-officer" className="block px-4 py-2 hover:bg-gray-200">
+              Aviation Security Officer
+            </Link>
+            <Link href="/solution/high-value-goods-escort" className="block px-4 py-2 hover:bg-gray-200">
+              High-Value Goods Escort Officer
+            </Link>
+            <Link href="/solution/residential-security-team" className="block px-4 py-2 hover:bg-gray-200">
+              Residential Security Team (RST) Member
+            </Link>
+            <Link href="/solution/k9-security-handler" className="block px-4 py-2 hover:bg-gray-200">
+              K9 Security Handler
+            </Link>
+            <Link href="/solution/hostile-environment-security-advisor" className="block px-4 py-2 hover:bg-gray-200">
+              Hostile Environment Security Advisor
+            </Link>
+            <Link href="/solution/asset-protection-officer" className="block px-4 py-2 hover:bg-gray-200">
+              Asset Protection Officer
+            </Link>
+          </div>
+        )}
+      </div>
+                
+      <div className="relative"> 
+        <button
+          className="block w-full text-left px-4 py-2 hover:bg-gray-200 flex justify-between items-center"
+          onClick={() => toggleSubDropdown("surveillance-monitoring")}
+        >
+          Surveillance & Monitoring
+          <Icons.ChevronRight className="h-5 w-5" />
+        </button>
+        {openSubDropdown === "surveillance-monitoring" && (
+          <div className="absolute left-full top-0 ml-2 bg-white text-black rounded shadow-lg border w-72 z-50">
+            <Link href="/solution/cctv-operator" className="block px-4 py-2 hover:bg-gray-200">
+              CCTV Operator
+            </Link>
+            <Link href="/solution/security-control-room-operator" className="block px-4 py-2 hover:bg-gray-200">
+              Security Control Room Operator
+            </Link>
+            <Link href="/solution/covert-surveillance-operative" className="block px-4 py-2 hover:bg-gray-200">
+              Covert Surveillance Operative
+            </Link>
+            <Link href="/solution/counter-surveillance-specialist" className="block px-4 py-2 hover:bg-gray-200">
+              Counter-Surveillance Specialist
+            </Link>
+            <Link href="/solution/technical-surveillance-countermeasures" className="block px-4 py-2 hover:bg-gray-200">
+              Technical Surveillance Countermeasures (TSCM) Specialist
+            </Link>
+            <Link href="/solution/intelligence-analyst-security" className="block px-4 py-2 hover:bg-gray-200">
+              Intelligence Analyst (Security)
+            </Link>
+            <Link href="/solution/forensic-security-investigator" className="block px-4 py-2 hover:bg-gray-200">
+              Forensic Security Investigator
+            </Link>
+          </div>
+        )}
+      </div>
                 <Link href="/solution/cyber-security-information-security" className="block px-4 py-2 hover:bg-gray-200">
-                  Cyber Security & Information Security
+                  Cyber Security & Information Security <i>(Coming Soon)</i>
+                </Link>
+                <Link href="/solution/risk-management-consultancy" className="block px-4 py-2 hover:bg-gray-200">
+                  Risk Management & Consultancy <i>(Coming Soon)</i>
+                </Link>
+                <Link href="/solution/private-investigation-specialist-roles" className="block px-4 py-2 hover:bg-gray-200">
+                  Private Investigation & Specialist Roles <i>(Coming Soon)</i>
+                </Link>
+                <Link href="/solution/transport-logistics-security" className="block px-4 py-2 hover:bg-gray-200">
+                  Transport & Logistics Security <i>(Coming Soon)</i>
+                </Link>
+                <Link href="/solution/access-technology-system-specialist" className="block px-4 py-2 hover:bg-gray-200">
+                  Access Technology & System Specialist <i>(Coming Soon)</i>
                 </Link>
               </div>
             )}
@@ -126,7 +237,7 @@ export default function Navbar() {
               className="flex items-center hover:text-gray-400"
               onClick={() => toggleDropdown("resources")}
             >
-              Resources <ChevronDown className="h-6 w-6 ml-1" />
+              Resources <Icons.ChevronDown className="h-6 w-6 ml-1" />
             </button>
             {openDropdown === "resources" && (
               <div className="absolute left-0 mt-2 bg-white text-black rounded shadow-lg border w-48 z-50">
@@ -154,7 +265,7 @@ export default function Navbar() {
           </Link>
 
           <Link href="/signin" className="text-white flex items-center space-x-2 ease-in-out hover:text-gray-200">
-            <FaLock className="h-4 w-4" />
+            <Icons.Lock className="h-4 w-4" />
             <span className="font-bold">Web Login</span>
           </Link>
         </div>

@@ -145,6 +145,14 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
           />
         </div>
 
+        <div className="relative flex items-center">
+          <FaClipboardList className="absolute left-3 text-gray-700" />
+          <input 
+            type="text" name="service" placeholder="Service Requirements"
+            value={formData.serviceRequirements} onChange={handleChange}
+            className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+          />
+        </div>
         {/* Service Offerings & Challenges */}
         <textarea 
           name="serviceOfferings" placeholder="Security Service Offerings"

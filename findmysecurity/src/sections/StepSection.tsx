@@ -1,7 +1,5 @@
 import Image from "next/image";
-import { FaDownload } from "react-icons/fa";
-import { BsFilePost } from "react-icons/bs";
-import { HiOutlineMailOpen } from "react-icons/hi";
+import Icons from '../constants/icons/icons'
 
 const StepsSection = () => {
   return (
@@ -23,7 +21,7 @@ const StepsSection = () => {
               Security guard mobile app for guards is available on both the Apple Store and Play Store.
             </p>
           </div>
-          <FaDownload className="text-blue-500 w-8 h-8" />
+          <Icons.Download className="text-blue-500 w-8 h-8" />
         </div>
 
         {/* Arrow (Only visible in Desktop) */}
@@ -40,7 +38,7 @@ const StepsSection = () => {
               Turn on the GPS of your smartphone to select the location and start adding multiple sites.
             </p>
           </div>
-          <BsFilePost className="text-blue-500 w-8 h-8" />
+          <Icons.Post className="text-blue-500 w-8 h-8" />
         </div>
 
         {/* Arrow (Only visible in Desktop) */}
@@ -57,7 +55,7 @@ const StepsSection = () => {
               Start inviting security guards to start collaborating and monitoring them seamlessly.
             </p>
           </div>
-          <HiOutlineMailOpen className="text-blue-500 w-8 h-8" />
+          <Icons.Mail className="text-blue-500 w-8 h-8" />
         </div>
       </div>
 

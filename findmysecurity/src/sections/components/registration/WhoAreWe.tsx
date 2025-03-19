@@ -5,9 +5,11 @@ import { ShieldCheck, User, Building, BookOpen, Briefcase, ArrowLeft } from "luc
 // import Form3 from "./forms/Form3";
 // import Form4 from "./forms/Form4";
 // import Form5 from "./forms/Form5";
+import { useRouter } from "next/navigation";
 import ClientGeneralForm from "./ClientRegistrationForm";
 import SecurityCompanyRegistrationForm from "./SecurityCompanyRegForm";
 import SecurityCompanyForm from "./SecurityCompanyRegForm";
+import BusinessForm from './CorporateForm'
 
 const options = [
   { id: 1, title: "Looking for Security Professional", icon: ShieldCheck, description: "Find trained and verified security professionals for your needs." },
@@ -20,7 +22,7 @@ const options = [
 export default function RegistrationSelector() {
   const [selected, setSelected] = useState<number | null>(null);
   const [step, setStep] = useState(1);
-
+  const router = useRouter();
   // Function to render the correct form based on the selection
   const renderForm = () => {
     switch (selected) {
@@ -28,7 +30,8 @@ export default function RegistrationSelector() {
       case 2: return <ClientGeneralForm id={2} title={'Individual Security Professional'} />;
       case 3: return <SecurityCompanyForm id={3} title={'Security Companies'} />;
       case 4: return  <SecurityCompanyForm id={4} title={'Course Provider'} />;
-      case 5: return <Form5 onNext={() => setStep(2)} />;
+      case 5: return  <BusinessForm id={5} title={'Corporate Clients'} />;
+      // case 5: return <Form5 onNext={() => setStep(2)} />;
       default: return null;
     }
   };
@@ -38,7 +41,7 @@ export default function RegistrationSelector() {
       {/* Back Button */}
       {step === 1 ? (
         <button className="absolute top-10 left-10 flex items-center text-gray-700 hover:text-black text-lg"
-          onClick={() => console.log("Navigate back to login")}>
+        onClick={() => router.push("/signin")}>
           <ArrowLeft className="w-6 h-6 mr-2" />
         </button>
       ) : (
