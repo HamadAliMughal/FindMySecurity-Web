@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Icons from "../../../constants/icons/icons"
+import { useRouter } from "next/navigation";
 
 interface BusinessFormProps {
   id: number;
@@ -9,6 +10,7 @@ interface BusinessFormProps {
 }
 
 const BusinessForm: React.FC<BusinessFormProps> = ({ id, title }) => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     companyName: "",
     registrationNumber: "",
@@ -39,6 +41,11 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ id, title }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
+      // Save form data to localStorage
+      localStorage.setItem("profileData", JSON.stringify(formData));
+
+      // Redirect to profile page
+      router.push("/profile");
   };
 
   const fieldCount = Object.keys(formData).length;

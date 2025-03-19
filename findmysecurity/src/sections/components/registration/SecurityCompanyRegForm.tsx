@@ -3,6 +3,7 @@ import {
   FaBuilding, FaUserTie, FaMapMarkerAlt, FaIndustry, 
   FaEnvelope, FaPhone, FaGlobe, FaClipboardList, FaCheck 
 } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 interface ClientGeneralFormProps {
   id: number;
@@ -10,6 +11,8 @@ interface ClientGeneralFormProps {
 }
 
 const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
+    const router = useRouter();
+  
   const [formData, setFormData] = useState({
     companyName: "",
     registrationNumber: "",
@@ -40,6 +43,11 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
   const handleSubmit = (e: any) => {
     e.preventDefault();
     console.log("Form Data Submitted:", formData);
+          // Save form data to localStorage
+          localStorage.setItem("profileData", JSON.stringify(formData));
+
+          // Redirect to profile page
+          router.push("/profile");
   };
 
   return (
@@ -55,14 +63,14 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
             <input 
               type="text" name="companyName" placeholder="Company Name"
               value={formData.companyName} onChange={handleChange}
-              className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+              className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
               required
             />
           </div>
           <input 
             type="text" name="registrationNumber" placeholder="Registration Number"
             value={formData.registrationNumber} onChange={handleChange}
-            className="w-full pl-3 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+            className="w-full pl-3 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
           />
         </div>
 
@@ -73,14 +81,14 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
             <input 
               type="text" name="address" placeholder="Business Address"
               value={formData.address} onChange={handleChange}
-              className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+              className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
               required
             />
           </div>
           <input 
             type="text" name="postcode" placeholder="Post Code"
             value={formData.postcode} onChange={handleChange}
-            className="w-full pl-3 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+            className="w-full pl-3 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
             required
           />
         </div>
@@ -91,7 +99,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
           <input 
             type="text" name="industryType" placeholder="Industry Type"
             value={formData.industryType} onChange={handleChange}
-            className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+            className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
             required
           />
         </div>
@@ -103,14 +111,14 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
             <input 
               type="text" name="contactPerson" placeholder="Contact Person"
               value={formData.contactPerson} onChange={handleChange}
-              className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+              className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
               required
             />
           </div>
           <input 
             type="text" name="jobTitle" placeholder="Job Title"
             value={formData.jobTitle} onChange={handleChange}
-            className="w-full pl-3 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+            className="w-full pl-3 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
             required
           />
         </div>
@@ -121,7 +129,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
           <input 
             type="email" name="email" placeholder="Email Address"
             value={formData.email} onChange={handleChange}
-            className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+            className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
             required
           />
         </div>
@@ -131,7 +139,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
           <input 
             type="text" name="phone" placeholder="Phone Number"
             value={formData.phone} onChange={handleChange}
-            className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+            className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
             required
           />
         </div>
@@ -141,7 +149,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
           <input 
             type="text" name="website" placeholder="Website (if applicable)"
             value={formData.website} onChange={handleChange}
-            className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+            className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
           />
         </div>
 
@@ -150,14 +158,14 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
           <input 
             type="text" name="service" placeholder="Service Requirements"
             value={formData.serviceRequirements} onChange={handleChange}
-            className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+            className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
           />
         </div>
         {/* Service Offerings & Challenges */}
         <textarea 
           name="serviceOfferings" placeholder="Security Service Offerings"
           value={formData.serviceOfferings} onChange={handleChange}
-          className="w-full p-3 border border-gray-500 rounded-md bg-gray-100 focus:ring-2 focus:ring-black h-24"
+          className="w-full p-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black h-24"
           required
         ></textarea>
 

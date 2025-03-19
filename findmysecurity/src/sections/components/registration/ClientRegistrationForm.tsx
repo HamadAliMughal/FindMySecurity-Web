@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FaUser, FaEnvelope, FaLock, FaMapMarkerAlt, FaCity, FaCodeBranch } from "react-icons/fa";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
+import { useRouter } from "next/navigation";
 
 interface ClientGeneralFormProps {
   id: number;
@@ -10,6 +11,8 @@ interface ClientGeneralFormProps {
 }
 
 const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
+  const router = useRouter();
+
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -44,6 +47,11 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
+       // Save form data to localStorage
+       localStorage.setItem("profileData", JSON.stringify(formData));
+
+       // Redirect to profile page
+       router.push("/profile");
   };
 
   return (
@@ -61,7 +69,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
             onChange={handleChange}
             required
             placeholder="Email Address"
-            className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring focus:ring-blue-300"
+            className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
           />
         </div>
 
@@ -75,7 +83,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
             onChange={handleChange}
             required
             placeholder="Password"
-            className="w-full pl-10 pr-10 py-2 border rounded-md bg-gray-100 focus:ring focus:ring-blue-300"
+            className="w-full pl-10 pr-10 py-2 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
           />
           <button
             type="button"
@@ -96,7 +104,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
               value={formData.firstName}
               onChange={handleChange}
               placeholder="First Name"
-              className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring focus:ring-blue-300"
+              className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
             />
           </div>
           <div className="relative">
@@ -107,7 +115,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
               value={formData.lastName}
               onChange={handleChange}
               placeholder="Last Name"
-              className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring focus:ring-blue-300"
+              className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
             />
           </div>
         </div>
@@ -121,7 +129,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
             value={formData.screenName}
             onChange={handleChange}
             placeholder="Screen Name"
-            className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring focus:ring-blue-300"
+            className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
           />
         </div>
 
