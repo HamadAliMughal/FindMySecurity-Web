@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import "./page-globals.css";
+import {ArrowLeft } from "lucide-react";
 
 const SignIn = () => {
   const router = useRouter();
@@ -15,6 +16,10 @@ const SignIn = () => {
 
   return (
     <div className="flex h-screen justify-center items-center bg-gray-100">
+         <button className="absolute top-10 left-10 flex items-center text-gray-700 hover:text-black text-lg"
+        onClick={() => router.push("/")}>
+          <ArrowLeft className="w-6 h-6 mr-2" />
+        </button>
       <div className="w-96 p-6 bg-white rounded-lg shadow-lg">
         <div className="text-center">
           <h1 className="text-3xl font-bold">SECURITY GUARD</h1>

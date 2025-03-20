@@ -1,6 +1,7 @@
 import { FaDownload, FaLock,FaChartBar,FaFacebookF, FaTwitter, FaInstagram, FaLinkedin, FaYoutube, FaBuilding, FaUserTie, FaMapMarkerAlt, FaIndustry, 
-    FaEnvelope, FaPhone, FaGlobe, FaClipboardList, FaCheck   } from "react-icons/fa";
+    FaEnvelope, FaPhone, FaGlobe, FaClipboardList, FaCheck,FaUser, FaCity, FaCodeBranch    } from "react-icons/fa";
 import { BsFilePost } from "react-icons/bs";
+import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import { HiOutlineMailOpen } from "react-icons/hi";
 import { FcInvite } from "react-icons/fc";
 import { ChevronDown, ChevronRight, Menu, X, Globe,Shield } from "@deemlol/next-icons";
@@ -46,7 +47,9 @@ const Icons = {
 
 // Forms
 FaBuilding, FaUserTie, FaMapMarkerAlt, FaIndustry, 
-FaEnvelope, FaPhone, FaGlobe, FaClipboardList, FaCheck,Globe,Shield
+FaEnvelope, FaPhone, FaGlobe, FaClipboardList, FaCheck,Globe,Shield,FaUser,FaCity,FaCodeBranch,
+
+IoMdEye, IoMdEyeOff 
 };
 
 export default Icons;

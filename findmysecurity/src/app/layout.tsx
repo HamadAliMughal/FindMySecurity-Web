@@ -4,7 +4,7 @@ import "./globals.css"; // Ensure you import global styles
 import Footer from "@/sections/Footer";
 
 export const metadata: Metadata = {
-  title: "My App",
+  title: "FindMySecurity",
   description: "Welcome to my Next.js app",
 };
 
@@ -25,7 +25,7 @@ export default function RootLayout({
         {/* Footer */}
         <footer className="bg-black text-white text-center py-3">
           <Footer/>
-          © {new Date().getFullYear()} My App
+          © {new Date().getFullYear()} Find My Security
         </footer>
       </body>
     </html>

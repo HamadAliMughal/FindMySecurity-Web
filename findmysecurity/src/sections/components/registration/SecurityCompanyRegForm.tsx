@@ -1,8 +1,5 @@
 import { useState } from "react";
-import { 
-  FaBuilding, FaUserTie, FaMapMarkerAlt, FaIndustry, 
-  FaEnvelope, FaPhone, FaGlobe, FaClipboardList, FaCheck 
-} from "react-icons/fa";
+import Icons from "@/constants/icons/icons";
 import { useRouter } from "next/navigation";
 
 interface ClientGeneralFormProps {
@@ -59,7 +56,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
         {/* Company Name & Registration Number */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="relative flex items-center">
-            <FaBuilding className="absolute left-3 text-gray-700" />
+            <Icons.FaBuilding className="absolute left-3 text-gray-700" />
             <input 
               type="text" name="companyName" placeholder="Company Name"
               value={formData.companyName} onChange={handleChange}
@@ -77,7 +74,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
         {/* Address & Postcode */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="relative flex items-center">
-            <FaMapMarkerAlt className="absolute left-3 text-gray-700" />
+            <Icons.FaMapMarkerAlt className="absolute left-3 text-gray-700" />
             <input 
               type="text" name="address" placeholder="Business Address"
               value={formData.address} onChange={handleChange}
@@ -95,7 +92,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
 
         {/* Industry Type */}
         <div className="relative flex items-center">
-          <FaIndustry className="absolute left-3 text-gray-700" />
+          <Icons.FaIndustry className="absolute left-3 text-gray-700" />
           <input 
             type="text" name="industryType" placeholder="Industry Type"
             value={formData.industryType} onChange={handleChange}
@@ -107,7 +104,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
         {/* Contact Person & Job Title */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="relative flex items-center">
-            <FaUserTie className="absolute left-3 text-gray-700" />
+            <Icons.FaUserTie className="absolute left-3 text-gray-700" />
             <input 
               type="text" name="contactPerson" placeholder="Contact Person"
               value={formData.contactPerson} onChange={handleChange}
@@ -125,7 +122,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
 
         {/* Email, Phone, Website */}
         <div className="relative flex items-center">
-          <FaEnvelope className="absolute left-3 text-gray-700" />
+          <Icons.FaEnvelope className="absolute left-3 text-gray-700" />
           <input 
             type="email" name="email" placeholder="Email Address"
             value={formData.email} onChange={handleChange}
@@ -135,7 +132,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
         </div>
 
         <div className="relative flex items-center">
-          <FaPhone className="absolute left-3 text-gray-700" />
+          <Icons.FaPhone className="absolute left-3 text-gray-700" />
           <input 
             type="text" name="phone" placeholder="Phone Number"
             value={formData.phone} onChange={handleChange}
@@ -145,7 +142,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
         </div>
 
         <div className="relative flex items-center">
-          <FaGlobe className="absolute left-3 text-gray-700" />
+          <Icons.FaGlobe className="absolute left-3 text-gray-700" />
           <input 
             type="text" name="website" placeholder="Website (if applicable)"
             value={formData.website} onChange={handleChange}
@@ -154,7 +151,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
         </div>
 
         <div className="relative flex items-center">
-          <FaClipboardList className="absolute left-3 text-gray-700" />
+          <Icons.FaClipboardList className="absolute left-3 text-gray-700" />
           <input 
             type="text" name="service" placeholder="Service Requirements"
             value={formData.serviceRequirements} onChange={handleChange}
@@ -182,7 +179,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title }) =>
 
         {/* Submit Button */}
         <button type="submit" className="w-full bg-black text-white py-3 rounded-md hover:opacity-80 flex items-center justify-center">
-          <FaCheck className="mr-2" /> Submit
+          <Icons.FaCheck className="mr-2" /> Submit
         </button>
 
       </form>

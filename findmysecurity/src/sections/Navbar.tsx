@@ -24,9 +24,21 @@ export default function Navbar() {
     <div className="container mx-auto px-6 py-5 flex items-center justify-between">
     
       {/* Logo */}
-        <Link href="/" className="text-3xl font-bold">
+      
+      <Link href="/" className="flex items-center gap-3 text-3xl font-bold">
+        <img
+          src="/icons/logo.jpg" // Update this path to your logo image
+          alt="Logo"
+          width={40} // Adjust size as needed
+          height={40}
+          className="rounded-md" // Optional styling
+        />
+        <span>FindMySecurity</span>
+      </Link>
+        {/* <Link href="/" className="text-3xl font-bold">
+        
           FindMySecurity
-        </Link>
+        </Link> */}
 
         {/* Mobile Menu Button */}
         <button
