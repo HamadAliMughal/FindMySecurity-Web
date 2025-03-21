@@ -71,8 +71,11 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ id, title }) => {
   }
 
   return (
-    <div className="max-w-4xl mt-5 mx-auto bg-white shadow-lg p-8 rounded-md text-black">
-      <h2 className="text-center text-3xl font-bold mb-6">{title}</h2>
+<div className="max-w-4xl mx-auto md:w-auto w-full bg-white shadow-lg p-8 rounded-md text-black">
+
+
+
+    <h2 className="text-center text-3xl font-bold mb-6">{title}</h2>
       <form onSubmit={handleSubmit} className={gridClass}>
         {/* Form Fields */}
         {[
