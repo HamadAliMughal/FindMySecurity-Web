@@ -1,6 +1,11 @@
+"use client";
+
 import Image from "next/image"; 
+import { useRouter } from "next/navigation";
 
 const BusinessSection = () => {
+  const router = useRouter();
+
   return (
     <section className="flex flex-col-reverse md:flex-row items-center justify-center px-4 sm:px-6 md:px-16 py-10 sm:py-16 bg-white mx-4 md:mx-32">
       
@@ -25,7 +30,7 @@ const BusinessSection = () => {
         </div>
 
         {/* Signup Button */}
-        <button className="mt-6 px-6 py-3 border-2 border-black rounded-full text-black hover:bg-black hover:text-white transition">
+        <button onClick={()=>{router.push("/signup")}} className="mt-6 px-6 py-3 border-2 border-black rounded-full text-black hover:bg-black hover:text-white transition">
           SIGNUP FOR FREE
         </button>
       </div>

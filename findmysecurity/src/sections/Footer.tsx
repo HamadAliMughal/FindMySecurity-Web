@@ -6,14 +6,14 @@ export default function Footer() {
         {/* Logo */}
         <div className="flex justify-left mt-10 mb-15">
           <h2 className="text-2xl font-bold flex items-center">
-          <img
-          src="/icons/logo.jpg" // Update this path to your logo image
-          alt="Logo"
-          width={40} // Adjust size as needed
-          height={40}
-          className="rounded-md" // Optional styling
-        />
-           <span className='ml-2'>FindMySecurity</span>
+            <img
+              src="/icons/logo.jpg" // Update this path to your logo image
+              alt="Logo"
+              width={40} // Adjust size as needed
+              height={40}
+              className="rounded-md" // Optional styling
+            />
+            <span className='ml-2'>FindMySecurity</span>
           </h2>
         </div>
 
@@ -72,12 +72,12 @@ export default function Footer() {
 
         {/* Social Icons */}
         <div className="flex justify-left space-x-6 mt-15">
-  <Icons.Facebook className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
-  <Icons.Twitter className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
-  <Icons.Instagram className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
-  <Icons.Linkedin className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
-  <Icons.Youtube className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
-</div>
+          <Icons.Facebook className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
+          <Icons.Twitter className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
+          <Icons.Instagram className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
+          <Icons.Linkedin className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
+          <Icons.Youtube className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
+        </div>
 
       </div>
     </footer>

@@ -46,16 +46,16 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
-       // Save form data to localStorage
-       localStorage.setItem("profileData", JSON.stringify(formData));
+    // Save form data to localStorage
+    localStorage.setItem("profileData", JSON.stringify(formData));
 
-       // Redirect to profile page
-       router.push("/profile");
+    // Redirect to profile page
+    router.push("/profile");
   };
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-md">
-      <h2 className="text-2xl font-bold text-center mb-4 text-black">Free Registration For {title}</h2>
+      <h2 className="text-2xl font-bold text-center my-4 text-black">Free Registration For {title}</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Email Address */}
@@ -174,7 +174,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
         <div className="flex items-center space-x-2">
           <input type="checkbox" name="receiveEmails" checked={formData.receiveEmails} onChange={handleChange} className="w-4 h-4" />
           <label className="text-sm">
-            Please tick here if you would like to receive occasional <strong>Find4Security</strong> emails and information.
+            Please tick here if you would like to receive occasional <strong>FindMySecurity</strong> emails and information.
           </label>
         </div>
 
