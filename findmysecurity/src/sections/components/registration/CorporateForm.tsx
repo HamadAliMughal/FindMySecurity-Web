@@ -55,7 +55,7 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ id, title }) => {
       <h2 className="text-center text-3xl font-bold mb-6">{title}</h2>
       <form 
         onSubmit={handleSubmit} 
-        className={`grid gap-4 mt-4 grid-cols-1 ${
+        className={`grid gap-4 mt-4 grid-cols-2  ${
             fieldCount % 2 !== 0 ? " md:grid-cols-1 [&>*:last-child]:col-span-2" : ""
           }`}
           
