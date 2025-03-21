@@ -12,23 +12,6 @@ interface BusinessFormProps {
 const BusinessForm: React.FC<BusinessFormProps> = ({ id, title }) => {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
-  // const [formData, setFormData] = useState({
-  //   companyName: "",
-  //   registrationNumber: "",
-  //   address: "",
-  //   postCode: "",
-  //   industryType: "",
-  //   contactPerson: "",
-  //   jobTitle: "",
-  //   email: "",
-  //   phone: "",
-  //   website: "",
-  //   serviceRequirements: "",
-  //   premiumService: "",
-  //   securityChallenges: "",
-  //   receiveEmails: false,
-  //   acceptTerms: false,
-  // });
   const [formData, setFormData] = useState({
     companyName: "",
     registrationNumber: "",
@@ -88,11 +71,6 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ id, title }) => {
   }
 
   return (
-<div className="max-w-4xl mx-auto md:w-auto w-full bg-white shadow-lg p-8 rounded-md text-black">
-
-
-
-    <h2 className="text-center text-3xl font-bold mb-6">{title}</h2>
     <div className="max-w-4xl mt-10 mx-auto bg-white shadow-lg p-8 rounded-md text-black">
       <h2 className="text-center text-3xl font-bold mb-6">{title}</h2>
       <form onSubmit={handleSubmit} className={gridClass}>
@@ -128,30 +106,30 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ id, title }) => {
       <h2 className="text-black font-bold text-lg mt-6">Additional Information</h2>
 
       <div className="grid grid-cols-1 gap-4 mt-4">
-  {/* Premium Services Checkbox */}
-  <label className="flex items-center space-x-2 text-black cursor-pointer">
-    <input
-      type="checkbox"
-      name="premiumService"
-      checked={formData.premiumService}
-      onChange={handleChange}
-      className="w-5 h-5"
-    />
-    <span>Interested in premium service package for enhanced visibility?</span>
-  </label>
+        {/* Premium Services Checkbox */}
+        <label className="flex items-center space-x-2 text-black cursor-pointer">
+          <input
+            type="checkbox"
+            name="premiumService"
+            checked={formData.premiumService}
+            onChange={handleChange}
+            className="w-5 h-5"
+          />
+          <span>Interested in premium service package for enhanced visibility?</span>
+        </label>
 
-  {/* Security Challenges Checkbox */}
-  <label className="flex items-center space-x-2 text-black cursor-pointer">
-    <input
-      type="checkbox"
-      name="securityChallenges"
-      checked={formData.securityChallenges}
-      onChange={handleChange}
-      className="w-5 h-5"
-    />
-    <span>Any specific security challenges or requirements?</span>
-  </label>
-</div>
+        {/* Security Challenges Checkbox */}
+        <label className="flex items-center space-x-2 text-black cursor-pointer">
+          <input
+            type="checkbox"
+            name="securityChallenges"
+            checked={formData.securityChallenges}
+            onChange={handleChange}
+            className="w-5 h-5"
+          />
+          <span>Any specific security challenges or requirements?</span>
+        </label>
+      </div>
 
 
 
