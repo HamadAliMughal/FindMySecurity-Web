@@ -24,7 +24,7 @@ export default function SecurityFeatures() {
   return (
     <section className="py-20 bg-gradient-to-b from-gray-50 to-gray-100">
       {/* Header */}
-      <div className="text-center max-w-3xl mx-auto mb-12">
+      <div className="text-center max-w-3xl mx-auto sm:mx-4 mb-12">
         <h2 className="text-4xl font-extrabold text-gray-900">
           Multiple Solutions on a Single Platform
         </h2>
