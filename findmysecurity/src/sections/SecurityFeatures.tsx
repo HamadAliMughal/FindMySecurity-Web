@@ -41,15 +41,9 @@ export default function SecurityFeatures() {
             return (
               <div
                 key={index}
-                style={{backgroundImage:"url('/images/pattern-1.png')"}}
-                // className="w-54 h-46 p-6 bg-white rounded-xl shadow-lg flex flex-col items-center text-center justify-center transition-all"
+                style={{ backgroundImage: "url('/images/pattern-1.png')" }}
                 className="w-54 h-46 p-6 bg-white rounded-xl shadow-lg flex flex-col items-center text-center justify-center 
              transition-all duration-300 transform hover:-translate-y-2 hover:shadow-xl"
-                // whileHover={{ y: -10, opacity: 1 }}
-                // initial={{ y: 0, opacity: 0 }}
-                // animate={{ opacity: 1 }}
-                // transition={{ duration: 0.5, ease: "easeInOut" }}
-                // whileTap={{ scale: 0.95 }}
               >
                 {/* Icon */}
                 <IconComponent className="w-16 h-16 text-black-600 mb-3" />
