@@ -1,23 +1,26 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Icons from "../constants/icons/icons";
+import { AppWindow, Mail, Users } from "lucide-react";
+import { CgProfile } from "react-icons/cg";
+import { MdReport } from "react-icons/md";
+
 
 const features = [
-  { title: "Invite guards & clients", icon: Icons.Mail },
-  { title: "Manage guard & client profiles", icon: Icons.Profile },
-  { title: "Create multiple teams", icon: Icons.MultipleUsers },
-  { title: "In-app check-in & out", icon: Icons.App },
-  { title: "Create custom reports", icon: Icons.Report },
-  { title: "Submit multiple reports", icon: Icons.SubmitReport },
-  { title: "Share post orders live", icon: Icons.Order },
-  { title: "In-app messenger", icon: Icons.Messenger },
-  { title: "GPS track security guards", icon: Icons.Gps },
-  { title: "Access live notifications", icon: Icons.Notification },
-  { title: "Add & View post orders", icon: Icons.ViewOrder },
-  { title: "Manage time logs easily", icon: Icons.Timer },
-  { title: "Share passdown logs", icon: Icons.Share },
-  { title: "Activate panic button", icon: Icons.PushButton },
+  { title: "Invite guards & clients", icon: Mail },
+  { title: "Manage guard & client profiles", icon: CgProfile },
+  { title: "Create multiple teams", icon: Users },
+  { title: "In-app check-in & out", icon: AppWindow },
+  { title: "Create custom reports", icon: MdReport },
+  // { title: "Submit multiple reports", icon: SubmitReport },
+  // { title: "Share post orders live", icon: Icons.Order },
+  // { title: "In-app messenger", icon: Icons.Messenger },
+  // { title: "GPS track security guards", icon: Icons.Gps },
+  // { title: "Access live notifications", icon: Icons.Notification },
+  // { title: "Add & View post orders", icon: Icons.ViewOrder },
+  // { title: "Manage time logs easily", icon: Icons.Timer },
+  // { title: "Share passdown logs", icon: Icons.Share },
+  // { title: "Activate panic button", icon: Icons.PushButton },
 ];
 
 export default function SecurityFeatures() {

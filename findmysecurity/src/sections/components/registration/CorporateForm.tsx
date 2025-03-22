@@ -1,8 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Icons from "../../../constants/icons/icons";
 import { useRouter } from "next/navigation";
+import { FaBuilding, FaClipboardList, FaIndustry, FaMapMarkerAlt, FaPhone, FaUserTie } from "react-icons/fa";
+import { BsPostcard } from "react-icons/bs";
+import { CgProfile } from "react-icons/cg";
+import { MdReport } from "react-icons/md";
+import { Globe, Mail } from "lucide-react";
 
 interface BusinessFormProps {
   id: number;
@@ -76,17 +80,17 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ id, title }) => {
       <form onSubmit={handleSubmit} className={gridClass}>
         {/* Form Fields */}
         {[
-          { name: "companyName", placeholder: "Enter company name", icon: <Icons.FaBuilding /> },
-          { name: "registrationNumber", placeholder: "Enter registration number", icon: <Icons.FaUserTie /> },
-          { name: "address", placeholder: "Enter address", icon: <Icons.FaMapMarkerAlt /> },
-          { name: "postCode", placeholder: "Enter post code", icon: <Icons.Post /> },
-          { name: "industryType", placeholder: "Enter industry type", icon: <Icons.FaIndustry /> },
-          { name: "contactPerson", placeholder: "Enter contact person", icon: <Icons.Profile /> },
-          { name: "jobTitle", placeholder: "Enter job title", icon: <Icons.Report /> },
-          { name: "email", placeholder: "Enter email", icon: <Icons.Mail />, type: "email" },
-          { name: "phone", placeholder: "Enter phone number", icon: <Icons.FaPhone />, type: "tel" },
-          { name: "website", placeholder: "Enter website URL", icon: <Icons.Globe /> },
-          { name: "serviceRequirements", placeholder: "Enter service requirements", icon: <Icons.FaClipboardList /> },
+          { name: "companyName", placeholder: "Enter company name", icon: <FaBuilding /> },
+          { name: "registrationNumber", placeholder: "Enter registration number", icon: <FaUserTie /> },
+          { name: "address", placeholder: "Enter address", icon: <FaMapMarkerAlt /> },
+          { name: "postCode", placeholder: "Enter post code", icon: <BsPostcard /> },
+          { name: "industryType", placeholder: "Enter industry type", icon: <FaIndustry /> },
+          { name: "contactPerson", placeholder: "Enter contact person", icon: <CgProfile /> },
+          { name: "jobTitle", placeholder: "Enter job title", icon: <MdReport /> },
+          { name: "email", placeholder: "Enter email", icon: <Mail />, type: "email" },
+          { name: "phone", placeholder: "Enter phone number", icon: <FaPhone />, type: "tel" },
+          { name: "website", placeholder: "Enter website URL", icon: <Globe /> },
+          { name: "serviceRequirements", placeholder: "Enter service requirements", icon: <FaClipboardList /> },
         ].map(({ name, placeholder, icon, type = "text" }) => (
           <div key={name} className="flex items-center border p-3 border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black">
             {icon && React.cloneElement(icon, { className: "text-black mr-2", size: 18 })}

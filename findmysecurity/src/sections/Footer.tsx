@@ -1,4 +1,5 @@
-import Icons from '../constants/icons/icons'
+import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter, FaYoutube } from "react-icons/fa";
+
 export default function Footer() {
   return (
     <footer className="bg-black text-white py-10">
@@ -72,11 +73,11 @@ export default function Footer() {
 
         {/* Social Icons */}
         <div className="flex justify-left space-x-6 mt-15">
-          <Icons.Facebook className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
-          <Icons.Twitter className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
-          <Icons.Instagram className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
-          <Icons.Linkedin className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
-          <Icons.Youtube className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
+          <FaFacebook className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
+          <FaTwitter className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
+          <FaInstagram className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
+          <FaLinkedin className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
+          <FaYoutube className="text-xl mr-8 sm:mr-6 md:mr-8 lg:mr-15 hover:text-gray-400 cursor-pointer" />
         </div>
 
       </div>

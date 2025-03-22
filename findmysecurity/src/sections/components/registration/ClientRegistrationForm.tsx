@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Icons from '../../../constants/icons/icons'
+import { LockIcon } from "lucide-react";
+import { FaEnvelope, FaMapMarkerAlt, FaUser } from "react-icons/fa";
+import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 
 interface ClientGeneralFormProps {
   id: number;
@@ -60,7 +62,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Email Address */}
         <div className="relative">
-          <Icons.FaEnvelope className="absolute left-3 top-3 text-gray-500" />
+          <FaEnvelope className="absolute left-3 top-3 text-gray-500" />
           <input
             type="email"
             name="email"
@@ -74,7 +76,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
 
         {/* Password */}
         <div className="relative">
-          <Icons.Lock className="absolute left-3 top-3 text-gray-500" />
+          <LockIcon className="absolute left-3 top-3 text-gray-500" />
           <input
             type={passwordVisible ? "text" : "password"}
             name="password"
@@ -89,14 +91,14 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
             className="absolute right-3 top-3 text-gray-500"
             onClick={() => setPasswordVisible(!passwordVisible)}
           >
-            {passwordVisible ? <Icons.IoMdEyeOff /> : <Icons.IoMdEye />}
+            {passwordVisible ? <IoMdEyeOff /> : <IoMdEye />}
           </button>
         </div>
 
         {/* Name Fields */}
         <div className="grid grid-cols-2 gap-4">
           <div className="relative">
-            <Icons.FaUser className="absolute left-3 top-3 text-gray-500" />
+            <FaUser className="absolute left-3 top-3 text-gray-500" />
             <input
               type="text"
               name="firstName"
@@ -107,7 +109,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
             />
           </div>
           <div className="relative">
-            <Icons.FaUser className="absolute left-3 top-3 text-gray-500" />
+            <FaUser className="absolute left-3 top-3 text-gray-500" />
             <input
               type="text"
               name="lastName"
@@ -121,7 +123,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
 
         {/* Screen Name */}
         <div className="relative">
-          <Icons.FaUser className="absolute left-3 top-3 text-gray-500" />
+          <FaUser className="absolute left-3 top-3 text-gray-500" />
           <input
             type="text"
             name="screenName"
@@ -159,7 +161,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
 
         {/* Address Fields */}
         <div className="relative">
-          <Icons.FaMapMarkerAlt className="absolute left-3 top-3 text-gray-500" />
+          <FaMapMarkerAlt className="absolute left-3 top-3 text-gray-500" />
           <input
             type="text"
             name="addressLine1"

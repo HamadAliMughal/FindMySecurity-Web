@@ -1,8 +1,10 @@
 "use client";
 
+import { Download, Mail } from "lucide-react";
 import Image from "next/image";
-import Icons from "../constants/icons/icons";
+
 import { useRouter } from "next/navigation";
+import { BsPostcard } from "react-icons/bs";
 
 
 const StepsSection = () => {
@@ -27,7 +29,7 @@ const StepsSection = () => {
               Security guard mobile app for guards is available on both the Apple Store and Play Store.
             </p>
           </div>
-          <Icons.Download className="text-black w-8 h-8" />
+          <Download className="text-black w-8 h-8" />
         </div>
 
         {/* Arrow (Only visible in Desktop) */}
@@ -44,7 +46,7 @@ const StepsSection = () => {
               Turn on the GPS of your smartphone to select the location and start adding multiple sites.
             </p>
           </div>
-          <Icons.Post className="text-black w-8 h-8" />
+          <BsPostcard className="text-black w-8 h-8" />
         </div>
 
         {/* Arrow (Only visible in Desktop) */}
@@ -61,7 +63,7 @@ const StepsSection = () => {
               Start inviting security guards to start collaborating and monitoring them seamlessly.
             </p>
           </div>
-          <Icons.Mail className="text-black w-8 h-8" />
+          <Mail className="text-black w-8 h-8" />
         </div>
       </div>
 
