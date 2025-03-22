@@ -1,13 +1,7 @@
 import { useState } from "react";
 import { ShieldCheck, User, Building, BookOpen, Briefcase, ArrowLeft } from "lucide-react";
-// import Form1 from "./forms/Form1"; // Import respective forms
-// import Form2 from "./forms/Form2";
-// import Form3 from "./forms/Form3";
-// import Form4 from "./forms/Form4";
-// import Form5 from "./forms/Form5";
 import { useRouter } from "next/navigation";
 import ClientGeneralForm from "./ClientRegistrationForm";
-import SecurityCompanyRegistrationForm from "./SecurityCompanyRegForm";
 import SecurityCompanyForm from "./SecurityCompanyRegForm";
 import BusinessForm from './CorporateForm'
 
