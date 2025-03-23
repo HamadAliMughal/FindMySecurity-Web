@@ -27,8 +27,8 @@ const UserProfile: React.FC = () => {
 ></div>
 
         <div>
-          <h2 className="text-xl font-semibold">{profileData?.contactPerson || "Mr. Y"}</h2>
-          <p className="text-gray-600">{profileData?.jobTitle || "Security Officer in London"}</p>
+          <h2 className="text-xl font-semibold">{profileData?.result.firstName +" "+ profileData?.result.lastName || "Mr. Y"}</h2>
+          <p className="text-gray-600">{profileData?.result.role.name || "Security Officer in London"}</p>
           <span className="text-sm text-yellow-500">✅ Usually responds within 1 hour</span>
         </div>
       </div>
