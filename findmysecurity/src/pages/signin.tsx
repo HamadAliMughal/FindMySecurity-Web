@@ -28,6 +28,8 @@ const SignIn = () => {
       }else{
         console.log("Login Success:", data.result);
         setSessionToken(data.result.code);
+        alert(data.result.code)
+        localStorage.setItem("loginData",JSON.stringify(data));
         setShow2FA(true);
       }
 
@@ -112,7 +114,6 @@ const SignIn = () => {
           </div>
         </form>
       </div>
-
       {/* Show 2FA popup after login */}
       {show2FA && <TwoFAPopup code1={sessionToken} onVerify={handle2FAVerify} />}
     </div>

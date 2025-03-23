@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { LockIcon } from "lucide-react";
 import { FaEnvelope, FaMapMarkerAlt, FaUser, FaPhone } from "react-icons/fa";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
@@ -13,7 +12,6 @@ interface ClientGeneralFormProps {
 }
 
 const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubmit }) => {
-  const router = useRouter();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [formData, setFormData] = useState({
     email: "",

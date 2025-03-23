@@ -30,15 +30,22 @@ export default function RegistrationSelector() {
         },
         body: JSON.stringify(formData),
       });
-
+      
+      // Log response status and body
+      console.log("Response Status:", response.status);
+      const responseData = await response.json();
+      console.log("Response Data:", responseData);
+      
+      
       if (!response.ok) {
-        throw new Error("Failed to register. Please try again.");
+        throw new Error(responseData.message || "Failed to register. Please try again.");
       }
+      localStorage.setItem("loginData",JSON.stringify(responseData));
+  
+      console.log("Registration Success:", responseData);
 
-      const data = await response.json();
-      console.log("Registration Success:", data);
           // Optional: Store data in localStorage
-      localStorage.setItem("profileData", JSON.stringify(data));
+      localStorage.setItem("profileData", JSON.stringify(responseData));
 
     // Redirect to profile page
     router.push("/profile");

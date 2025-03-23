@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FaUser, FaEnvelope, FaLock, FaMapMarkerAlt, FaCity, FaCodeBranch } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaLock, FaMapMarkerAlt } from "react-icons/fa";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 
 const ClientGeneralForm = () => {

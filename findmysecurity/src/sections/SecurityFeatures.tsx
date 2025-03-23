@@ -1,9 +1,14 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { AppWindow, Mail, Users } from "lucide-react";
 import { CgProfile } from "react-icons/cg";
 import { MdReport } from "react-icons/md";
+import { TbReportAnalytics,TbGps } from "react-icons/tb";
+import { FaFirstOrder } from "react-icons/fa6";
+import { MdOutlineMessage,MdOutlineNotificationsActive,MdStreetview} from "react-icons/md";
+import { SiWondersharefilmora,SiPushbullet } from "react-icons/si";
+
+import { CiTimer } from "react-icons/ci";
 
 
 const features = [
@@ -12,15 +17,15 @@ const features = [
   { title: "Create multiple teams", icon: Users },
   { title: "In-app check-in & out", icon: AppWindow },
   { title: "Create custom reports", icon: MdReport },
-  // { title: "Submit multiple reports", icon: SubmitReport },
-  // { title: "Share post orders live", icon: Icons.Order },
-  // { title: "In-app messenger", icon: Icons.Messenger },
-  // { title: "GPS track security guards", icon: Icons.Gps },
-  // { title: "Access live notifications", icon: Icons.Notification },
-  // { title: "Add & View post orders", icon: Icons.ViewOrder },
-  // { title: "Manage time logs easily", icon: Icons.Timer },
-  // { title: "Share passdown logs", icon: Icons.Share },
-  // { title: "Activate panic button", icon: Icons.PushButton },
+  { title: "Submit multiple reports", icon: TbReportAnalytics},
+  { title: "Share post orders live", icon: FaFirstOrder },
+  { title: "In-app messenger", icon: MdOutlineMessage },
+  { title: "GPS track security guards", icon: TbGps },
+  { title: "Access live notifications", icon: MdOutlineNotificationsActive },
+  { title: "Add & View post orders", icon: MdStreetview },
+  { title: "Manage time logs easily", icon: CiTimer },
+  { title: "Share passdown logs", icon: SiWondersharefilmora },
+  { title: "Activate panic button", icon: SiPushbullet },
 ];
 
 export default function SecurityFeatures() {

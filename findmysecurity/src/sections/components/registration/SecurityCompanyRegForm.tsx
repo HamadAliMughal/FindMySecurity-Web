@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { FaBuilding, FaCheck, FaClipboardList, FaEnvelope, FaGlobe, FaIndustry, FaMapMarkerAlt, FaPhone, FaUserTie } from "react-icons/fa";
 import { LockIcon } from "lucide-react";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
@@ -12,7 +11,6 @@ interface ClientGeneralFormProps {
 }
 
 const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubmit }) => {
-  const router = useRouter();
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   const [formData, setFormData] = useState({
