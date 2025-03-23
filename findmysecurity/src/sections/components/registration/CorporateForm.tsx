@@ -16,6 +16,7 @@ interface BusinessFormProps {
 const BusinessForm: React.FC<BusinessFormProps> = ({ id, title }) => {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
+  
   const [formData, setFormData] = useState({
     companyName: "",
     registrationNumber: "",

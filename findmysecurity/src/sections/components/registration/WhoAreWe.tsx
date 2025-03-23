@@ -1,38 +1,68 @@
 import { useState } from "react";
 import { ShieldCheck, User, Building, BookOpen, Briefcase, ArrowLeft } from "lucide-react";
-// import Form1 from "./forms/Form1"; // Import respective forms
-// import Form2 from "./forms/Form2";
-// import Form3 from "./forms/Form3";
-// import Form4 from "./forms/Form4";
-// import Form5 from "./forms/Form5";
 import { useRouter } from "next/navigation";
 import ClientGeneralForm from "./ClientRegistrationForm";
-import SecurityCompanyRegistrationForm from "./SecurityCompanyRegForm";
 import SecurityCompanyForm from "./SecurityCompanyRegForm";
-import BusinessForm from './CorporateForm'
+import BusinessForm from "./CorporateForm";
 
 const options = [
-  { id: 1, title: "Looking for Security Professional", icon: ShieldCheck, description: "Find trained and verified security professionals for your needs." },
-  { id: 2, title: "Individual Security Professional", icon: User, description: "Register yourself as a security professional and find opportunities." },
-  { id: 3, title: "Security Companies", icon: Building, description: "Register your security company and connect with clients." },
-  { id: 4, title: "Course Provider", icon: BookOpen, description: "Offer security training courses and certifications." },
-  { id: 5, title: "Corporate Clients", icon: Briefcase, description: "Find top security professionals and companies for your business." },
+  { id: 4, title: "Looking for Security Professional", icon: ShieldCheck, description: "Find trained and verified security professionals for your needs." },
+  { id: 3, title: "Individual Security Professional", icon: User, description: "Register yourself as a security professional and find opportunities." },
+  { id: 5, title: "Security Companies", icon: Building, description: "Register your security company and connect with clients." },
+  { id: 6, title: "Course Provider", icon: BookOpen, description: "Offer security training courses and certifications." },
+  { id: 7, title: "Corporate Clients", icon: Briefcase, description: "Find top security professionals and companies for your business." },
 ];
 
 export default function RegistrationSelector() {
   const [selected, setSelected] = useState<number | null>(null);
   const [step, setStep] = useState(1);
   const router = useRouter();
-  // Function to render the correct form based on the selection
+
+  // Function to handle form submission and send data to API
+  const handleFormSubmit = async (formData: any) => {
+  
+
+    try {
+      const response = await fetch("https://findmysecurity-backend.onrender.com/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to register. Please try again.");
+      }
+
+      const data = await response.json();
+      console.log("Registration Success:", data);
+          // Optional: Store data in localStorage
+      localStorage.setItem("profileData", JSON.stringify(data));
+
+    // Redirect to profile page
+    router.push("/profile");
+     // Redirect after success
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  // Function to render the correct form based on selection
   const renderForm = () => {
     switch (selected) {
-      case 1: return <ClientGeneralForm id={1} title={'Looking for Security Professional'} />;
-      case 2: return <ClientGeneralForm id={2} title={'Individual Security Professional'} />;
-      case 3: return <SecurityCompanyForm id={3} title={'Security Companies'} />;
-      case 4: return  <SecurityCompanyForm id={4} title={'Course Provider'} />;
-      case 5: return  <BusinessForm id={5} title={'Corporate Clients'} />;
-      // case 5: return <Form5 onNext={() => setStep(2)} />;
-      default: return null;
+      case 4:
+        return <ClientGeneralForm id={4} title="Looking for Security Professional" onSubmit={handleFormSubmit} />;
+      case 3:
+        return <ClientGeneralForm id={3} title="Individual Security Professional" onSubmit={handleFormSubmit} />;
+      case 5:
+        return <SecurityCompanyForm id={5} title="Security Companies" onSubmit={handleFormSubmit} />;
+      case 6:
+        return <SecurityCompanyForm id={6} title="Course Provider" onSubmit={handleFormSubmit} />;
+      case 7:
+        return <BusinessForm id={7} title="Corporate Clients" onSubmit={handleFormSubmit} />;
+      default:
+        return null;
     }
   };
 
@@ -40,13 +70,11 @@ export default function RegistrationSelector() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-white text-black p-6 relative">
       {/* Back Button */}
       {step === 1 ? (
-        <button className="absolute top-10 left-10 flex items-center text-gray-700 hover:text-black text-lg"
-        onClick={() => router.push("/signin")}>
+        <button className="absolute top-10 left-10 flex items-center text-gray-700 hover:text-black text-lg" onClick={() => router.push("/signin")}>
           <ArrowLeft className="w-6 h-6 mr-2" />
         </button>
       ) : (
-        <button className="absolute top-10 left-10 flex items-center text-gray-700 hover:text-black text-lg"
-          onClick={() => setStep(1)}>
+        <button className="absolute top-10 left-10 flex items-center text-gray-700 hover:text-black text-lg" onClick={() => setStep(1)}>
           <ArrowLeft className="w-6 h-6 mr-2" /> Back
         </button>
       )}
@@ -59,8 +87,13 @@ export default function RegistrationSelector() {
             {options.map((option) => (
               <div
                 key={option.id}
-                className={`p-6 cursor-pointer transition-transform duration-200 ease-in-out rounded-2xl shadow-lg bg-gray-900 hover:scale-105 ${selected === option.id ? "border-4 border-red-600" : ""}`}
-                onClick={() => { setSelected(option.id); setStep(2); }}
+                className={`p-6 cursor-pointer transition-transform duration-200 ease-in-out rounded-2xl shadow-lg bg-gray-900 hover:scale-105 ${
+                  selected === option.id ? "border-4 border-red-600" : ""
+                }`}
+                onClick={() => {
+                  setSelected(option.id);
+                  setStep(2);
+                }}
               >
                 <div className="flex flex-col items-center text-center">
                   <option.icon className="w-12 h-12 text-white mb-4" />

@@ -3,17 +3,17 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LockIcon } from "lucide-react";
-import { FaEnvelope, FaMapMarkerAlt, FaUser } from "react-icons/fa";
+import { FaEnvelope, FaMapMarkerAlt, FaUser, FaPhone } from "react-icons/fa";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 
 interface ClientGeneralFormProps {
   id: number;
   title: string;
+  onSubmit: (data: any) => void; // Callback function to pass data to parent
 }
 
-const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
+const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubmit }) => {
   const router = useRouter();
-
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -21,21 +21,14 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
     firstName: "",
     lastName: "",
     screenName: "",
+    phoneNumber: "",
     dateOfBirth: { day: "", month: "", year: "" },
-    addressLine1: "",
-    addressLine2: "",
-    town: "",
-    postcode: "",
-    receiveEmails: false,
-    acceptTerms: false,
+    address: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-
-    if (e.target instanceof HTMLInputElement && type === "checkbox") {
-      setFormData({ ...formData, [name]: e.target.checked });
-    } else if (["day", "month", "year"].includes(name)) {
+    if (["day", "month", "year"].includes(name)) {
       setFormData({
         ...formData,
         dateOfBirth: { ...formData.dateOfBirth, [name]: value },
@@ -47,12 +40,25 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Save form data to localStorage
-    localStorage.setItem("profileData", JSON.stringify(formData));
 
-    // Redirect to profile page
-    router.push("/profile");
+    const { day, month, year } = formData.dateOfBirth;
+    const formattedDateOfBirth = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+
+    const submissionData = {
+      email: formData.email,
+      password: formData.password,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      screenName: formData.screenName,
+      phoneNumber: formData.phoneNumber,
+      dateOfBirth: formattedDateOfBirth,
+      address: formData.address,
+      permissions: {},
+      roleId: id,
+    };
+
+    // Send data back to the parent component
+    onSubmit(submissionData);
   };
 
   return (
@@ -70,7 +76,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
             onChange={handleChange}
             required
             placeholder="Email Address"
-            className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
+            className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
           />
         </div>
 
@@ -84,7 +90,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
             onChange={handleChange}
             required
             placeholder="Password"
-            className="w-full pl-10 pr-10 py-2 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
+            className="w-full pl-10 pr-10 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
           />
           <button
             type="button"
@@ -105,7 +111,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
               value={formData.firstName}
               onChange={handleChange}
               placeholder="First Name"
-              className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
+              className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
             />
           </div>
           <div className="relative">
@@ -116,7 +122,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
               value={formData.lastName}
               onChange={handleChange}
               placeholder="Last Name"
-              className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
+              className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
             />
           </div>
         </div>
@@ -130,7 +136,20 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
             value={formData.screenName}
             onChange={handleChange}
             placeholder="Screen Name"
-            className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
+            className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+          />
+        </div>
+
+        {/* Phone Number */}
+        <div className="relative">
+          <FaPhone className="absolute left-3 top-3 text-gray-500" />
+          <input
+            type="text"
+            name="phoneNumber"
+            value={formData.phoneNumber}
+            onChange={handleChange}
+            placeholder="Phone Number"
+            className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
           />
         </div>
 
@@ -141,51 +160,35 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title }) => {
             <select name="day" value={formData.dateOfBirth.day} onChange={handleChange} className="w-full px-3 py-2 border rounded-md bg-gray-100">
               <option value="">DD</option>
               {[...Array(31)].map((_, i) => (
-                <option key={i} value={i + 1}>{i + 1}</option>
+                <option key={i} value={String(i + 1)}>{i + 1}</option>
               ))}
             </select>
             <select name="month" value={formData.dateOfBirth.month} onChange={handleChange} className="w-full px-3 py-2 border rounded-md bg-gray-100">
-              <option value="">Month</option>
-              {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((m, i) => (
-                <option key={i} value={i + 1}>{m}</option>
+              <option value="">MM</option>
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                <option key={m} value={String(m)}>{m}</option>
               ))}
             </select>
             <select name="year" value={formData.dateOfBirth.year} onChange={handleChange} className="w-full px-3 py-2 border rounded-md bg-gray-100">
               <option value="">YYYY</option>
               {[...Array(100)].map((_, i) => (
-                <option key={i} value={2024 - i}>{2024 - i}</option>
+                <option key={i} value={String(2024 - i)}>{2024 - i}</option>
               ))}
             </select>
           </div>
         </div>
 
-        {/* Address Fields */}
+        {/* Address */}
         <div className="relative">
           <FaMapMarkerAlt className="absolute left-3 top-3 text-gray-500" />
           <input
             type="text"
-            name="addressLine1"
-            value={formData.addressLine1}
+            name="address"
+            value={formData.address}
             onChange={handleChange}
-            placeholder="Address Line 1"
-            className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100"
+            placeholder="Full Address"
+            className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
           />
-        </div>
-
-        {/* Marketing Emails Checkbox */}
-        <div className="flex items-center space-x-2">
-          <input type="checkbox" name="receiveEmails" checked={formData.receiveEmails} onChange={handleChange} className="w-4 h-4" />
-          <label className="text-sm">
-            Please tick here if you would like to receive occasional <strong>FindMySecurity</strong> emails and information.
-          </label>
-        </div>
-
-        {/* Terms and Conditions Checkbox */}
-        <div className="flex items-center space-x-2">
-          <input type="checkbox" name="acceptTerms" checked={formData.acceptTerms} onChange={handleChange} required className="w-4 h-4" />
-          <label className="text-sm">
-            Please tick here to confirm that you have read our <a href="#" className="text-black underline">Terms and Conditions</a>.
-          </label>
         </div>
 
         {/* Submit Button */}
