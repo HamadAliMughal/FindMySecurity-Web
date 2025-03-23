@@ -6,17 +6,19 @@ import { FaBuilding, FaClipboardList, FaIndustry, FaMapMarkerAlt, FaPhone, FaUse
 import { BsPostcard } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
 import { MdReport } from "react-icons/md";
-import { Globe, Mail } from "lucide-react";
+import { Globe, LockIcon, Mail } from "lucide-react";
+import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 
 interface BusinessFormProps {
   id: number;
   title: string;
+  onSubmit: (data: any) => void;
+
 }
 
-const BusinessForm: React.FC<BusinessFormProps> = ({ id, title }) => {
+const BusinessForm: React.FC<BusinessFormProps> = ({ id, title ,onSubmit }) => {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
-  
   const [formData, setFormData] = useState({
     companyName: "",
     registrationNumber: "",
@@ -25,6 +27,7 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ id, title }) => {
     industryType: "",
     contactPerson: "",
     jobTitle: "",
+    password:"",
     email: "",
     phone: "",
     website: "",
@@ -34,7 +37,7 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ id, title }) => {
     receiveEmails: false,
     acceptTerms: false,
   });
-
+  const [passwordVisible, setPasswordVisible] = useState(false);
   useEffect(() => {
     // Function to detect if the screen is in mobile mode
     const handleResize = () => {
@@ -60,6 +63,37 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ id, title }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const formattedData = {
+      email: formData.email,
+      password: formData.password,
+      firstName: formData.companyName.split(" ")[0],
+      lastName: formData.companyName.split(" ")[1],
+      phoneNumber: formData.phone,
+      companyData: {
+        companyName: formData.companyName,
+        registrationNumber: formData.registrationNumber,
+        address: formData.address,
+        postCode: formData.postCode,
+        industryType: formData.industryType,
+        contactPerson: formData.contactPerson,
+        jobTitle: formData.jobTitle,
+        phoneNumber: formData.phone,
+        website: formData.website,
+      },
+      serviceRequirements: formData.serviceRequirements
+        ? formData.serviceRequirements.split(",").map((item) => item.trim())
+        : [],
+      
+        permissions: {
+          premiumServiceNeed: formData.premiumService,
+          acceptEmails: formData.receiveEmails,
+          acceptTerms: formData.acceptTerms,
+        },
+      roleId: id, // Ensure roleId is assigned correctly
+    };
+
+    console.log("Formatted Data:", formattedData);
+    onSubmit(formattedData);
     console.log("Form submitted:", formData);
     localStorage.setItem("profileData", JSON.stringify(formData));
     router.push("/profile");
@@ -106,7 +140,25 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ id, title }) => {
           </div>
         ))}
       </form>
-
+      <div className="relative">
+          <LockIcon className="absolute left-3 top-3 text-gray-500" />
+          <input
+            type={passwordVisible ? "text" : "password"}
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            placeholder="Password"
+            className="w-full pl-10 pr-10 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+          />
+          <button
+            type="button"
+            className="absolute right-3 top-3 text-gray-500"
+            onClick={() => setPasswordVisible(!passwordVisible)}
+          >
+            {passwordVisible ? <IoMdEyeOff /> : <IoMdEye />}
+          </button>
+        </div>
       {/* Additional Information */}
       <h2 className="text-black font-bold text-lg mt-6">Additional Information</h2>
 
