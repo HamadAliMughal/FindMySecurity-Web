@@ -47,6 +47,7 @@ export function DialogContent({ className, children, onClose }: { className?: st
 export default function TwoFAPopup({ onVerify, code1 }: TwoFAPopupProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [code, setCode] = useState("");
+  const [success , setSuccess] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -60,10 +61,11 @@ export default function TwoFAPopup({ onVerify, code1 }: TwoFAPopupProps) {
     }
     setError("");
     if(code1 != code){
-      setError("Invalid code");
+      setError(`Invalid code ${code1} + ${code}`);
       return;
     }else{
         onVerify(code);
+        setSuccess(true);
         setIsOpen(false);
     }
 
@@ -82,6 +84,7 @@ export default function TwoFAPopup({ onVerify, code1 }: TwoFAPopupProps) {
           aria-label="Enter your 6-digit authentication code"
         />
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+        {success && <p className="text-green-500 text-sm mt-2">{'Verified..Please wait for a while'}</p>}
         <Button onClick={handleVerify} className="mt-4 w-full">
           Verify
         </Button>

@@ -26,8 +26,8 @@ const SignIn = () => {
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }else{
-        console.log("Login Success:", data);
-        setSessionToken(data.code);
+        console.log("Login Success:", data.result);
+        setSessionToken(data.result.code);
         setShow2FA(true);
       }
 
@@ -39,7 +39,14 @@ const SignIn = () => {
   };
 
   const handle2FAVerify = async (code: string) => {
+    if(code===""){
+      setShow2FA(false);
+     
+    }else if(code === sessionToken){
+
+    
  router.push('/profile')
+    }
   };
 
   return (
