@@ -6,7 +6,6 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import "./page-globals.css";
 import WhoAreWe from "@/sections/components/registration/WhoAreWe";
-import Layout from "@/app/layout";
 
 export default function SignupPage() {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -70,7 +69,6 @@ export default function SignupPage() {
     //     </button>
     //   </div>
     // </div>
-    
     <WhoAreWe />
   
   );

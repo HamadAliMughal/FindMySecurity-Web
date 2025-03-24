@@ -52,7 +52,7 @@ const SignIn = () => {
   };
 
   return (
-    <div className="flex h-screen justify-center items-center bg-gray-100">
+<div className="flex h-screen justify-center items-center bg-gray-100">
       <button
         className="absolute top-10 left-10 flex items-center text-gray-700 hover:text-black text-lg"
         onClick={() => router.push("/")}

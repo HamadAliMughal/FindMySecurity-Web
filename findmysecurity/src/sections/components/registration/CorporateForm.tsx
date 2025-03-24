@@ -8,7 +8,6 @@ import { CgProfile } from "react-icons/cg";
 import { MdReport } from "react-icons/md";
 import { Globe, Mail, Lock } from "lucide-react";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
-
 interface BusinessFormProps {
   id: number;
   title: string;

@@ -15,8 +15,8 @@ export default function Navbar() {
     }
   }, []);
   const handleLogout = () => {
-    // localStorage.removeItem("loginData"); // Remove user session
-    localStorage.clear();
+    localStorage.removeItem("loginData"); // Remove user session
+    // localStorage.clear();
     setProfileData(null); // Update state to reflect logout
   };
 

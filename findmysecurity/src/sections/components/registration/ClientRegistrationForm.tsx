@@ -4,7 +4,6 @@ import { useState } from "react";
 import { LockIcon } from "lucide-react";
 import { FaEnvelope, FaMapMarkerAlt, FaUser, FaPhone } from "react-icons/fa";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
-
 interface ClientGeneralFormProps {
   id: number;
   title: string;
