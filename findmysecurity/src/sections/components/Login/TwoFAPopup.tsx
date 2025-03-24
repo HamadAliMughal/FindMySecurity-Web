@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 
 interface TwoFAPopupProps {
   onVerify: (code: string) => void;
-  code1 :any;
+  email :any;
 }
 
 export function Button({ className, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
@@ -44,7 +44,7 @@ export function DialogContent({ className, children, onClose }: { className?: st
   );
 }
 
-export default function TwoFAPopup({ onVerify, code1 }: TwoFAPopupProps) {
+export default function TwoFAPopup({ onVerify, email }: TwoFAPopupProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [code, setCode] = useState("");
   const [success , setSuccess] = useState(false);
@@ -54,23 +54,38 @@ export default function TwoFAPopup({ onVerify, code1 }: TwoFAPopupProps) {
     setIsOpen(true);
   }, []);
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     if (code.length !== 6 || isNaN(Number(code))) {
-      setError("Please enter a valid 4-digit code");
+      setError("Please enter a valid 6-digit code");
       return;
     }
     setError("");
-    if(code1 != code){
-      setError(`Invalid code ${code1} + ${code}`);
-      return;
-    }else{
+  
+    try {
+      const response = await fetch("https://findmysecurity-backend.onrender.com/api/auth/login/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, code }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        console.log("Verification Success:", data);
+        localStorage.setItem("loginData", JSON.stringify(data)); // Store in localStorage
         onVerify(code);
         setSuccess(true);
         setIsOpen(false);
+      } else {
+        setError(data.message || "Verification failed. Please try again.");
+      }
+    } catch (error) {
+      setError("An error occurred. Please try again.");
     }
-
   };
-
+  
   return (
     <Dialog open={isOpen}>
       <DialogContent onClose={() => onVerify("")}>

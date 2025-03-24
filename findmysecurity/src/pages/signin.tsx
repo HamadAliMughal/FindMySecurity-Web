@@ -29,7 +29,7 @@ const SignIn = () => {
         console.log("Login Success:", data.result);
         setSessionToken(data.result.code);
         alert(data.result.code)
-        localStorage.setItem("loginData",JSON.stringify(data));
+       // localStorage.setItem("loginData",JSON.stringify(data));
         setShow2FA(true);
       }
 
@@ -115,7 +115,7 @@ const SignIn = () => {
         </form>
       </div>
       {/* Show 2FA popup after login */}
-      {show2FA && <TwoFAPopup code1={sessionToken} onVerify={handle2FAVerify} />}
+      {show2FA && <TwoFAPopup email={email} onVerify={handle2FAVerify} />}
     </div>
   );
 };
