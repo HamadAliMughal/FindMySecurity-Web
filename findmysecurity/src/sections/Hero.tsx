@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -6,6 +5,7 @@ import { FaChevronDown, FaFilter, FaSearch } from "react-icons/fa";
 import Image from "next/image";
 import lookingForData from "@/sections/data/secuirty_professional.json";
 import searchData from "@/sections/data/hero_section.json";
+import useMobileView from "@/sections/hooks/useMobileView";
 
 interface SearchValues {
   lookingFor: string;
@@ -24,6 +24,7 @@ export default function Hero() {
     postcode: "",
   });
 
+  const isMobile = useMobileView();
   const [selectedLookingFor, setSelectedLookingFor] = useState<string | null>(null);
   const [selectedMainLocation, setSelectedMainLocation] = useState<string | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -68,8 +69,8 @@ export default function Hero() {
       const selectedCategory = lookingForData.find((c) => c.id === selectedLookingFor);
 
       return (
-        <div ref={dropdownRef} className="absolute left-0 top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 flex">
-          <div className="w-64 border-r border-gray-300">
+        <div ref={dropdownRef} className={`absolute top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 ${isMobile ? 'w-full' : 'w-64'} flex`}>
+          <div className="w-full border-b md:border-r md:w-64">
             {lookingForData.map((category) => (
               <div
                 key={category.id}
@@ -82,7 +83,7 @@ export default function Hero() {
           </div>
 
           {selectedCategory?.roles && selectedCategory.roles.length > 0 && (
-            <div className="w-64">
+            <div className="w-full md:w-64">
               {selectedCategory.roles.map((role) => (
                 <div
                   key={role}
@@ -102,8 +103,8 @@ export default function Hero() {
       const selectedLocation = searchData.location.find((l) => l.id === selectedMainLocation);
 
       return (
-        <div ref={dropdownRef} className="absolute left-0 top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 flex">
-          <div className="w-64 border-r border-gray-300">
+        <div ref={dropdownRef} className={`absolute top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 ${isMobile ? 'w-full' : 'w-64'} flex`}>
+          <div className="w-full border-b md:border-r md:w-64">
             {searchData.location.map((location) => (
               <div
                 key={location.id}
@@ -116,7 +117,7 @@ export default function Hero() {
           </div>
 
           {selectedLocation?.subLocations && selectedLocation.subLocations.length > 0 && (
-            <div className="w-64">
+            <div className="w-full md:w-64">
               {selectedLocation.subLocations.map((subLocation) => (
                 <div
                   key={subLocation}
@@ -136,7 +137,7 @@ export default function Hero() {
       const options = field === "jobTitle" ? searchData.jobTitles : searchData.experience;
 
       return (
-        <div ref={dropdownRef} className="absolute left-0 top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 w-64">
+        <div ref={dropdownRef} className={`absolute top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 ${isMobile ? 'w-full' : 'w-64'}`}>
           {options.map((option: string) => (
             <div
               key={option}
@@ -163,7 +164,8 @@ export default function Hero() {
         <h2 className="text-lg font-bold text-gray-800 mb-1">FindMySecurity</h2>
 
         {/* Search Fields - Full Width Line */}
-        <div className="flex flex-wrap w-full gap-4 items-center">
+        <div className={`${isMobile ? 'flex flex-col w-full gap-4' : 'flex flex-wrap w-full gap-4 items-center'} `}>
+
           {["lookingFor", "jobTitle", "experience", "location"].map((field) => (
             (!showAdvanced && field !== "lookingFor") ? null : (
               <div key={field} className="relative flex-2">
@@ -207,6 +209,225 @@ export default function Hero() {
     </section>
   );
 }
+
+
+
+
+
+// "use client";
+
+// import { useState, useEffect, useRef } from "react";
+// import { FaChevronDown, FaFilter, FaSearch } from "react-icons/fa";
+// import Image from "next/image";
+// import lookingForData from "@/sections/data/secuirty_professional.json";
+// import searchData from "@/sections/data/hero_section.json";
+// import useMobileView from "@/sections/hooks/useMobileView";
+// interface SearchValues {
+//   lookingFor: string;
+//   jobTitle: string;
+//   experience: string;
+//   location: string;
+//   postcode: string;
+// }
+
+// export default function Hero() {
+//   const [searchValues, setSearchValues] = useState<SearchValues>({
+//     lookingFor: "",
+//     jobTitle: "",
+//     experience: "",
+//     location: "",
+//     postcode: "",
+//   });
+
+//   const isMobile = useMobileView();
+//   const [selectedLookingFor, setSelectedLookingFor] = useState<string | null>(null);
+//   const [selectedMainLocation, setSelectedMainLocation] = useState<string | null>(null);
+//   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+//   const [showAdvanced, setShowAdvanced] = useState(false);
+//   const dropdownRef = useRef<HTMLDivElement>(null);
+
+//   useEffect(() => {
+//     function handleClickOutside(event: MouseEvent) {
+//       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+//         setOpenDropdown(null);
+//         setSelectedMainLocation(null);
+//         setSelectedLookingFor(null);
+//       }
+//     }
+//     document.addEventListener("mousedown", handleClickOutside);
+//     return () => {
+//       document.removeEventListener("mousedown", handleClickOutside);
+//     };
+
+//   }, []);
+
+//   const handleSelect = (field: keyof SearchValues, value: string) => {
+//     setSearchValues((prevValues) => ({ ...prevValues, [field]: value }));
+//     setOpenDropdown(null);
+//   };
+
+//   const handleLocationSelect = (mainLocation: string, subLocation?: string) => {
+//     const locationValue = subLocation ? `${mainLocation} - ${subLocation}` : mainLocation;
+//     setSearchValues((prevValues) => ({ ...prevValues, location: locationValue }));
+//     setOpenDropdown(null);
+//     setSelectedMainLocation(null);
+//   };
+
+//   const handleLookingForSelect = (category: string, role?: string) => {
+//     const lookingForValue = role ? `${category} - ${role}` : category;
+//     setSearchValues((prevValues) => ({ ...prevValues, lookingFor: lookingForValue }));
+//     setOpenDropdown(null);
+//     setSelectedLookingFor(null);
+//   };
+
+//   const renderDropdown = (field: keyof SearchValues) => {
+//     if (field === "lookingFor") {
+//       const selectedCategory = lookingForData.find((c) => c.id === selectedLookingFor);
+
+//       return (
+//         <div ref={dropdownRef} className="absolute left-0 top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 flex">
+//           <div className="w-64 border-r border-gray-300">
+//             {lookingForData.map((category) => (
+//               <div
+//                 key={category.id}
+//                 className="px-4 py-2 cursor-pointer text-sm hover:bg-gray-800 hover:text-white"
+//                 onClick={() => setSelectedLookingFor(category.id)}
+//               >
+//                 {category.title}
+//               </div>
+//             ))}
+//           </div>
+
+//           {selectedCategory?.roles && selectedCategory.roles.length > 0 && (
+//             <div className="w-64">
+//               {selectedCategory.roles.map((role) => (
+//                 <div
+//                   key={role}
+//                   className="px-4 py-2 hover:bg-gray-800 hover:text-white cursor-pointer text-sm"
+//                   onClick={() => handleLookingForSelect(selectedCategory.title, role)}
+//                 >
+//                   {role}
+//                 </div>
+//               ))}
+//             </div>
+//           )}
+//         </div>
+//       );
+//     }
+
+//     if (field === "location") {
+//       const selectedLocation = searchData.location.find((l) => l.id === selectedMainLocation);
+
+//       return (
+//         <div ref={dropdownRef} className="absolute left-0 top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 flex">
+//           <div className="w-64 border-r border-gray-300">
+//             {searchData.location.map((location) => (
+//               <div
+//                 key={location.id}
+//                 className="px-4 py-2 cursor-pointer text-sm hover:bg-gray-800 hover:text-white"
+//                 onClick={() => setSelectedMainLocation(location.id)}
+//               >
+//                 {location.title}
+//               </div>
+//             ))}
+//           </div>
+
+//           {selectedLocation?.subLocations && selectedLocation.subLocations.length > 0 && (
+//             <div className="w-64">
+//               {selectedLocation.subLocations.map((subLocation) => (
+//                 <div
+//                   key={subLocation}
+//                   className="px-4 py-2 hover:bg-gray-800 hover:text-white cursor-pointer text-sm"
+//                   onClick={() => handleLocationSelect(selectedLocation.title, subLocation)}
+//                 >
+//                   {subLocation}
+//                 </div>
+//               ))}
+//             </div>
+//           )}
+//         </div>
+//       );
+//     }
+
+//     if (field === "jobTitle" || field === "experience") {
+//       const options = field === "jobTitle" ? searchData.jobTitles : searchData.experience;
+
+//       return (
+//         <div ref={dropdownRef} className="absolute left-0 top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 w-64">
+//           {options.map((option: string) => (
+//             <div
+//               key={option}
+//               className="px-4 py-2 hover:bg-gray-800 hover:text-white cursor-pointer text-sm"
+//               onClick={() => handleSelect(field, option)}
+//             >
+//               {option}
+//             </div>
+//           ))}
+//         </div>
+//       );
+//     }
+
+//     return null;
+//   };
+
+//   return (
+//     <section className="relative w-full h-screen flex flex-col items-center justify-center text-center bg-gray-900 text-white px-4 md:px-8">
+//        <div className="absolute inset-0">
+//          <Image src="/images/hero-bg.jpg" alt="Hero Background" layout="fill" objectFit="cover" className="opacity-50" />
+//        </div>
+
+//        <div className="relative bg-gray-300 z-10 p-6 rounded-lg w-full max-w-5xl shadow-xl">
+//         <h2 className="text-lg font-bold text-gray-800 mb-1">FindMySecurity</h2>
+
+//         {/* Search Fields - Full Width Line */}
+//         <div className={`${isMobile ? 'flex flex-col w-full gap-4' : 'flex flex-wrap w-full gap-4 items-center'} `}>
+//         {/* <div className="flex flex-col w-full gap-4 items-center sm:w-full sm:flex-col md:flex-row"> */}
+//         {/* <div className="flex sm:flex-col flex-wrap sm:w-full gap-4"> */}
+
+
+//           {["lookingFor", "jobTitle", "experience", "location"].map((field) => (
+//             (!showAdvanced && field !== "lookingFor") ? null : (
+//               <div key={field} className="relative flex-2">
+//                 <div
+//                   className="flex items-center bg-black text-white px-4 py-2 rounded-lg cursor-pointer hover:shadow-lg w-full"
+//                   onClick={() => setOpenDropdown(field)}
+//                 >
+//                   {searchValues[field as keyof SearchValues] || `${field}`}
+//                   <FaChevronDown className="ml-auto" />
+//                 </div>
+//                 {openDropdown === field && renderDropdown(field as keyof SearchValues)}
+//               </div>
+//             )
+//           ))}
+
+//           {/* Postcode as Input Field */}
+//           <input
+//             type="text"
+//             className="flex-1 px-4 py-2 rounded-lg text-black border border-black w-full focus:outline-none focus:ring-2 focus:ring-black"
+//             placeholder="Postcode"
+//             value={searchValues.postcode}
+//             onChange={(e) => setSearchValues({ ...searchValues, postcode: e.target.value })}
+//           />
+
+//           {/* Go Button */}
+//           <button className="flex items-center px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800">
+//             <FaSearch className="mr-2" />
+//             Go
+//           </button>
+//         </div>
+
+//         {/* Toggle Button at Bottom */}
+//         <button
+//           className="flex items-center px-4 py-2 mt-4 bg-black text-white rounded-lg hover:bg-gray-800"
+//           onClick={() => setShowAdvanced(!showAdvanced)}
+//         >
+//           <FaFilter className="mr-2" />
+//           {showAdvanced ? "Basic Search" : "Advanced Search"}
+//         </button>
+//       </div>
+//     </section>
+//   );
+// }
 
 
 

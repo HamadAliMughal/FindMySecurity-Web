@@ -122,7 +122,7 @@ export default function Navbar() {
           {profileData ? (
             <>
 
-              <button onClick={handleLogout} className="block py-2 text-center hover:text-gray-300">
+              <button onClick={handleLogout} className="block py-2 ml-4 text-center hover:text-gray-300">
                 Logout
               </button>
               <Link href="/profile" className="block py-2 bg-white text-black text-center rounded">
