@@ -1,0 +1,61 @@
+{
+    "title": "Corporate Security Management",
+    "id": "corporate-security-management",
+    "jobTitles": [
+      "Corporate Security Manager",
+      "Executive Protection Officer",
+      "Travel Risk Manager",
+      "Hotel Security Manager",
+      "Bank & Financial Institution Security Manager",
+      "Data Centre Security Manager"
+    ],
+    "experience": ["1-5 Years", "5-10 Years", "10-15 Years", "15+ Years"],
+    "location": [
+      {
+        "title": "North East England",
+        "id": "north-east-england",
+        "subLocations": ["Tyne and Wear", "Durham", "Northumberland", "Teesside"]
+      },
+      {
+        "title": "North West England",
+        "id": "north-west-england",
+        "subLocations": ["Greater Manchester", "Lancashire", "Merseyside", "Cheshire", "Cumbria"]
+      },
+      {
+        "title": "Yorkshire and the Humber",
+        "id": "yorkshire-humber",
+        "subLocations": ["West Yorkshire", "South Yorkshire", "East Riding of Yorkshire", "North Yorkshire"]
+      },
+      {
+        "title": "East Midlands",
+        "id": "east-midlands",
+        "subLocations": ["Derbyshire", "Leicestershire", "Lincolnshire", "Northamptonshire", "Nottinghamshire", "Rutland"]
+      },
+      {
+        "title": "West Midlands",
+        "id": "west-midlands",
+        "subLocations": ["Birmingham", "Coventry", "Staffordshire", "Warwickshire", "Worcestershire"]
+      },
+      {
+        "title": "Greater London",
+        "id": "greater-london",
+        "subLocations": []
+      },
+      {
+        "title": "Scotland",
+        "id": "scotland",
+        "subLocations": ["Glasgow", "Edinburgh", "Aberdeen", "Highlands"]
+      },
+      {
+        "title": "Wales",
+        "id": "wales",
+        "subLocations": ["Cardiff", "Newport", "Swansea"]
+      },
+      {
+        "title": "Northern Ireland",
+        "id": "northern-ireland",
+        "subLocations": ["Belfast", "Derry", "Armagh"]
+      }
+    ]
+  }
+  

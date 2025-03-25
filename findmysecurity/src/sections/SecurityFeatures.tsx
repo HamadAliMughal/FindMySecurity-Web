@@ -42,7 +42,7 @@ export default function SecurityFeatures() {
       </div>
 
       {/* Feature Grid */}
-      <div className="max-w-8xl mx-auto px-10 md:px-20 lg:px-32">
+      <div className="max-w-8xl mx-auto px-10 md:px-20 lg:px-26">
         <div className="flex flex-wrap justify-center gap-6">
           {features.map((feature, index) => {
             const IconComponent = feature.icon;

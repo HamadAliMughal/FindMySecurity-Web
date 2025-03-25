@@ -1,4 +1,7 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   FaMobileAlt,
   FaHome,
@@ -11,8 +14,7 @@ import {
   FaSignOutAlt
 } from "react-icons/fa";
 import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
-import "./page-globals.css";
+import "../globals.css"; 
 
 const UserProfile: React.FC = () => {
   const [profileData, setProfileData] = useState<any>(null);
@@ -27,11 +29,11 @@ const UserProfile: React.FC = () => {
     }
   }, [router]); 
 
-  const handleLogout = () => {
-    localStorage.removeItem("profileData");
-    localStorage.removeItem("loginData");
-    router.push("/"); // Redirect to homepage after logout
-  };
+  // const handleLogout = () => {
+  //   localStorage.removeItem("profileData");
+  //   localStorage.removeItem("loginData");
+  //   router.push("/"); // Redirect to homepage after logout
+  // };
 
   if (!profileData) return null;
 
@@ -135,13 +137,13 @@ const UserProfile: React.FC = () => {
         </div>
 
         {/* Logout Button */}
-        <button
+        {/* <button
           onClick={handleLogout}
           className="mt-6 w-full bg-black text-white px-4 py-2 rounded-lg shadow-md flex items-center justify-center hover:bg-gray-600"
         >
           <FaSignOutAlt className="mr-2" />
           Logout
-        </button>
+        </button> */}
       </div>
     </div>
   );

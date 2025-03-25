@@ -1,0 +1,138 @@
+[
+  {
+    "title": "Physical Security & Manned Guarding Services",
+    "id": "physical-security",
+    "roles": [
+      "General Security",
+      "Retail Security",
+      "Corporate Security",
+      "Door Supervisor Services",
+      "Event Security (Stewards)",
+      "Mobile Patrol Services",
+      "Loss Prevention Services",
+      "Access Control Services",
+      "Estate Security",
+      "University Campus Security",
+      "Hospital Security",
+      "Museum & Art Gallery Security",
+      "Construction Site Security",
+      "Concierge Security Service",
+      "Hotel Security",
+    "Bank & Financial Institution Security"
+    ]
+  },
+  {
+    "title": "Specialist Security Services",
+    "id": "specialist-security",
+    "roles": [
+      "Close Protection Services",
+      "Armed Security Services",
+      "High-Net-Worth Individual (HNWI) Protection Services",
+      "Residential Security Team (RST) Services",
+      "VIP Chauffeur & Security Driver Services",
+      "Counter-Kidnap & Hostage Negotiation Services",
+      "Religious Institution Security Services"
+    ]
+  },
+  {
+    "title": "Surveillance & Monitoring Services",
+    "id": "surveillance-monitoring",
+    "roles": [
+      "CCTV Services",
+      "Security Control Room Services",
+      "Covert Surveillance Services",
+      "Counter-Surveillance Specialist Services"
+    ]
+  },
+  {
+    "title": "Transport & Maritime Security Services",
+    "id": "transport-maritime-security",
+    "roles": [
+      "Maritime Security Services",
+      "Aviation Security Services",
+      "High-Value Goods Escort Services",
+      "Secure Cash Transit Services",
+      "Security Escort Services",
+      "Port Security Services",
+      "Fleet Security Management Services",
+      "Cargo Security Inspection Services",
+      "Railway Security Services",
+      "Travel Security Services"
+    ]
+  },
+  {
+    "title": "Advanced Intelligence & Technical Surveillance Services",
+    "id": "intelligence-surveillance",
+    "roles": [
+      "Technical Surveillance Countermeasures (TSCM) Services",
+      "Open-Source Intelligence (OSINT) Services",
+      "Red Team Security Services",
+      "Tactical Surveillance Services",
+      "Human Intelligence (HUMINT) Services",
+      "Drone Security Services"
+    ]
+  },
+  {
+    "title": "Technical & Network Security Services",
+    "id": "technical-network-security",
+    "roles": [
+      "Cybersecurity Services",
+      "Network Security Services",
+      "Cloud Security Services",
+      "IT Security Audit Services",
+      "Identity and Access Management (IAM) Services",
+      "SCADA Security Services",
+      "Digital Forensics Services",
+      "Incident Response Services",
+      "Blockchain Security Services",
+      "Mobile Security Services",
+      "Industrial Control Systems (ICS) Security Services",
+      "AI & Machine Learning Security Services"
+    ]
+  },
+  {
+    "title": "Public Safety & Law Enforcement Security Services",
+    "id": "public-safety",
+    "roles": [
+      "Police Community Support Services (PCSO)",
+      "Counter-Terrorism Services",
+      "Prison Services",
+      "Border Force Services",
+      "Defence & Military Security Services",
+      "Security Clearance & Vetting Services",
+      "National Security Advisory Services",
+      "Community Safety Services",
+      "Crime Prevention Design Advisory Services (CPDA)",
+      "Cyber Crime Investigation Services",
+      "Interpol & International Security Services",
+      "Risk Consultancy Services",
+      "Security Consultancy Services",
+      "Bailiff Services"
+    ]
+  },
+  {
+    "title": "Access Control Services",
+    "id": "access-control",
+    "roles": [
+      "Biometric Security Services",
+      "Smart Building Security Services",
+      "Security Systems Integration Services",
+      "Alarm & Security Systems Services",
+      "Drones & UAV Security Services"
+    ]
+  },
+  {
+    "title": "Private Investigation & Specialist Services",
+    "id": "private-investigation",
+    "roles": [
+      "Private Investigation Services",
+      "Corporate Investigation Services",
+      "Insurance Fraud Investigation Services",
+      "Undercover Loss Prevention Investigation Services",
+      "Anti-Piracy Security Consultancy Services",
+      "Art & Cultural Asset Protection Services",
+      "Brand Protection Services",
+      "Corporate Fraud Investigation Services"
+    ]
+  }
+]

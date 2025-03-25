@@ -1,0 +1,129 @@
+[
+    {
+      "title": "Physical Security & Manned Guarding",
+      "id": "physical-security",
+      "roles": [
+        "Security Officer",
+        "Retail Security Officer",
+        "Corporate Security Officer",
+        "Door Supervisor",
+        "Event Security Officer",
+        "Mobile Patrol Officer",
+        "Loss Prevention Officer",
+        "Access Control Officer",
+        "Estate Security Officer",
+        "University Campus Security Officer",
+        "Hospital Security Officer",
+        "Museum & Art Gallery Security Officer",
+        "Construction Site Security Officer",
+        "Concierge Security Officer",
+        "Hotel Security Officer",
+        "Bank & Financial Institution Security Officer"
+      ]
+    },
+    {
+      "title": "Specialist Security Roles",
+      "id": "specialist-security",
+      "roles": [
+        "Close Protection Officer (CPO)",
+        "Armed Security Officer",
+        "High-Net-Worth Individual (HNWI) Protection",
+        "Residential Security Team (RST) Member",
+        "VIP Chauffeur & Security Driver",
+        "Counter-Kidnap & Hostage Negotiator",
+        "Religious Institution Security Officer"
+      ]
+    },
+    {
+      "title": "Surveillance & Monitoring",
+      "id": "surveillance-monitoring",
+      "roles": [
+        "CCTV Operator",
+        "Security Control Room Operator",
+        "Covert Surveillance Operative",
+        "Counter-Surveillance Specialist"
+      ]
+    },
+    {
+      "title": "Transport & Maritime Security",
+      "id": "transport-maritime-security",
+      "roles": [
+        "Maritime Security Officer (MSO)",
+        "Aviation Security Officer",
+        "High-Value Goods Escort Officer",
+        "Secure Cash Transit Officer",
+        "Security Escort Officer",
+        "Port Security Officer",
+        "Fleet Security Manager",
+        "Cargo Security Inspector",
+        "Railway Protection Officer",
+        "Travel Risk Officer"
+      ]
+    },
+    {
+      "title": "Cyber Security & Information Security (Coming Soon)",
+      "id": "cyber-security",
+      "roles": [
+        "Cybersecurity Analyst",
+        "Cybersecurity Consultant",
+        "Ethical Hacker / Penetration Tester",
+        "Incident Response Analyst",
+        "Security Operations Centre (SOC) Analyst",
+        "Chief Information Security Officer (CISO)",
+        "Network Security Engineer",
+        "Cloud Security Specialist",
+        "IT Security Auditor",
+        "Risk & Compliance Manager (Cybersecurity)",
+        "Identity and Access Management (IAM) Specialist"
+      ]
+    },
+    {
+      "title": "Risk Management & Consultancy (Coming Soon)",
+      "id": "risk-management",
+      "roles": [
+        "Security Risk Consultant",
+        "Physical Security Consultant",
+        "Risk Mitigation Consultant",
+        "Business Continuity & Resilience Manager",
+        "Threat Intelligence Analyst",
+        "Counter-Terrorism Security Advisor (CTSA)",
+        "Crisis Management Consultant",
+        "Security Auditor",
+        "Fraud Prevention Specialist"
+      ]
+    },
+    {
+      "title": "Private Investigation & Specialist Roles (Coming Soon)",
+      "id": "private-investigation",
+      "roles": [
+        "Private Investigator",
+        "Corporate Investigator",
+        "Insurance Fraud Investigator",
+        "Undercover Security Operative"
+      ]
+    },
+    {
+      "title": "Transport & Logistics Security (Coming Soon)",
+      "id": "transport-security",
+      "roles": [
+        "Aviation Security Officer",
+        "Rail Security Officer",
+        "Port Security Officer",
+        "Logistics & Supply Chain Security Manager",
+        "Security Escort Officer"
+      ]
+    },
+    {
+      "title": "Access Technology & System Specialists (Coming Soon)",
+      "id": "access-technology",
+      "roles": [
+        "Access Control Specialist",
+        "Biometric Security Specialist",
+        "Drone Security Operator",
+        "Alarm & Security Systems Engineer",
+        "Security Systems Integrator",
+        "Fire & Safety Security Officer"
+      ]
+    }
+  ]
+  
