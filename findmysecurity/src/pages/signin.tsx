@@ -61,7 +61,7 @@ const SignIn = () => {
       </button>
       <div className="w-96 p-6 bg-white rounded-lg shadow-lg">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">SECURITY GUARD</h1>
+          <h1 className="text-3xl font-bold">Log In</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-6">

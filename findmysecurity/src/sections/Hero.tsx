@@ -115,7 +115,7 @@ export default function Hero() {
       </div>
 
       <div className="relative bg-gray-300 z-10 p-6 rounded-lg w-full max-w-5xl shadow-xl">
-        <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-1">Find My Security</h2>
+        <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-1">FindMySecurity</h2>
 
         {/* Basic Search */}
         {!showAdvanced && (
@@ -125,8 +125,8 @@ export default function Hero() {
                 className="flex items-center bg-black text-white px-4 py-2 rounded-lg cursor-pointer hover:shadow-lg transition duration-300 min-w-0"
                 onClick={() => setOpenDropdown("lookingFor")}
               >
-                <span className="truncate overflow-hidden whitespace-nowrap text-ellipsis w-full">
-                  {truncateText(searchValues.lookingFor || "Looking For")}
+                <span className="overflow-auto whitespace-normal  break-words w-full">
+                  {(searchValues.lookingFor || "Looking For")}
                 </span>
                 <FaChevronDown className="ml-auto" />
               </div>
@@ -134,17 +134,19 @@ export default function Hero() {
             </div>
 
             <div className="relative w-full sm:w-auto">
-              <div
-                className="flex items-center bg-black text-white px-4 py-2 rounded-lg cursor-pointer hover:shadow-lg transition duration-300 min-w-0"
-                onClick={() => setOpenDropdown("location")}
-              >
-                <span className="truncate overflow-hidden whitespace-nowrap text-ellipsis w-full">
-                  {truncateText(searchValues.location || "Location")}
-                </span>
-                <FaChevronDown className="ml-auto" />
-              </div>
-              {openDropdown === "location" && renderDropdown("location")}
-            </div>
+  <div className="flex items-center bg-black text-white px-4 py-2 rounded-lg cursor-pointer hover:shadow-lg transition duration-300 min-w-0">
+    <input
+      type="text"
+      className="bg-black text-white w-full truncate outline-none border-none placeholder-white"
+      placeholder="Postal Code"
+      value={searchValues.location || ""}
+      onChange={(e) => setSearchValues({ ...searchValues, location: e.target.value })}
+      onClick={() => setOpenDropdown("location")}
+    />
+    
+  </div>
+ 
+</div>
 
             <button className="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-full text-lg font-bold flex justify-center items-center gap-2 hover:shadow-lg transition duration-300">
                Go
@@ -154,31 +156,45 @@ export default function Hero() {
 
         {/* Advanced Search */}
         {showAdvanced && (
-          <div className="mt-3 flex flex-col sm:flex-row flex-wrap gap-4 items-center">
-            {Object.keys(options).map((field) => {
-              const typedField = field as keyof SearchOptions;
-              return (
-                <div key={typedField} className="relative w-full sm:flex-1">
-                  <div
-                    className="flex items-center bg-black text-white px-4 py-2 rounded-lg cursor-pointer hover:shadow-lg transition duration-300 w-full"
-                    onClick={() => setOpenDropdown(typedField)}
-                  >
-                    <span className="truncate overflow-hidden whitespace-nowrap text-ellipsis w-full">
-                      {truncateText(searchValues[typedField] || typedField.replace(/([A-Z])/g, " $1").trim())}
-                    </span>
-                    <FaChevronDown className="ml-auto" />
-                  </div>
-                  {openDropdown === typedField && renderDropdown(typedField)}
-                </div>
-              );
-            })}
+  <div className="mt-3 flex flex-col sm:flex-row flex-wrap gap-4 items-center">
+    {Object.keys(options).map((field) => {
+      const typedField = field as keyof SearchOptions;
 
-            {/* Search Button */}
-            <button className="w-full sm:w-auto bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-full text-lg font-bold flex justify-center items-center gap-2 hover:shadow-lg transition duration-300">
-              Go
-            </button>
+      return typedField === "location" ? (
+        // Render a text input for "location" (renamed to Postal Code)
+        <div key={typedField} className="relative w-full sm:flex-1">
+          <input
+            type="text"
+            className="bg-black text-white px-4 py-2 rounded-lg w-full outline-none border-none placeholder-white"
+            placeholder="Postal Code"
+            value={searchValues[typedField] || ""}
+            onChange={(e) => setSearchValues({ ...searchValues, [typedField]: e.target.value })}
+          />
+        </div>
+      ) : (
+        // Render a dropdown for other fields
+        <div key={typedField} className="relative w-full sm:flex-1">
+          <div
+            className="flex items-center bg-black text-white px-4 py-2 rounded-lg cursor-pointer hover:shadow-lg transition duration-300 w-full"
+            onClick={() => setOpenDropdown(typedField)}
+          >
+            <span className="truncate overflow-hidden whitespace-nowrap text-ellipsis w-full">
+              {truncateText(searchValues[typedField] || typedField.replace(/([A-Z])/g, " $1").trim())}
+            </span>
+            <FaChevronDown className="ml-auto" />
           </div>
-        )}
+          {openDropdown === typedField && renderDropdown(typedField)}
+        </div>
+      );
+    })}
+
+    {/* Search Button */}
+    <button className="w-full sm:w-auto bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-full text-lg font-bold flex justify-center items-center gap-2 hover:shadow-lg transition duration-300">
+      Go
+    </button>
+  </div>
+)}
+
 
         {/* Toggle Button */}
         <button

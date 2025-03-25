@@ -85,12 +85,19 @@ const UserProfile: React.FC = () => {
           <button className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600">
             <FaMobileAlt className="mr-2" /> {profileData?.result?.phoneNumber || "Mobile"}
           </button>
-          <button className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-800">
-            <FaHome className="mr-2" /> {profileData?.result?.address || "Home"}
-          </button>
-          <button className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-800">
-            <FaEnvelope className="mr-2" /> {profileData?.result?.email || "Email"}
-          </button>
+          <div className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-800 min-w-0 whitespace-normal break-words text-center">
+  <FaHome className="mr-2 flex-shrink-0" />
+  <span className="flex-1 break-words text-left">
+    {profileData?.result?.address || profileData?.result.role.address || "Home"}
+  </span>
+</div>
+
+<button className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-800 min-w-max w-full sm:w-auto">
+  <FaEnvelope className="mr-2 flex-shrink-0" />
+  <span className="truncate">{profileData?.result?.email || "Email"}</span>
+</button>
+
+
         </div>
 
         {/* Upgrade Button */}
