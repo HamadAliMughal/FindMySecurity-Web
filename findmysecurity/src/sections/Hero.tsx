@@ -50,12 +50,12 @@ export default function Hero() {
     setOpenDropdown(null);
   };
 
-  const handleLocationSelect = (mainLocation: string, subLocation?: string) => {
-    const locationValue = subLocation ? `${mainLocation} - ${subLocation}` : mainLocation;
-    setSearchValues((prevValues) => ({ ...prevValues, location: locationValue }));
-    setOpenDropdown(null);
-    setSelectedMainLocation(null);
-  };
+  // const handleLocationSelect = (mainLocation: string, subLocation?: string) => {
+  //   const locationValue = subLocation ? `${mainLocation} - ${subLocation}` : mainLocation;
+  //   setSearchValues((prevValues) => ({ ...prevValues, location: locationValue }));
+  //   setOpenDropdown(null);
+  //   setSelectedMainLocation(null);
+  // };
 
   const handleLookingForSelect = (category: string, role?: string) => {
     const lookingForValue = role ? `${category} - ${role}` : category;
@@ -99,39 +99,39 @@ export default function Hero() {
       );
     }
 
-    if (field === "location") {
-      const selectedLocation = searchData.location.find((l) => l.id === selectedMainLocation);
+    // if (field === "location") {
+    //   const selectedLocation = searchData.location.find((l) => l.id === selectedMainLocation);
 
-      return (
-        <div ref={dropdownRef} className={`absolute top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 ${isMobile ? 'w-full' : ''} flex`}>
-          <div className="w-full border-b md:border-r md:w-64">
-            {searchData.location.map((location) => (
-              <div
-                key={location.id}
-                className="px-4 py-2 cursor-pointer text-sm hover:bg-gray-800 hover:text-white"
-                onClick={() => setSelectedMainLocation(location.id)}
-              >
-                {location.title}
-              </div>
-            ))}
-          </div>
+    //   return (
+    //     <div ref={dropdownRef} className={`absolute top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 ${isMobile ? 'w-full' : ''} flex`}>
+    //       <div className="w-full border-b md:border-r md:w-64">
+    //         {searchData.location.map((location) => (
+    //           <div
+    //             key={location.id}
+    //             className="px-4 py-2 cursor-pointer text-sm hover:bg-gray-800 hover:text-white"
+    //             onClick={() => setSelectedMainLocation(location.id)}
+    //           >
+    //             {location.title}
+    //           </div>
+    //         ))}
+    //       </div>
 
-          {selectedLocation?.subLocations && selectedLocation.subLocations.length > 0 && (
-            <div className="w-full md:w-64">
-              {selectedLocation.subLocations.map((subLocation) => (
-                <div
-                  key={subLocation}
-                  className="px-4 py-2 hover:bg-gray-800 hover:text-white cursor-pointer text-sm"
-                  onClick={() => handleLocationSelect(selectedLocation.title, subLocation)}
-                >
-                  {subLocation}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      );
-    }
+    //       {selectedLocation?.subLocations && selectedLocation.subLocations.length > 0 && (
+    //         <div className="w-full md:w-64">
+    //           {selectedLocation.subLocations.map((subLocation) => (
+    //             <div
+    //               key={subLocation}
+    //               className="px-4 py-2 hover:bg-gray-800 hover:text-white cursor-pointer text-sm"
+    //               onClick={() => handleLocationSelect(selectedLocation.title, subLocation)}
+    //             >
+    //               {subLocation}
+    //             </div>
+    //           ))}
+    //         </div>
+    //       )}
+    //     </div>
+    //   );
+    // }
 
     if (field === "jobTitle" || field === "experience") {
       const options = field === "jobTitle" ? searchData.jobTitles : searchData.experience;
@@ -166,7 +166,9 @@ export default function Hero() {
         {/* Search Fields - Full Width Line */}
         <div className={`${isMobile ? 'flex flex-col w-full gap-4' : 'flex flex-wrap w-full gap-4 items-center'} `}>
 
-          {["lookingFor", "jobTitle", "experience", "location"].map((field) => (
+          {["lookingFor", "jobTitle", "experience",
+          //  "location"
+          ].map((field) => (
             (!showAdvanced && field !== "lookingFor") ? null : (
               <div key={field} className="relative flex-2">
                 <div
