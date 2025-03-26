@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { UserCircle } from "@phosphor-icons/react";
-import { Cross, Lock, Menu, LogOut,User  } from "lucide-react";
+import { UserCircle,UserPlus  } from "@phosphor-icons/react";
+import { Cross, Lock, Menu, LogOut  } from "lucide-react";
 import { useRouter } from 'next/navigation'
 import ResourcesDropdown from "./Navbar_Menus/ResourcesDropdown";
 import DynamicDropdown from "./Navbar_Menus/DynamicDropdown";
@@ -105,14 +105,26 @@ export default function Navbar() {
           : (
             <>
               <div className="hidden md:flex items-center space-x-4">
-                <Link href="/signup" className="bg-white text-black px-4 py-1 font-bold rounded-full text-center ease-in-out hover:bg-gray-200">
+                {/* <Link href="/signup" className="bg-white text-black px-4 py-1 font-bold rounded-full text-center ease-in-out hover:bg-gray-200">
                   Sign Up
-                </Link>
-
+                </Link> */}
+ 
                 <Link href="/signin" className="text-white flex items-center space-x-2 ease-in-out hover:text-gray-200">
                   <Lock className="h-4 w-4" />
                   <span className="font-bold">Web Login</span>
                 </Link>
+                <Link
+      href="/signup"
+      className="relative flex items-center text-white rounded-full transition-all duration-300 hover:bg-gray-100 group "
+    >
+      {/* Signup Icon */}
+      <UserPlus size={32} weight="fill" className="text-white transition-all duration-300 group-hover:text-gray-700" />
+
+      {/* Hover Tooltip */}
+      <span className="absolute left-full ml-1 px-1 py-1 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-lg opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 whitespace-nowrap">
+        Signup
+      </span>
+    </Link>
               </div>
 
             </>

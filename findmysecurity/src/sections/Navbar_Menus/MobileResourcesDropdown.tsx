@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 
 const whatWeDo = [
+  { title: "What we do", id: "what-we-do", link: "/what-we-do" },
   { title: "Our Company", id: "our-company", link: "/our-company" },
   { title: "Sustainability", id: "sustainability", link: "/sustainability" },
   { title: "News & Events", id: "news-events", link: "/news-events" },

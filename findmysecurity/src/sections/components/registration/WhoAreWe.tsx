@@ -7,10 +7,10 @@ import BusinessForm from "./CorporateForm";
 
 const options = [
   { id: 4, title: "Looking for Security Professional", icon: ShieldCheck, description: "Find trained and verified security professionals for your needs." },
-  { id: 3, title: "Security Professional", icon: User, description: "Register yourself as a security professional and find opportunities." },
+  { id: 3, title: "Security Professionals", icon: User, description: "Register yourself as a security professional and find opportunities." },
   { id: 5, title: "Security Companies", icon: Building, description: "Register your security company and connect with clients." },
-  { id: 6, title: "Training Provider", icon: BookOpen, description: "Offer security training courses and certifications." },
-  { id: 7, title: "Business Client", icon: Briefcase, description: "Find top security professionals and companies for your business." },
+  { id: 6, title: "Training Providers", icon: BookOpen, description: "Offer security training courses and certifications." },
+  { id: 7, title: "Businesses", icon: Briefcase, description: "Find top security professionals and companies for your business." },
 ];
 
 export default function RegistrationSelector() {
