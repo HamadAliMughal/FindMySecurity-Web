@@ -69,7 +69,7 @@ export default function Hero() {
       const selectedCategory = lookingForData.find((c) => c.id === selectedLookingFor);
 
       return (
-        <div ref={dropdownRef} className={`absolute top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 ${isMobile ? 'w-full' : 'w-64'} flex`}>
+        <div ref={dropdownRef} className={`absolute top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 ${isMobile ? 'w-full' : ''} flex`}>
           <div className="w-full border-b md:border-r md:w-64">
             {lookingForData.map((category) => (
               <div
@@ -103,7 +103,7 @@ export default function Hero() {
       const selectedLocation = searchData.location.find((l) => l.id === selectedMainLocation);
 
       return (
-        <div ref={dropdownRef} className={`absolute top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 ${isMobile ? 'w-full' : 'w-64'} flex`}>
+        <div ref={dropdownRef} className={`absolute top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 ${isMobile ? 'w-full' : ''} flex`}>
           <div className="w-full border-b md:border-r md:w-64">
             {searchData.location.map((location) => (
               <div
@@ -137,11 +137,11 @@ export default function Hero() {
       const options = field === "jobTitle" ? searchData.jobTitles : searchData.experience;
 
       return (
-        <div ref={dropdownRef} className={`absolute top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 ${isMobile ? 'w-full' : 'w-64'}`}>
+        <div ref={dropdownRef} className={`absolute top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 ${isMobile ? 'w-11/12' : 'w-64'}`}>
           {options.map((option: string) => (
             <div
               key={option}
-              className="px-4 py-2 hover:bg-gray-800 hover:text-white cursor-pointer text-sm"
+              className="px-4 py-2 hover:bg-gray-800 hover:text-white cursor-pointer text-sm md:w-64"
               onClick={() => handleSelect(field, option)}
             >
               {option}
