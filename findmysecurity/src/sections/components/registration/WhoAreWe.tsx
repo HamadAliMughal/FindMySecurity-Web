@@ -18,7 +18,6 @@ export default function RegistrationSelector() {
   const [step, setStep] = useState(1);
   const router = useRouter();
 
-  // Function to handle form submission and send data to API
   const handleFormSubmit = async (formData: any) => {
   
 
