@@ -167,6 +167,10 @@ export default function Hero() {
         <div className={`${isMobile ? 'flex flex-col w-full gap-4' : 'flex flex-wrap w-full gap-4 items-center'} `}>
 
           {["lookingFor", "jobTitle", "experience",
+<<<<<<< HEAD
+=======
+          //  "location"
+>>>>>>> test
           ].map((field) => (
             (!showAdvanced && field !== "lookingFor") ? null : (
               <div key={field} className="relative flex-2">
