@@ -9,7 +9,8 @@ import useMobileView from "@/sections/hooks/useMobileView";
 
 interface SearchValues {
   lookingFor: string;
-  jobTitle: string;
+  subCategory: string;
+  distance: string;
   experience: string;
   location: string;
   postcode: string;
@@ -18,15 +19,15 @@ interface SearchValues {
 export default function Hero() {
   const [searchValues, setSearchValues] = useState<SearchValues>({
     lookingFor: "",
-    jobTitle: "",
+    subCategory: "",
+    distance: "",
     experience: "",
     location: "",
     postcode: "",
   });
 
   const isMobile = useMobileView();
-  const [selectedLookingFor, setSelectedLookingFor] = useState<string | null>(null);
-  const [selectedMainLocation, setSelectedMainLocation] = useState<string | null>(null);
+  const [selectedMainCategory, setSelectedMainCategory] = useState<string | null>(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -35,8 +36,6 @@ export default function Hero() {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setOpenDropdown(null);
-        setSelectedMainLocation(null);
-        setSelectedLookingFor(null);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -45,145 +44,131 @@ export default function Hero() {
     };
   }, []);
 
+  // Handle dropdown selection
   const handleSelect = (field: keyof SearchValues, value: string) => {
-    setSearchValues((prevValues) => ({ ...prevValues, [field]: value }));
+    setSearchValues((prev) => ({ ...prev, [field]: value }));
     setOpenDropdown(null);
   };
 
-  // const handleLocationSelect = (mainLocation: string, subLocation?: string) => {
-  //   const locationValue = subLocation ? `${mainLocation} - ${subLocation}` : mainLocation;
-  //   setSearchValues((prevValues) => ({ ...prevValues, location: locationValue }));
-  //   setOpenDropdown(null);
-  //   setSelectedMainLocation(null);
-  // };
-
-  const handleLookingForSelect = (category: string, role?: string) => {
-    const lookingForValue = role ? `${category} - ${role}` : category;
-    setSearchValues((prevValues) => ({ ...prevValues, lookingFor: lookingForValue }));
-    setOpenDropdown(null);
-    setSelectedLookingFor(null);
-  };
-
+  // Render dropdown options
   const renderDropdown = (field: keyof SearchValues) => {
+    let options: string[] = [];
+
     if (field === "lookingFor") {
-      const selectedCategory = lookingForData.find((c) => c.id === selectedLookingFor);
-
       return (
-        <div ref={dropdownRef} className={`absolute top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 ${isMobile ? 'w-full' : ''} flex`}>
-          <div className="w-full border-b md:border-r md:w-64">
-            {lookingForData.map((category) => (
-              <div
-                key={category.id}
-                className="px-4 py-2 cursor-pointer text-sm hover:bg-gray-800 hover:text-white"
-                onClick={() => setSelectedLookingFor(category.id)}
-              >
-                {category.title}
-              </div>
-            ))}
-          </div>
-
-          {selectedCategory?.roles && selectedCategory.roles.length > 0 && (
-            <div className="w-full md:w-64">
-              {selectedCategory.roles.map((role) => (
-                <div
-                  key={role}
-                  className="px-4 py-2 hover:bg-gray-800 hover:text-white cursor-pointer text-sm"
-                  onClick={() => handleLookingForSelect(selectedCategory.title, role)}
-                >
-                  {role}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    // if (field === "location") {
-    //   const selectedLocation = searchData.location.find((l) => l.id === selectedMainLocation);
-
-    //   return (
-    //     <div ref={dropdownRef} className={`absolute top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 ${isMobile ? 'w-full' : ''} flex`}>
-    //       <div className="w-full border-b md:border-r md:w-64">
-    //         {searchData.location.map((location) => (
-    //           <div
-    //             key={location.id}
-    //             className="px-4 py-2 cursor-pointer text-sm hover:bg-gray-800 hover:text-white"
-    //             onClick={() => setSelectedMainLocation(location.id)}
-    //           >
-    //             {location.title}
-    //           </div>
-    //         ))}
-    //       </div>
-
-    //       {selectedLocation?.subLocations && selectedLocation.subLocations.length > 0 && (
-    //         <div className="w-full md:w-64">
-    //           {selectedLocation.subLocations.map((subLocation) => (
-    //             <div
-    //               key={subLocation}
-    //               className="px-4 py-2 hover:bg-gray-800 hover:text-white cursor-pointer text-sm"
-    //               onClick={() => handleLocationSelect(selectedLocation.title, subLocation)}
-    //             >
-    //               {subLocation}
-    //             </div>
-    //           ))}
-    //         </div>
-    //       )}
-    //     </div>
-    //   );
-    // }
-
-    if (field === "jobTitle" || field === "experience") {
-      const options = field === "jobTitle" ? searchData.jobTitles : searchData.experience;
-
-      return (
-        <div ref={dropdownRef} className={`absolute top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 ${isMobile ? 'w-11/12' : 'w-64'}`}>
-          {options.map((option: string) => (
+        <div ref={dropdownRef} className="absolute top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 w-64">
+          {lookingForData.map((category) => (
             <div
-              key={option}
-              className="px-4 py-2 hover:bg-gray-800 hover:text-white cursor-pointer text-sm md:w-64"
-              onClick={() => handleSelect(field, option)}
+              key={category.id}
+              className="px-4 py-2 cursor-pointer text-sm hover:bg-gray-800 hover:text-white"
+              onClick={() => {
+                setSearchValues((prev) => ({ ...prev, lookingFor: category.title, subCategory: "" }));
+                setSelectedMainCategory(category.title);
+                setOpenDropdown(null);
+              }}
             >
-              {option}
+              {category.title}
             </div>
           ))}
         </div>
       );
     }
 
-    return null;
+    if (field === "subCategory") {
+      const selectedCategory = lookingForData.find((c) => c.title === selectedMainCategory);
+      options = selectedCategory?.roles || [];
+    }
+
+    if (field === "distance") {
+      options = searchData.distance; // Assuming `distance` array is in hero_section.json
+    }
+
+    if (field === "experience") {
+      options = searchData.experience;
+    }
+
+    if (!options.length) return null;
+
+    return (
+      <div ref={dropdownRef} className="absolute top-10 bg-white text-black rounded shadow-lg z-50 border border-gray-300 w-64">
+        {options.map((option) => (
+          <div
+            key={option}
+            className="px-4 py-2 hover:bg-gray-800 hover:text-white cursor-pointer text-sm"
+            onClick={() => handleSelect(field, option)}
+          >
+            {option}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
     <section className="relative w-full h-screen flex flex-col items-center justify-center text-center bg-gray-900 text-white px-4 md:px-8">
-       <div className="absolute inset-0">
-         <Image src="/images/hero-bg.jpg" alt="Hero Background" layout="fill" objectFit="cover" className="opacity-50" />
-       </div>
+      <div className="absolute inset-0">
+        <Image src="/images/hero-bg.jpg" alt="Hero Background" layout="fill" objectFit="cover" className="opacity-50" />
+      </div>
 
-       <div className="relative bg-gray-300 z-10 p-6 rounded-lg w-full max-w-5xl shadow-xl">
+      <div className="relative bg-gray-300 z-10 p-6 rounded-lg w-full max-w-5xl shadow-xl">
         <h2 className="text-lg font-bold text-gray-800 mb-1">FindMySecurity</h2>
 
-        {/* Search Fields - Full Width Line */}
-        <div className={`${isMobile ? 'flex flex-col w-full gap-4' : 'flex flex-wrap w-full gap-4 items-center'} `}>
+        {/* Search Fields */}
+        <div className={`${isMobile ? "flex flex-col w-full gap-4" : "flex flex-wrap w-full gap-4 items-center"} `}>
 
-          {["lookingFor", "jobTitle", "experience",
-          //  "location"
-          ].map((field) => (
-            (!showAdvanced && field !== "lookingFor") ? null : (
-              <div key={field} className="relative flex-2">
-                <div
-                  className="flex items-center bg-black text-white px-4 py-2 rounded-lg cursor-pointer hover:shadow-lg w-full"
-                  onClick={() => setOpenDropdown(field)}
-                >
-                  {searchValues[field as keyof SearchValues] || `${field}`}
-                  <FaChevronDown className="ml-auto" />
-                </div>
-                {openDropdown === field && renderDropdown(field as keyof SearchValues)}
+          {/* Main Category Dropdown */}
+          <div className="relative flex-2">
+            <div
+              className="flex items-center bg-black text-white px-4 py-2 rounded-lg cursor-pointer hover:shadow-lg w-full"
+              onClick={() => setOpenDropdown("lookingFor")}
+            >
+              {searchValues.lookingFor || "Looking For"}
+              <FaChevronDown className="ml-auto" />
+            </div>
+            {openDropdown === "lookingFor" && renderDropdown("lookingFor")}
+          </div>
+
+          {/* Subcategory Dropdown (Always Visible) */}
+          <div className="relative flex-2">
+            <div
+              className="flex items-center bg-black text-white px-4 py-2 rounded-lg cursor-pointer hover:shadow-lg w-full"
+              onClick={() => setOpenDropdown("subCategory")}
+            >
+              {searchValues.subCategory || "Subcategory"}
+              <FaChevronDown className="ml-auto" />
+            </div>
+            {openDropdown === "subCategory" && renderDropdown("subCategory")}
+          </div>
+
+          {/* Distance (Replaces Job Title) - Only in Advanced Search */}
+          {showAdvanced && (
+            <div className="relative flex-2">
+              <div
+                className="flex items-center bg-black text-white px-4 py-2 rounded-lg cursor-pointer hover:shadow-lg w-full"
+                onClick={() => setOpenDropdown("distance")}
+              >
+                {searchValues.distance || "Distance"}
+                <FaChevronDown className="ml-auto" />
               </div>
-            )
-          ))}
+              {openDropdown === "distance" && renderDropdown("distance")}
+            </div>
+          )}
 
-          {/* Postcode as Input Field */}
+          {/* Experience (Only in Advanced Search) */}
+          {showAdvanced && (
+            <div className="relative flex-2">
+              <div
+                className="flex items-center bg-black text-white px-4 py-2 rounded-lg cursor-pointer hover:shadow-lg w-full"
+                onClick={() => setOpenDropdown("experience")}
+              >
+                {searchValues.experience || "Experience"}
+                <FaChevronDown className="ml-auto" />
+              </div>
+              {openDropdown === "experience" && renderDropdown("experience")}
+            </div>
+          )}
+
+          {/* Postcode Input Field */}
           <input
             type="text"
             className="flex-1 px-4 py-2 rounded-lg text-black border border-black w-full focus:outline-none focus:ring-2 focus:ring-black"
@@ -199,7 +184,7 @@ export default function Hero() {
           </button>
         </div>
 
-        {/* Toggle Button at Bottom */}
+        {/* Toggle Button for Advanced Search */}
         <button
           className="flex items-center px-4 py-2 mt-4 bg-black text-white rounded-lg hover:bg-gray-800"
           onClick={() => setShowAdvanced(!showAdvanced)}
@@ -211,8 +196,6 @@ export default function Hero() {
     </section>
   );
 }
-
-
 
 
 

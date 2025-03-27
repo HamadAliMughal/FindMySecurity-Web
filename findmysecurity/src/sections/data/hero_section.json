@@ -1,13 +1,12 @@
 {
     "title": "Corporate Security Management",
     "id": "corporate-security-management",
-    "jobTitles": [
-      "Corporate Security Manager",
-      "Executive Protection Officer",
-      "Travel Risk Manager",
-      "Hotel Security Manager",
-      "Bank & Financial Institution Security Manager",
-      "Data Centre Security Manager"
+    "distance": [
+      "Up to : 5 miles",
+      "10 miles",
+      "20 miles",
+      "50 miles", 
+      "Nationwide"
     ],
     "experience": ["1-5 Years", "5-10 Years", "10-15 Years", "15+ Years"],
     "location": [
