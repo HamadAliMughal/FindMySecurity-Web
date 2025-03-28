@@ -1,0 +1,2 @@
+path/to/largefile filter=lfs diff=lfs merge=lfs -text
+H:/G[[:space:]]Drive/Client[[:space:]]Security[[:space:]]Project/27-onward/FindMySecurity-Web/findmysecurity/public/images filter=lfs diff=lfs merge=lfs -text
