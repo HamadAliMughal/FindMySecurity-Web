@@ -22,7 +22,7 @@ const MobileResourcesDropdown = () => {
         onClick={() => setOpenDropdown(!openDropdown)}
       >
         Resources
-        <ChevronDown className={`h-2 w-2 transition-transform ${openDropdown ? "rotate-180" : ""}`} />
+        <ChevronDown className={`h-5 w-5 transition-transform  ${openDropdown ? "rotate-180" : ""}`} />
       </button>
 
       {/* Dropdown Content */}

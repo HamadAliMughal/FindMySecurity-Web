@@ -133,7 +133,11 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-black text-white p-4">
+        <div 
+        
+        className="md:hidden bg-black text-white p-4 max-h-[90vh] overflow-y-auto"
+        // className="md:hidden bg-black text-white p-4"
+        >
 
           {/* Solution Dropdown */}
           <MobileDynamicDropdown jsonFile="secuirty_professional.json" title="Security Professionals" basePath="/professionals/" />
