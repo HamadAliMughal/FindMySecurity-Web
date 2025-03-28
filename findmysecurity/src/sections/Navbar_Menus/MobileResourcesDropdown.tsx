@@ -3,12 +3,12 @@ import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 
 const whatWeDo = [
+  { title: "Our Purpose", id: "our-purpose", link: "/our-purpose" },
+  { title: "Our Values", id: "our-values", link: "/our-values" },
+  { title: "Who We Are", id: "who-we-are", link: "/who-we-are" },
   { title: "What we do", id: "what-we-do", link: "/what-we-do" },
-  { title: "Our Company", id: "our-company", link: "/our-company" },
-  { title: "Sustainability", id: "sustainability", link: "/sustainability" },
-  { title: "News & Events", id: "news-events", link: "/news-events" },
-  { title: "Careers", id: "careers", link: "/careers" },
-  { title: "Investors", id: "investors", link: "/investors" },
+  { title: "Contact US ", id: "contact-us ", link: "/contact-us" },
+  { title: "Customer Service", id: "customers-service", link: "/customers-service" },
 ];
 
 const MobileResourcesDropdown = () => {

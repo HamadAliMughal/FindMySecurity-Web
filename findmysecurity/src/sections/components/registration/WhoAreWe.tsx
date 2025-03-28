@@ -10,7 +10,7 @@ const options = [
   { id: 3, title: "Security Professionals", icon: User, description: "Register yourself as a security professional and find opportunities." },
   { id: 5, title: "Security Companies", icon: Building, description: "Register your security company and connect with clients." },
   { id: 6, title: "Training Providers", icon: BookOpen, description: "Offer security training courses and certifications." },
-  { id: 7, title: "Businesses", icon: Briefcase, description: "Find top security professionals and companies for your business." },
+  { id: 7, title: "Businesses", icon: Briefcase, description: "Discover top-tier security professionals, companies, and training providers tailored to your specific needs." },
 ];
 
 export default function RegistrationSelector() {

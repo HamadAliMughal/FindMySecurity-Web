@@ -71,7 +71,7 @@ const DynamicDropdown: React.FC<DropdownProps> = ({ jsonFile, title, basePath })
                 className="block w-full text-left px-4 py-2 hover:bg-gray-200 flex justify-between items-center"
                 onClick={(e) => handleCategoryClick(category.id, e)}
               >
-                {category.title} <ChevronRight className="h-5 w-5" />
+                {category.title} <ChevronRight className="h-5 w-5 ml-1" />
               </button>
 
               {openSubDropdown === category.id && (
