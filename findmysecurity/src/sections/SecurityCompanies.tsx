@@ -6,14 +6,14 @@ import searchData from "@/sections/data/hero_section.json";
 
 const features = [
   { title: "Physical Security & Manned Guarding Services", image: "/images/sec_companies_pic1.jpg" },
-  { title: "Specialist Security Services", image: "/images/sec_companies_pic1.jpg" },
-  { title: "Serveillance & Monitoring Services", image: "/images/sec_companies_pic1.jpg" },
-  { title: "Transport & Maritime Security Services", image: "/images/sec_companies_pic1.jpg" },
-  { title: "Advanced Intelligence & Technical Serveillance Services", image: "/images/sec_companies_pic1.jpg" },
-  { title: "Technical &  Network Security Services", image: "/images/sec_companies_pic1.jpg" },
-  { title: "Public Safety & Law Enforcement Security Services", image: "/images/sec_companies_pic1.jpg" },
-  { title: "Access Control Specialist", image: "/images/sec_companies_pic1.jpg" },
-  { title: "Private Investigation & Specialist Services", image: "/images/sec_companies_pic1.jpg" },
+  { title: "Specialist Security Services", image: "/images/sec_companies_pic2.jpg" },
+  { title: "Serveillance & Monitoring Services", image: "/images/sec_companies_pic3.jpg" },
+  { title: "Transport & Maritime Security Services", image: "/images/sec_companies_pic4.jpg" },
+  { title: "Advanced Intelligence & Technical Serveillance Services", image: "/images/sec_companies_pic5.jpg" },
+  { title: "Technical &  Network Security Services", image: "/images/sec_companies_pic6.jpg" },
+  { title: "Public Safety & Law Enforcement Security Services", image: "/images/sec_companies_pic7.jpg" },
+  { title: "Access Control Specialist", image: "/images/sec_companies_pic8.jpg" },
+  { title: "Private Investigation & Specialist Services", image: "/images/sec_companies_pic9.jpg" },
 ];
 
 export default function SecurityCompanies() {

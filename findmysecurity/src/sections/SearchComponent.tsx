@@ -26,6 +26,7 @@ interface SearchComponentProps {
 }
 
 export default function SearchComponent({ lookingForData, searchData,title }: SearchComponentProps)  {
+  const [loginData, setLoginData] = useState<string | null>(null);
   const [searchValues, setSearchValues] = useState<SearchValues>({
     lookingFor: "",
     subCategory: "",
@@ -34,7 +35,12 @@ export default function SearchComponent({ lookingForData, searchData,title }: Se
     postcode: "",
   });
 
-  const loginData = localStorage.getItem("loginData");
+ 
+  // ✅ Use useEffect to safely access localStorage in the browser
+  useEffect(() => {
+    const storedLoginData = localStorage.getItem("loginData");
+    setLoginData(storedLoginData);
+  }, []);
 
   const handleToggleAdvancedSearch = () => {
     if (!loginData) {
@@ -43,7 +49,6 @@ export default function SearchComponent({ lookingForData, searchData,title }: Se
     }
     setShowAdvanced(!showAdvanced);
   };
-
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [selectedMainCategory, setSelectedMainCategory] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);

@@ -6,14 +6,14 @@ import searchData from "@/sections/data/hero_section.json";
 
 const features = [
   { title: "SIA Licence Courses", image: "/images/training_providers_pic1.jpg" },
-  { title: "Specialist & Advanced Training", image: "/images/training_providers_pic1.jpg" },
-  { title: "First Aid & Emergency Training", image: "/images/training_providers_pic1.jpg" },
-  { title: "Transport & Maritime Security Training", image: "/images/training_providers_pic1.jpg" },
+  { title: "Specialist & Advanced Training", image: "/images/training_providers_pic2.jpg" },
+  { title: "First Aid & Emergency Training", image: "/images/training_providers_pic3.jpg" },
+  { title: "Transport & Maritime Security Training", image: "/images/training_providers_pic2.jpg" },
   { title: "Advanced Intelligence & Technical Serveillance Training", image: "/images/training_providers_pic1.jpg" },
-  { title: "Corporate & In-House Training", image: "/images/training_providers_pic1.jpg" },
+  { title: "Corporate & In-House Training", image: "/images/training_providers_pic3.jpg" },
   { title: "Public Safety & Law Enforcement Training", image: "/images/training_providers_pic1.jpg" },
-  { title: "Technical & Control Room Training", image: "/images/training_providers_pic1.jpg" },
-  { title: "Online & E-learning Courses", image: "/images/training_providers_pic1.jpg" },
+  { title: "Technical & Control Room Training", image: "/images/training_providers_pic3.jpg" },
+  { title: "Online & E-learning Courses", image: "/images/training_providers_pic2.jpg" },
   { title: "Trainer & Assessor Certification", image: "/images/training_providers_pic1.jpg" },
 ];
 
