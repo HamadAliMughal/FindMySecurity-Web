@@ -34,7 +34,7 @@ export default function SearchComponent({ lookingForData, searchData,title }: Se
     postcode: "",
   });
 
-  const loginData = localStorage.getItem("loginData") || "null";
+  const loginData = JSON.parse(localStorage.getItem("loginData") || "null");
 
   const handleToggleAdvancedSearch = () => {
     if (!loginData) {
