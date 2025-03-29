@@ -60,13 +60,12 @@ const GetStarted: React.FC = () => {
       </h2>
 
       {/* Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mx-20">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mx-auto sm:max-w-6xl">
         {categories.map((category, index) => (
           <div
             key={index}
-            className="relative bg-white text-gray-900 shadow-lg rounded-2xl p-8 border border-gray-200 transition-all transform hover:-translate-y-2 hover:shadow-2xl"
+            className="relative bg-white text-gray-900 shadow-lg rounded-2xl p-8 border border-gray-200 flex flex-col w-full max-w-[90%] mx-auto sm:max-w-none transition-all transform hover:-translate-y-2 hover:shadow-2xl"
           >
-            {/* Category Title */}
             <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">{category.title}</h3>
 
             {/* Steps List */}

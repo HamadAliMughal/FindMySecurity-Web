@@ -46,7 +46,7 @@ const Testimonials: React.FC = () => {
       </p>
 
       {/* Testimonials Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 md:gap-2 gap-5 max-w-6xl mx-auto">
   {testimonials.map((testimonial, index) => (
     <div 
       key={index} 

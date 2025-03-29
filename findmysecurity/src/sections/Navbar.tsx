@@ -8,6 +8,7 @@ import ResourcesDropdown from "./Navbar_Menus/ResourcesDropdown";
 import DynamicDropdown from "./Navbar_Menus/DynamicDropdown";
 import MobileDynamicDropdown from "./Navbar_Menus/MobileDropdown";
 import MobileResourcesDropdown from "./Navbar_Menus/MobileResourcesDropdown";
+// import '@/sections/Navbar_Menus/nav.css'
 export default function Navbar() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -41,7 +42,8 @@ export default function Navbar() {
 
 
   return (
-      <nav className="bg-black bg-opacity-90 backdrop-blur-md px-0 sm:px-0 md:px-12 lg:px-20 xl:px-26 text-white fixed top-0 left-0 shadow-md z-50 w-full">
+    <>
+      <nav className="bg-black bg-opacity-90 backdrop-blur-md px-0 sm:px-0 md:px-0 lg:px-0 xl:px-26 text-white fixed top-0 left-0 shadow-md z-50 w-full">
       <div className="container mx-auto px-3 py-5 flex items-center justify-between">
 
         {/* Logo */}
@@ -57,14 +59,14 @@ export default function Navbar() {
           <span>FindMySecurity</span>
         </Link>
         <button
-          className="md:hidden text-white text-3xl"
+          className="lg:hidden text-white text-3xl"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? <Cross /> : <Menu />}
         </button>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex space-x-4">
+        <div className="hidden lg:flex space-x-4">
           {/* Solution Dropdown */}
           <DynamicDropdown jsonFile="secuirty_professional.json" title="Security Professionals" basePath="/professionals/" />
           <DynamicDropdown jsonFile="secuirty_services.json" title="Security Services" basePath="/services/" />
@@ -78,7 +80,7 @@ export default function Navbar() {
         </div>
         {profileData ? (
           <>
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden lg:flex items-center space-x-4">
 
               <button onClick={handleLogout} className="text-white flex items-center space-x-2 ease-in-out hover:text-gray-200">
                 <LogOut className="h-4 w-4" />
@@ -104,7 +106,7 @@ export default function Navbar() {
         )
           : (
             <>
-              <div className="hidden md:flex items-center space-x-4">
+              <div className="hidden lg:flex items-center space-x-4">
                 {/* <Link href="/signup" className="bg-white text-black px-4 py-1 font-bold rounded-full text-center ease-in-out hover:bg-gray-200">
                   Sign Up
                 </Link> */}
@@ -135,7 +137,7 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div 
         
-        className="md:hidden bg-black text-white p-4 max-h-[90vh] overflow-y-auto"
+        className="lg:hidden bg-black text-white p-4 max-h-[90vh] overflow-y-auto"
         // className="md:hidden bg-black text-white p-4"
         >
 
@@ -174,5 +176,6 @@ export default function Navbar() {
         </div>
       )}
     </nav>
+    </>
   );
 }

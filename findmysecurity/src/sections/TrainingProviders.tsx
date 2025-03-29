@@ -62,10 +62,10 @@ export default function TrainingProviders() {
 
             );
           })}
-          
-        <SearchComponent lookingForData={lookingForData} searchData={searchData} title="Training Providers" />
         </div>
-        
+        <div className="flex justify-center w-full mt-10">
+        <SearchComponent lookingForData={lookingForData} searchData={searchData} title="Training Providers" />
+          </div>
       </div>
     </section>
   );

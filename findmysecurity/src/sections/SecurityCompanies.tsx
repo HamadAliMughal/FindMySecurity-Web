@@ -62,9 +62,10 @@ export default function SecurityCompanies() {
             );
           })}
           
+        </div>
+        <div className="flex justify-center w-full mt-10">
         <SearchComponent lookingForData={lookingForData} searchData={searchData} title="Security Companies" />
         </div>
-        
       </div>
     </section>
   );
