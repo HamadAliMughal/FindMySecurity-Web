@@ -8,7 +8,7 @@ export default function Hero() {
   return (
     <section className="relative w-full h-screen flex flex-col items-center justify-center text-center bg-gray-900 text-white px-4 md:px-8">
       <div className="absolute inset-0">
-        <Image src="/images/hero_bg.jpg" alt="Hero Background" layout="fill" objectFit="cover" className="opacity-50" />
+        <Image src="/images/hero-bg.jpg" alt="Hero Background" layout="fill" objectFit="cover" className="opacity-50" />
       </div>
       <SearchComponent lookingForData={lookingForData} searchData={searchData} title="Professionals" />
     </section>
