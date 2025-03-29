@@ -10,7 +10,9 @@ export default function Hero() {
       <div className="absolute inset-0">
         <Image src="/images/hero-bg.jpg" alt="Hero Background" layout="fill" objectFit="cover" className="opacity-50" />
       </div>
+      <div className="flex justify-center w-full mt-10">
       <SearchComponent lookingForData={lookingForData} searchData={searchData} title="Professionals" />
+      </div>
     </section>
   );
 }
