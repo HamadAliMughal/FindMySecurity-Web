@@ -21,7 +21,7 @@ export default function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex justify-center w-full mt-10">
+      <div className="relative z-10 flex justify-center w-full my-40">
         <SearchComponent
           lookingForData={lookingForData}
           searchData={searchData}
