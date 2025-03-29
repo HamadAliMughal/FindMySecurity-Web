@@ -6,16 +6,53 @@ import SearchComponent from "./SearchComponent";
 
 export default function Hero() {
   return (
-    <section style={{height:'100vh'}} className="relative w-full h-screen flex flex-col items-center justify-center text-center bg-gray-900 text-white px-4 md:px-8">
-      <div className="absolute inset-0">
-        <Image src="/images/hero-bg.jpg" alt="Hero Background" layout="fill" objectFit="cover" className="opacity-50" />
+    <section className="relative w-full min-h-screen flex flex-col items-center justify-center text-center bg-gray-900 text-white px-4 md:px-8">
+      {/* Background Image */}
+      <div className="absolute inset-0 w-full h-full">
+        <Image
+          src="/images/hero-bg.jpg"
+          alt="Hero Background"
+          layout="fill"
+          objectFit="cover"
+          objectPosition="center"
+          className="opacity-50"
+          priority
+        />
       </div>
-      <div className="flex justify-center w-full mt-10">
-      <SearchComponent lookingForData={lookingForData} searchData={searchData} title="Professionals" />
+
+      {/* Content */}
+      <div className="relative z-10 flex justify-center w-full mt-10">
+        <SearchComponent
+          lookingForData={lookingForData}
+          searchData={searchData}
+          title="Professionals"
+        />
       </div>
     </section>
   );
 }
+
+
+
+
+// "use client";
+// import Image from "next/image";
+// import lookingForData from "@/sections/data/secuirty_professional.json";
+// import searchData from "@/sections/data/hero_section.json";
+// import SearchComponent from "./SearchComponent";
+
+// export default function Hero() {
+//   return (
+//     <section className="relative w-full h-screen flex flex-col items-center justify-center text-center bg-gray-900 text-white px-4 md:px-8">
+//       <div className="absolute inset-0">
+//         <Image src="/images/hero-bg.jpg" alt="Hero Background" layout="fill" objectFit="cover" className="opacity-50" />
+//       </div>
+//       <div className="flex justify-center w-full mt-10">
+//       <SearchComponent lookingForData={lookingForData} searchData={searchData} title="Professionals" />
+//       </div>
+//     </section>
+//   );
+// }
 
 
 
