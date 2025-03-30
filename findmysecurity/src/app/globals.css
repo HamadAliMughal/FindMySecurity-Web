@@ -12,6 +12,14 @@
   "Segoe UI Emoji"
   "Segoe UI Symbol"
   "Noto Color Emoji" !important;
+  -webkit-appearance: none !important;
+  -webkit-font-smoothing:  ui-sans-serif
+  system-ui
+  sans-serif
+  "Apple Color Emoji"
+  "Segoe UI Emoji"
+  "Segoe UI Symbol"
+  "Noto Color Emoji" !important;
 
 }
 
