@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Navbar from "@/sections/Navbar";
+import Navbar from "@/sections/home/Navbar";
 import "./globals.css"; // Ensure you import global styles
-import Footer from "@/sections/Footer";
+import Footer from "@/sections/home/Footer";
 
 export const metadata: Metadata = {
   title: "FindMySecurity",

@@ -4,10 +4,10 @@ import Link from "next/link";
 import { UserCircle,UserPlus  } from "@phosphor-icons/react";
 import { Cross, Lock, Menu, LogOut  } from "lucide-react";
 import { useRouter } from 'next/navigation'
-import ResourcesDropdown from "./Navbar_Menus/ResourcesDropdown";
-import DynamicDropdown from "./Navbar_Menus/DynamicDropdown";
-import MobileDynamicDropdown from "./Navbar_Menus/MobileDropdown";
-import MobileResourcesDropdown from "./Navbar_Menus/MobileResourcesDropdown";
+import ResourcesDropdown from "@/sections/Navbar_Menus/ResourcesDropdown";
+import DynamicDropdown from "@/sections/Navbar_Menus/DynamicDropdown";
+import MobileDynamicDropdown from "@/sections/Navbar_Menus/MobileDropdown";
+import MobileResourcesDropdown from "@/sections/Navbar_Menus/MobileResourcesDropdown";
 // import '@/sections/Navbar_Menus/nav.css'
 export default function Navbar() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);

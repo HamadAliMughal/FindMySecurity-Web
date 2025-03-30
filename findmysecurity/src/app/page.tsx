@@ -1,13 +1,13 @@
-import BusinessSection from '@/sections/Business'
-import TrustedCompanies from '@/sections/Companies'
-import GetStarted from '@/sections/GetStarted'
-import Hero from '@/sections/Hero'
-import SecurityAppSection from '@/sections/SecurityApp'
-import SecurityCompanies from '@/sections/SecurityCompanies'
-import SecurityFeatures from '@/sections/SecurityFeatures'
-import StepsSection from '@/sections/StepSection'
-import Testimonials from '@/sections/Testimonials'
-import TrainingProviders from '@/sections/TrainingProviders'
+import BusinessSection from '@/sections/home/Business'
+import TrustedCompanies from '@/sections/home/Companies'
+import GetStarted from '@/sections/home/GetStarted'
+import Hero from '@/sections/home/Hero'
+import SecurityAppSection from '@/sections/home/SecurityApp'
+import SecurityCompanies from '@/sections/home/SecurityCompanies'
+import SecurityFeatures from '@/sections/home/SecurityFeatures'
+import StepsSection from '@/sections/home/StepSection'
+import Testimonials from '@/sections/home/Testimonials'
+import TrainingProviders from '@/sections/home/TrainingProviders'
 
 export default function Home() {
   return (
