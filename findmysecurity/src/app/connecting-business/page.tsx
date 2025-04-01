@@ -12,6 +12,7 @@ const ConnectingBusiness = () => {
   const [distance, setDistance] = useState<string>("5 Miles");
   const [postcode, setPostcode] = useState<string>("");
   const [filter, setFilter] = useState<string>("All Results");
+  const [profileData, setProfileData] = useState<any>(null);
 
   // Default map center (London)
   const defaultCenter = { lat: 51.5074, lng: -0.1278 };
@@ -26,7 +27,15 @@ const ConnectingBusiness = () => {
   // Load Google Maps only on the client side
   useEffect(() => {
     setIsLoaded(true);
-  }, []);
+    const storedData =
+    localStorage.getItem("profileData") || localStorage.getItem("loginData");
+  if (storedData) {
+    setProfileData(JSON.parse(storedData));
+  } else {
+    router.push("/"); // Redirect if no profile data is found
+  }
+  }, [router]);
+  if (!profileData) return null;
 
   // Ensure the map has a proper height
   const mapStyles = { width: "100%", height: "400px", borderRadius: "12px" };

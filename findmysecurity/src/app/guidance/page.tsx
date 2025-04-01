@@ -1,13 +1,22 @@
 "use client";
-
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft,AlertTriangle,Shield,BadgeCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const Guidance: React.FC = () => {
   const router = useRouter();
+  const [profileData, setProfileData] = useState<any>(null);
+  useEffect(()=>{
+    const storedData =
+    localStorage.getItem("profileData") || localStorage.getItem("loginData");
+  if (storedData) {
+    setProfileData(JSON.parse(storedData));
+  } else {
+    router.push("/"); // Redirect if no profile data is found
+  }
+  },[router])
+  if (!profileData) return null;
 
-  
   const qualifications = [
     {
       category: 'Physical Security & Manned Guarding',

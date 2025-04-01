@@ -35,6 +35,8 @@ const ViewJobs: React.FC = () => {
   const [filter, setFilter] = useState<string>("All Results");
 
   const [jobData, setJobData] = useState<any>({}); // State to hold the job data
+  const [profileData1, setProfileData1] = useState<any>(null);
+  
 
   // Use useEffect to fetch data from localStorage when the component mounts
   useEffect(() => {
@@ -42,7 +44,16 @@ const ViewJobs: React.FC = () => {
     if (storedData) {
       setJobData(JSON.parse(storedData)); // Parse and set data from localStorage
     }
-  }, []);
+    const storedData1 =
+    localStorage.getItem("profileData") || localStorage.getItem("loginData");
+  if (storedData1) {
+    setProfileData1(JSON.parse(storedData1));
+  } else {
+    router.push("/"); // Redirect if no profile data is found
+  }
+  }, [router]);
+  if (!profileData1) return null;
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -34,6 +34,8 @@ const JobPosting: React.FC = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [profileData, setProfileData] = useState<any>(null);
+ 
   // Initialize state with localStorage data or defaults
   const [formData, setFormData] = useState<FormData>(() => {
     const defaultData = {
@@ -72,7 +74,6 @@ const JobPosting: React.FC = () => {
       return defaultData;
     }
   });
-
   // Update localStorage whenever formData changes
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -87,7 +88,16 @@ const JobPosting: React.FC = () => {
     } catch (error) {
       console.error("Error saving form data:", error);
     }
-  }, [formData]);
+    const storedData =
+    localStorage.getItem("profileData") || localStorage.getItem("loginData");
+  if (storedData) {
+    setProfileData(JSON.parse(storedData));
+  } else {
+    router.push("/"); // Redirect if no profile data is found
+  }
+  }, [formData,router]);
+  if (!profileData) return null;
+
 
   const handleInputChange = <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setFormData(prev => ({
