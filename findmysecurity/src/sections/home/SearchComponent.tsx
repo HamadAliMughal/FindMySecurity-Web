@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { FaChevronDown, FaFilter, FaSearch } from "react-icons/fa";
 import useMobileView from "@/sections/hooks/useMobileView";
-
+import Link from "next/link";
 interface SearchValues {
   lookingFor: string;
   subCategory: string;
@@ -179,10 +179,12 @@ export default function SearchComponent({ lookingForData, searchData,title }: Se
           onChange={(e) => setSearchValues({ ...searchValues, postcode: e.target.value })}
         />
 
-        <button className="flex items-center px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800">
+        {/* <button > */}
+          <Link href='/connecting-business' className="flex items-center px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800">
           <FaSearch className="mr-2" />
           Go
-        </button>
+          </Link>
+        {/* </button> */}
       </div>
 
       <button

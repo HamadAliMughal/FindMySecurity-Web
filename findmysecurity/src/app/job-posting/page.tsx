@@ -5,6 +5,7 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { FaCheckCircle } from "react-icons/fa";
+import { CheckCircle, Loader2, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft} from "lucide-react";
@@ -32,7 +33,7 @@ interface FormData {
 const JobPosting: React.FC = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [showModal, setShowModal] = useState(false);
   // Initialize state with localStorage data or defaults
   const [formData, setFormData] = useState<FormData>(() => {
     const defaultData = {
@@ -149,22 +150,41 @@ const JobPosting: React.FC = () => {
     }));
   };
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setIsSubmitting(true);
+    
+  //   try {
+  //     console.log("Submitting form data:", formData);
+  //     // Here you would typically send the data to your backend
+  //     // await submitFormData(formData);
+  //     // router.push('/success');
+  //   } catch (error) {
+  //     console.error("Form submission error:", error);
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
-      console.log("Submitting form data:", formData);
-      // Here you would typically send the data to your backend
-      // await submitFormData(formData);
-      // router.push('/success');
+      // Simulate API request delay (Replace with actual API call)
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      setShowModal(true); // Show success modal
     } catch (error) {
       console.error("Form submission error:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
-
+  const closeModalAndRedirect = () => {
+    setShowModal(false);
+    router.push("/profile"); // Redirect to profile page
+  };
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-8 my-8 sm:my-20 bg-white rounded-lg shadow-lg border border-gray-200">
             {/* Back Button */}
@@ -488,6 +508,27 @@ const JobPosting: React.FC = () => {
           </button>
         </div>
       </form>
+      {/* ✅ Success Modal */}
+      {showModal && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center relative">
+            <button className="absolute top-2 right-2 text-gray-500 hover:text-black" onClick={closeModalAndRedirect}>
+              <X className="w-5 h-5" />
+            </button>
+
+            <CheckCircle className="w-12 h-12 mx-auto text-green-600" />
+            <h2 className="text-xl font-bold mt-2">Success!</h2>
+            <p className="text-gray-600 mt-2">Your form has been submitted successfully.</p>
+
+            <button
+              className="mt-4 bg-black text-white py-2 px-6 rounded-md hover:bg-gray-800 transition"
+              onClick={closeModalAndRedirect}
+            >
+              Go to Profile
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
