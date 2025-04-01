@@ -43,7 +43,7 @@ const UserProfile: React.FC = () => {
     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
       {/* Back Button */}
       <button
-        className="absolute top-4 left-4 mt-20 z-50 flex items-center text-gray-600 hover:text-black"
+        className="absolute top-4 left-4 mt-20 z-2 flex items-center text-gray-600 hover:text-black"
         onClick={() => router.push("/")}
       >
         <ArrowLeft className="w-6 h-6 mr-2" />
