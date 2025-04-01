@@ -180,10 +180,43 @@ export default function SearchComponent({ lookingForData, searchData,title }: Se
         />
 
         {/* <button > */}
-          <Link href='/connecting-business' className="flex items-center px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800">
+       {/* Disable the link when required fields are empty */}
+       <Link
+  href={
+    // Check if either Basic or Advanced search fields are filled
+    (showAdvanced
+      ? searchValues.lookingFor && searchValues.subCategory && searchValues.distance && searchValues.experience && searchValues.postcode
+      : searchValues.lookingFor && searchValues.subCategory && searchValues.postcode) // For Basic Search: Only lookingFor and postcode
+      ? "/connecting-business"
+      : "#"
+  }
+  className={`flex items-center px-4 py-2 rounded-lg ${
+    (showAdvanced
+      ? searchValues.lookingFor && searchValues.subCategory && searchValues.distance && searchValues.experience && searchValues.postcode
+      : searchValues.lookingFor && searchValues.subCategory && searchValues.postcode) // Apply condition based on the mode
+      ? "bg-black text-white hover:bg-gray-800"
+      : "bg-gray-400 text-gray-600 cursor-not-allowed"
+  }`}
+  onClick={(e) => {
+    // Prevent navigation if required fields for the current search mode are not filled
+    if (
+      (showAdvanced
+        ? !searchValues.lookingFor || !searchValues.subCategory || !searchValues.distance || !searchValues.experience || !searchValues.postcode
+        : !searchValues.lookingFor || !searchValues.postcode) // Basic search checks only lookingFor and postcode
+    ) {
+      e.preventDefault(); // Prevent navigation when fields are empty
+    }
+  }}
+>
+  <FaSearch className="mr-2" />
+  Go
+</Link>
+
+       
+          {/* <Link href='/connecting-business' className="flex items-center px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800">
           <FaSearch className="mr-2" />
           Go
-          </Link>
+          </Link> */}
         {/* </button> */}
       </div>
 
