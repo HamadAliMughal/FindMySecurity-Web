@@ -1,397 +1,237 @@
 "use client";
 
-import React, { useState } from "react";
-import { Calendar, momentLocalizer } from "react-big-calendar";
-import moment from "moment";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import { FaCheckCircle } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { FaSearch, FaMapMarkerAlt, FaFilter, FaBuilding, FaRoute } from "react-icons/fa";
+import { FaStar, FaRegStar, FaThumbsUp, FaListUl } from "react-icons/fa";
+// Define the default data structure
+const defaultData = {
+  screenName: "",
+  postcode: "London",
+  profileHeadline: "",
+  selectedServices: [],
+  otherService: "",
+  gender: "",
+  aboutMe: "",
+  experience: "",
+  availability: "",
+  selectedDates: [],
+  qualifications: "",
+  hourlyRate: "",
+  profilePhoto: null,
+  homeTelephone: "",
+  mobileTelephone: "",
+  website: ""
+};
 
-const localizer = momentLocalizer(moment);
+const ViewJobs: React.FC = () => {
+  const router = useRouter();
 
-const JobPosting: React.FC = () => {
-  const [screenName, setScreenName] = useState("");
-  const [postcode, setPostcode] = useState("London");
-  const [profileHeadline, setProfileHeadline] = useState("");
-  const [selectedServices, setSelectedServices] = useState<string[]>([]);
-  const [otherService, setOtherService] = useState("");
-  const [gender, setGender] = useState("");
-  const [aboutMe, setAboutMe] = useState("");
-  const [experience, setExperience] = useState("");
-  const [availability, setAvailability] = useState("");
-  const [selectedDates, setSelectedDates] = useState<Date[]>([]);
-  const [qualifications, setQualifications] = useState("");
-  const [hourlyRate, setHourlyRate] = useState("");
-  const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
-  const [homeTelephone, setHomeTelephone] = useState("");
-  const [mobileTelephone, setMobileTelephone] = useState("");
-  const [website, setWebsite] = useState("");
+  const [searchType, setSearchType] = useState<string>("SECURITY COMPANY");
+  const [distance, setDistance] = useState<string>("5 Miles");
+  const [postcode, setPostcode] = useState<string>("");
+  const [filter, setFilter] = useState<string>("All Results");
 
-  const handleSelectSlot = (slotInfo: { start: Date }) => {
-    setSelectedDates((prevDates) => {
-      const isAlreadySelected = prevDates.some(
-        (selectedDate) => moment(selectedDate).isSame(slotInfo.start, "day")
-      );
+  const [jobData, setJobData] = useState<any>(defaultData); // State to hold the job data
 
-      return isAlreadySelected
-        ? prevDates.filter(
-            (selectedDate) => !moment(selectedDate).isSame(slotInfo.start, "day")
-          )
-        : [...prevDates, slotInfo.start];
-    });
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setProfilePhoto(e.target.files[0]);
+  // Use useEffect to fetch data from localStorage when the component mounts
+  useEffect(() => {
+    const storedData = localStorage.getItem("jobPostingFormData");
+    if (storedData) {
+      setJobData(JSON.parse(storedData)); // Parse and set data from localStorage
     }
-  };
-
-  const services = [
-    'Corporate Security',
-    'Retail Security',
-    'Event Security',
-    'Door Supervisor',
-    'Mobile Patrol',
-    'Loss Prevention',
-    'Construction Site Security',
-    'Close Protection',
-    'Maritime Security',
-    'High-Value Goods Escort',
-    'Residential Security Team (RST)',
-    'K9 Security Handler',
-    'Armed Security Professional',
-    'VIP Chauffeur & Security Driver',
-    'CCTV Operator',
-    'Security Control Room Operator',
-    'Covert Surveillance Specialist'
-  ];
-
-  const handleServiceToggle = (service: string) => {
-    setSelectedServices((prev) =>
-      prev.includes(service) ? prev.filter((s) => s !== service) : [...prev, service]
-    );
-  };
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log({
-      screenName,
+      searchType,
+      distance,
       postcode,
-      profileHeadline,
-      services: selectedServices,
-      otherService,
-      gender,
-      aboutMe,
-      experience,
-      availability,
-      selectedDates,
-      qualifications,
-      hourlyRate,
-      profilePhoto,
-      homeTelephone,
-      mobileTelephone,
-      website
+      filter
     });
+  };
+  const profileData = {
+    name: "Mr. X",
+    title: "Security Officer in London",
+    rate: "From £14.00/hour",
+    responseTime: "Usually responds within 12 hours",
+    description: "A well-trained SIA Close Protection Officer with over 10 years of experience in the security industry, specialising in high-risk environments, VIP protection, and threat assessment. Adapt at risk mitigation, conflict resolution, and crisis management, ensuring the safety and security of clients at all times. Highly skilled in physical intervention, surveillance, and defensive tactics, with a strong ability to assess security threats in real-time. Experienced in working with high-profile individuals, ......",
+    lastLogin: "Logged in 29 January 25",
+    rating: 4.5,
+    reviews: 12,
+    profileImage: "/profile-placeholder.jpg" // Replace with your image path
+  };
+
+  // Function to render star ratings
+  const renderStars = (rating: number) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+    
+    for (let i = 1; i <= 5; i++) {
+      if (i <= fullStars) {
+        stars.push(<FaStar key={i} className="text-yellow-400" />);
+      } else if (i === fullStars + 1 && hasHalfStar) {
+        stars.push(<FaStar key={i} className="text-yellow-400" />);
+      } else {
+        stars.push(<FaRegStar key={i} className="text-yellow-400" />);
+      }
+    }
+    return stars;
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-8 my-20 bg-white rounded-lg shadow-lg border border-gray-200">
-      <h1 className="text-4xl font-extrabold text-gray-800 mb-6 text-center">My Public Profile</h1>
-      <p className="text-center text-red-600 text-sm font-medium mb-4">Congratulations! You have successfully registered with FindMySecurity. To begin your exceptional journey with us, please complete your profile to become visible to potential employers. While you can update your profile at any time, it will only be published on the platform once all required details are completed.</p>
-      <p className="text-gray-700 text-left mb-4">Your profile is your public advert for the services you offer. Please read our Safety Centre for guidance. Any changes made to your profile must be approved by our human moderation team before being published.</p>
-      <p className="text-left"><span className='font-semibold'><a href="" className='text-blue-600 underline'>Profile</a> Status:</span> You have not yet completed your profile</p>
-
-      <form onSubmit={handleSubmit} className="space-y-6 mt-6">
-        {/* Existing fields */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Screen Name* (Maximum 8 characters)</label>
-          <input
-            type="text"
-            value={screenName}
-            onChange={(e) => setScreenName(e.target.value)}
-            maxLength={8}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Postcode*</label>
-          <input
-            type="text"
-            value={postcode}
-            onChange={(e) => setPostcode(e.target.value)}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Profile Headline</label>
-          <input
-            type="text"
-            value={profileHeadline}
-            onChange={(e) => setProfileHeadline(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-          />
-        </div>
-
-        {/* Gender Section */}
-        <div className="border-t border-gray-200 pt-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Gender</h2>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Choose an option*</label>
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={() => setGender("Male")}
-                className={`px-4 py-2 border rounded-lg transition-all ${
-                  gender === "Male"
-                    ? "bg-black text-white border-black"
-                    : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
-                }`}
-              >
-                Male
-              </button>
-              <button
-                type="button"
-                onClick={() => setGender("Female")}
-                className={`px-4 py-2 border rounded-lg transition-all ${
-                  gender === "Female"
-                    ? "bg-black text-white border-black"
-                    : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
-                }`}
-              >
-                Female
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Services Section */}
-        <div className="border-t border-gray-200 pt-6">
-          <label className="block text-lg font-semibold text-gray-700 mb-2">Services Offered*</label>
-          <p className="text-sm text-gray-600 mb-4">Select all relevant security services:</p>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {services.map((service) => (
-              <div key={service} className="flex items-center bg-gray-100 p-3 rounded-md shadow-md hover:bg-gray-200 transition">
-                <input
-                  type="checkbox"
-                  id={service}
-                  checked={selectedServices.includes(service)}
-                  onChange={() => handleServiceToggle(service)}
-                  className="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500"
-                />
-                <label htmlFor={service} className="ml-3 flex items-center text-gray-700 font-medium">
-                  <FaCheckCircle className={selectedServices.includes(service) ? "text-blue-500 mr-2" : "text-gray-400 mr-2"} />
-                  {service}
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Other Services:</label>
-          <input
-            type="text"
-            value={otherService}
-            onChange={(e) => setOtherService(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-            placeholder="Enter any additional service"
-          />
-        </div>
-
-        {/* About Me Section */}
-        <div className="border-t border-gray-200 pt-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">About me*</h2>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Describe your service* (Minimum 50 characters)</label>
-            <textarea
-              value={aboutMe}
-              onChange={(e) => setAboutMe(e.target.value)}
-              minLength={50}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border h-32"
-              placeholder="Describe the services you offer..."
-            />
-          </div>
-        </div>
-
-        {/* Experience Section */}
-        <div className="border-t border-gray-200 pt-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">My Experience*</h2>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Describe your experience* (Minimum 50 characters)</label>
-            <textarea
-              value={experience}
-              onChange={(e) => setExperience(e.target.value)}
-              minLength={50}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border h-32"
-              placeholder="Describe your professional experience..."
-            />
-          </div>
-        </div>
-
-        {/* Availability Section */}
-        <div className="border-t border-gray-200 pt-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">My Availability</h2>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Describe your availability</label>
-            <textarea
-              value={availability}
-              onChange={(e) => setAvailability(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border h-32"
-              placeholder="Describe your general availability..."
-            />
-          </div>
-
-          {/* Calendar Table */}
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Weekly Availability</h3>
-            <Calendar
-              localizer={localizer}
-              selectable
-              events={selectedDates.map((date) => ({
-                start: date,
-                end: moment(date).add(1, "hours").toDate(),
-                title: "Available",
-              }))}
-              startAccessor="start"
-              endAccessor="end"
-              style={{ height: 500 }}
-              onSelectSlot={handleSelectSlot}
-            />
-          </div>
-        </div>
-
-{/* Qualifications Section */}
-<div className="border-t border-gray-200 pt-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">My Qualifications*</h2>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Describe your qualifications* (Minimum 50 characters)</label>
-            <textarea
-              value={qualifications}
-              onChange={(e) => setQualifications(e.target.value)}
-              minLength={50}
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border h-32"
-              placeholder="Describe your qualifications..."
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              To Check Required Qualification <a href="/guidance" className="text-blue-600 underline">Click here</a>
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              Note for Developer: Click will take user to next window and there should be return bar on guidance page so user can return to this page
-            </p>
-          </div>
-        </div>
-
-        {/* Fees Section */}
-        <div className="border-t border-gray-200 pt-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">My Fees</h2>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Describe your fees</label>
-            <textarea
-              value={availability}
-              onChange={(e) => setAvailability(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border h-32"
-              placeholder="Describe your fees..."
-            />
-          </div>
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Rates*</label>
-            <div className="flex items-center">
-              <span className="mr-2">From £</span>
-              <input
-                type="number"
-                value={hourlyRate}
-                onChange={(e) => setHourlyRate(e.target.value)}
-                className="w-24 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
-                placeholder="0.00"
-              />
-              <span className="ml-2">per hour</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Profile Photo Section */}
-        <div className="border-t border-gray-200 pt-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Profile Photo</h2>
-          <p className="text-sm text-gray-600 mb-4">
-            Your photo must be of yourself or your setting only. No children or logos.
-          </p>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Upload a new Profile Photo*</label>
-            <input
-              type="file"
-              onChange={handleFileChange}
-              accept="image/*"
-              className="block w-full text-sm text-gray-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-md file:border-0
-                file:text-sm file:font-semibold
-                file:bg-blue-50 file:text-blue-700
-                hover:file:bg-blue-100"
-            />
-          </div>
-        </div>
-
-        {/* Direct Contact Details Section */}
-        <div className="border-t border-gray-200 pt-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Direct Contact Details</h2>
-          <p className="text-sm text-gray-600 mb-4">
-            You can optionally add your direct contact details to your profile. This can be viewed by premium members. You can see which other members have viewed your contact details on the Who's Looked At Me? page.
-          </p>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Home Telephone</label>
-              <input
-                type="tel"
-                value={homeTelephone}
-                onChange={(e) => setHomeTelephone(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Telephone</label>
-              <input
-                type="tel"
-                value={mobileTelephone}
-                onChange={(e) => setMobileTelephone(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
-              <p className="text-xs text-gray-500 mb-2">Premium Members Only: You can enter your website address here, but you'll need to upgrade to Gold Membership for it to be visible to other members.</p>
-              <input
-                type="url"
-                value={website}
-                onChange={(e) => setWebsite(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-                placeholder="https://example.com"
-              />
-            </div>
-          </div>
-        </div>
+    <div style={{ marginTop: "90px" }} className="min-h-screen bg-gray-100 p-4 md:p-8 lg:px-32">
+      <div className="absolute top-4 left-4 mt-18 flex items-center text-gray-600 hover:text-black">
         <button
-          type="submit"
-          className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="flex items-center text-gray-600 hover:text-black transition-all duration-200 mb-6"
+          onClick={() => router.back()}
         >
-          Save Profile
+          <ArrowLeft className="w-6 h-6 mr-2" />
         </button>
-      </form>
+      </div>
+      {/* Header */}
+      <h1 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-6">
+        Find <span className="text-black">Security Providers</span> Near You
+      </h1>
+      {/* Search Form - Responsive */}
+      <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {/* Search Type */}
+          <div className="flex flex-col">
+            <label className="text-gray-900 font-medium flex items-center gap-2">
+              <FaBuilding /> I'm looking for
+            </label>
+            <select
+              value={searchType}
+              onChange={(e) => setSearchType(e.target.value)}
+              className="w-full p-3 border border-gray-400 rounded-md focus:ring-2 focus:ring-black"
+            >
+              <option value="SECURITY COMPANY">SECURITY COMPANY</option>
+              <option value="SECURITY GUARD">SECURITY GUARD</option>
+              <option value="ALARM SYSTEM">ALARM SYSTEM</option>
+            </select>
+          </div>
+
+          {/* Distance */}
+          <div className="flex flex-col">
+            <label className="text-gray-900 font-medium flex items-center gap-2">
+              <FaRoute /> Within
+            </label>
+            <select
+              value={distance}
+              onChange={(e) => setDistance(e.target.value)}
+              className="w-full p-3 border border-gray-400 rounded-md focus:ring-2 focus:ring-black"
+            >
+              <option value="5 Miles">5 Miles</option>
+              <option value="10 Miles">10 Miles</option>
+              <option value="25 Miles">25 Miles</option>
+              <option value="50 Miles">50 Miles</option>
+            </select>
+          </div>
+
+          {/* Postcode */}
+          <div className="flex flex-col">
+            <label className="text-gray-900 font-medium flex items-center gap-2">
+              <FaMapMarkerAlt /> Postcode
+            </label>
+            <input
+              type="text"
+              value={postcode}
+              onChange={(e) => setPostcode(e.target.value)}
+              placeholder="Enter Postcode"
+              className="w-full p-3 border border-gray-400 rounded-md focus:ring-2 focus:ring-black"
+            />
+          </div>
+
+          {/* Filter */}
+          <div className="flex flex-col">
+            <label className="text-gray-900 font-medium flex items-center gap-2">
+              <FaFilter /> Filter Results
+            </label>
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="w-full p-3 border border-gray-400 rounded-md focus:ring-2 focus:ring-black"
+            >
+              <option>All Results</option>
+              <option>Top Rated</option>
+              <option>Most Affordable</option>
+              <option>24/7 Available</option>
+            </select>
+          </div>
+
+          {/* Search Button */}
+          <div className="flex items-end">
+            <button
+              className="w-full py-3 bg-gradient-to-r from-black to-gray-900 text-white rounded-md font-medium hover:from-gray-800 hover:to-gray-900 transition flex justify-center items-center gap-2"
+              onClick={() => console.log("Search Submitted")}
+            >
+              <FaSearch /> Search
+            </button>
+          </div>
+        </div>
+      </div>
+      {/* Display job data */}
+      <div className="mb-6 p-6 bg-white rounded-lg shadow-lg">
+      <div className="flex items-start gap-4 mb-4">
+        <div className="flex-shrink-0">
+          <img 
+            src={profileData.profileImage} 
+            alt={profileData.name}
+            className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+          />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">{profileData.name}</h1>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">{profileData.title}</h2>
+          <p className="text-lg font-medium text-blue-600 mb-2">{profileData.rate}</p>
+        </div>
+      </div>
+
+      <div className="flex items-center mb-4">
+        <span className="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded-full mr-2">❶</span>
+        <p className="text-gray-700">{profileData.responseTime}</p>
+      </div>
+      
+      <p className="text-gray-600 mb-6 whitespace-pre-line">{profileData.description}</p>
+
+      {/* Rating Section */}
+      <div className="flex items-center mb-4">
+        <div className="flex mr-2">
+          {renderStars(profileData.rating)}
+        </div>
+        <span className="text-gray-700">{profileData.rating.toFixed(1)} ({profileData.reviews} reviews)</span>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex flex-wrap gap-3 mb-6">
+        <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+          Read More
+        </button>
+        <button className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition">
+          <FaThumbsUp className="mr-2" /> Like
+        </button>
+        <button className="flex items-center px-4 py-2 bg-green-100 text-green-700 rounded hover:bg-green-200 transition">
+          <FaListUl className="mr-2" /> Add to list
+        </button>
+      </div>
+      
+      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+        <h3 className="font-medium text-yellow-800 mb-1">More for Developer</h3>
+        <p className="text-yellow-700 text-sm">Similarly for Rating as Cerebilitations</p>
+      </div>
+      
+      <p className="text-sm text-gray-500">{profileData.lastLogin}</p>
+    </div>
     </div>
   );
 };
 
-export default JobPosting;
+export default ViewJobs;
+
 
 
 
@@ -400,419 +240,120 @@ export default JobPosting;
 // "use client";
 
 // import React, { useState } from "react";
-// import { Calendar, momentLocalizer } from "react-big-calendar";
-// import moment from "moment";
-// import "react-big-calendar/lib/css/react-big-calendar.css";
-// import { FaCheckCircle } from "react-icons/fa";
+// import { ArrowLeft} from "lucide-react";
+// import { useRouter } from "next/navigation";
+// import { FaSearch, FaMapMarkerAlt, FaFilter, FaBuilding, FaRoute } from "react-icons/fa";
 
+// const ViewJobs: React.FC = () => {
+//   const router = useRouter();  
 
-// const localizer = momentLocalizer(moment);
-
-// const JobPosting: React.FC = () => {
-//   const [screenName, setScreenName] = useState("");
-//   const [postcode, setPostcode] = useState("London");
-//   const [profileHeadline, setProfileHeadline] = useState("");
-//   const [selectedServices, setSelectedServices] = useState<string[]>([]);
-//   const [otherService, setOtherService] = useState("");
-//   const [gender, setGender] = useState("");
-//   const [aboutMe, setAboutMe] = useState("");
-//   const [experience, setExperience] = useState("");
-//   const [availability, setAvailability] = useState("");
-//   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
-
-//   // Function to toggle dates
-//   // Handle date selection
-//   const handleSelectSlot = (slotInfo: { start: Date }) => {
-//     setSelectedDates((prevDates) => {
-//       const isAlreadySelected = prevDates.some(
-//         (selectedDate) => moment(selectedDate).isSame(slotInfo.start, "day")
-//       );
-  
-//       return isAlreadySelected
-//         ? prevDates.filter(
-//             (selectedDate) => !moment(selectedDate).isSame(slotInfo.start, "day")
-//           )
-//         : [...prevDates, slotInfo.start];
-//     });
-//   };
-  
-
-
-//   const services = [
-//     'Corporate Security',
-//     'Retail Security',
-//     'Event Security',
-//     'Door Supervisor',
-//     'Mobile Patrol',
-//     'Loss Prevention',
-//     'Construction Site Security',
-//     'Close Protection',
-//     'Maritime Security',
-//     'High-Value Goods Escort',
-//     'Residential Security Team (RST)',
-//     'K9 Security Handler',
-//     'Armed Security Professional',
-//     'VIP Chauffeur & Security Driver',
-//     'CCTV Operator',
-//     'Security Control Room Operator',
-//     'Covert Surveillance Specialist'
-//   ];
-
-//    const handleServiceToggle = (service: string) => {
-//     setSelectedServices((prev) =>
-//       prev.includes(service) ? prev.filter((s) => s !== service) : [...prev, service]
-//     );
-//   };
+//   const [searchType, setSearchType] = useState<string>("SECURITY COMPANY");
+//   const [distance, setDistance] = useState<string>("5 Miles");
+//   const [postcode, setPostcode] = useState<string>("");
+//   const [filter, setFilter] = useState<string>("All Results");
 
 //   const handleSubmit = (e: React.FormEvent) => {
 //     e.preventDefault();
 //     console.log({
-//       screenName,
-//       postcode,
-//       profileHeadline,
-//       services: selectedServices,
-//       otherService,
-//       gender,
-//       aboutMe,
-//       experience,
-//       availability,
-//       selectedDates,
-//     });
-//   };
-//   return (
-//     <div className="max-w-4xl mx-auto p-8 my-20 bg-white rounded-lg shadow-lg border border-gray-200">
-//       <h1 className="text-4xl font-extrabold text-gray-800 mb-6 text-center">My Public Profile</h1>
-//       <p className="text-center text-red-600 text-sm font-medium mb-4">Congratulations! You have successfully registered with FindMySecurity. To begin your exceptional journey with us, please complete your profile to become visible to potential employers. While you can update your profile at any time, it will only be published on the platform once all required details are completed.</p>
-//       <p className="text-gray-700 text-left mb-4">Your profile is your public advert for the services you offer. Please read our Safety Centre for guidance. Any changes made to your profile must be approved by our human moderation team before being published.</p>
-//       <p className="text-left"><span className='font-semibold'><a href="" className='text-blue-600 underline'>Profile</a> Status:</span> You have not yet completed your profile</p>
-
-//       <form onSubmit={handleSubmit} className="space-y-6 mt-6">
-//         {/* Existing fields */}
-//         <div>
-//           <label className="block text-sm font-medium text-gray-700 mb-1">Screen Name*</label>
-//           <input
-//             type="text"
-//             value={screenName}
-//             onChange={(e) => setScreenName(e.target.value)}
-//             maxLength={6}
-//             required
-//             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-//           />
-//         </div>
-
-//         <div>
-//           <label className="block text-sm font-medium text-gray-700 mb-1">Postcode*</label>
-//           <input
-//             type="text"
-//             value={postcode}
-//             onChange={(e) => setPostcode(e.target.value)}
-//             required
-//             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-//           />
-//         </div>
-
-//         <div>
-//           <label className="block text-sm font-medium text-gray-700 mb-1">Profile Headline</label>
-//           <input
-//             type="text"
-//             value={profileHeadline}
-//             onChange={(e) => setProfileHeadline(e.target.value)}
-//             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-//           />
-//         </div>
-
-//         {/* Gender Section */}
-//         <div className="border-t border-gray-200 pt-6">
-//       <h2 className="text-2xl font-bold text-gray-800 mb-4">Gender</h2>
-//       <div className="space-y-2">
-//         <label className="block text-sm font-medium text-gray-700 mb-2">
-//           Choose an option*
-//         </label>
-//         <div className="flex items-center gap-6">
-//           {/* Male Radio Button */}
-//           <label className="flex items-center gap-2 cursor-pointer">
-//             <input
-//               type="radio"
-//               name="gender"
-//               value="Male"
-//               checked={gender === "Male"}
-//               onChange={() => setGender("Male")}
-//               className="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500"
-//             />
-//             <span className="text-gray-700 font-medium">Male</span>
-//           </label>
-
-//           {/* Female Radio Button */}
-//           <label className="flex items-center gap-2 cursor-pointer">
-//             <input
-//               type="radio"
-//               name="gender"
-//               value="Female"
-//               checked={gender === "Female"}
-//               onChange={() => setGender("Female")}
-//               className="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500"
-//             />
-//             <span className="text-gray-700 font-medium">Female</span>
-//           </label>
-//         </div>
-//       </div>
-//     </div>
-
-
-//         {/* About Me Section */}
-//         <div className="border-t border-gray-200 pt-6">
-//           <h2 className="text-2xl font-bold text-gray-800 mb-4">About me*</h2>
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700 mb-2">Describe your service* (Minimum 50 characters)</label>
-//             <textarea
-//               value={aboutMe}
-//               onChange={(e) => setAboutMe(e.target.value)}
-//               minLength={50}
-//               required
-//               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border h-32"
-//               placeholder="Describe the services you offer..."
-//             />
-//           </div>
-//         </div>
-
-//         {/* Experience Section */}
-//         <div className="border-t border-gray-200 pt-6">
-//           <h2 className="text-2xl font-bold text-gray-800 mb-4">My Experience*</h2>
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700 mb-2">Describe your experience* (Minimum 50 characters)</label>
-//             <textarea
-//               value={experience}
-//               onChange={(e) => setExperience(e.target.value)}
-//               minLength={50}
-//               required
-//               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border h-32"
-//               placeholder="Describe your professional experience..."
-//             />
-//           </div>
-//         </div>
-
-//         {/* Availability Section */}
-//         <div className="border-t border-gray-200 pt-6">
-//           <h2 className="text-2xl font-bold text-gray-800 mb-4">My Availability</h2>
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700 mb-2">Describe your availability</label>
-//             <textarea
-//               value={availability}
-//               onChange={(e) => setAvailability(e.target.value)}
-//               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border h-32"
-//               placeholder="Describe your general availability..."
-//             />
-//           </div>
-
-//           {/* Calendar Table */}
-//           <div className="max-w-4xl mx-auto p-8 my-20 bg-white rounded-lg shadow-lg border border-gray-200">
-//       <h2 className="text-2xl font-bold text-gray-800 mb-4">My Availability</h2>
-
-//       <Calendar
-//   localizer={localizer}
-//   selectable
-//   events={selectedDates.map((date) => ({
-//     start: date,
-//     end: moment(date).add(1, "hours").toDate(), // Example duration
-//     title: "Available",
-//   }))}
-//   startAccessor="start"
-//   endAccessor="end"
-//   style={{ height: 500 }}
-//   onSelectSlot={handleSelectSlot}
-// />
-
-//     </div>
-//         </div>
-
-//         {/* Services Section */}
-//         <div className="border-t border-gray-200 pt-6">
-//           <label className="block text-lg font-semibold text-gray-700 mb-2">Services Offered*</label>
-//           <p className="text-sm text-gray-600 mb-4">Select all relevant security services:</p>
-          
-//           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-//             {services.map((service) => (
-//               <div key={service} className="flex items-center bg-gray-100 p-3 rounded-md shadow-md hover:bg-gray-200 transition">
-//                 <input
-//                   type="checkbox"
-//                   id={service}
-//                   checked={selectedServices.includes(service)}
-//                   onChange={() => handleServiceToggle(service)}
-//                   className="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500"
-//                 />
-//                 <label htmlFor={service} className="ml-3 flex items-center text-gray-700 font-medium">
-//                   <FaCheckCircle className={selectedServices.includes(service) ? "text-blue-500 mr-2" : "text-gray-400 mr-2"} />
-//                   {service}
-//                 </label>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-
-//         <div>
-//           <label className="block text-sm font-medium text-gray-700 mb-1">Other Services:</label>
-//           <input
-//             type="text"
-//             value={otherService}
-//             onChange={(e) => setOtherService(e.target.value)}
-//             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-//             placeholder="Enter any additional service"
-//           />
-//         </div>
-
-//         <button
-//           type="submit"
-//           className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-//         >
-//           Save Profile
-//         </button>
-//       </form>
-//     </div>
-//   );
-// };
-
-// export default JobPosting;
-
-
-
-
-
-
-// "use client";
-
-// import React, { useState } from 'react';
-// import { FaCheckCircle } from "react-icons/fa";
-
-// const JobPosting: React.FC = () => {
-//   const [screenName, setScreenName] = useState('');
-//   const [postcode, setPostcode] = useState('London');
-//   const [profileHeadline, setProfileHeadline] = useState('');
-//   const [selectedServices, setSelectedServices] = useState<string[]>([]);
-//   const [otherService, setOtherService] = useState('');
-
-//   const services = [
-//     'Corporate Security',
-//     'Retail Security',
-//     'Event Security',
-//     'Door Supervisor',
-//     'Mobile Patrol',
-//     'Loss Prevention',
-//     'Construction Site Security',
-//     'Close Protection',
-//     'Maritime Security',
-//     'High-Value Goods Escort',
-//     'Residential Security Team (RST)',
-//     'K9 Security Handler',
-//     'Armed Security Professional',
-//     'VIP Chauffeur & Security Driver',
-//     'CCTV Operator',
-//     'Security Control Room Operator',
-//     'Covert Surveillance Specialist'
-//   ];
-
-//   const handleServiceToggle = (service: string) => {
-//     setSelectedServices(prev =>
-//       prev.includes(service)
-//         ? prev.filter(s => s !== service)
-//         : [...prev, service]
-//     );
-//   };
-
-//   const handleSubmit = (e: React.FormEvent) => {
-//     e.preventDefault();
-//     console.log({
-//       screenName,
-//       postcode,
-//       profileHeadline,
-//       services: selectedServices,
-//       otherService
 //     });
 //   };
 
 //   return (
-//     <div className="max-w-4xl mx-auto p-8 my-20 bg-white rounded-lg shadow-lg border border-gray-200">
-//       <h1 className="text-4xl font-extrabold text-gray-800 mb-6 text-center">My Public Profile</h1>
-//       <p className="text-center text-red-600 text-sm font-medium mb-4">Congratulations! You have successfully registered with FindMySecurity. To begin your exceptional journey with us, please complete your profile to become visible to potential employers. While you can update your profile at any time, it will only be published on the platform once all required details are completed.</p>
-//       <p className="text-gray-700 text-left mb-4">Your profile is your public advert for the services you offer. Please read our Safety Centre for guidance. Any changes made to your profile must be approved by our human moderation team before being published.</p>
-//       <p className="text-left"><span className='font-semibold'><a href="" className='text-blue-600 underline'>Profile</a> Status:</span> You have not yet completed your profile</p>
-
-//       <form onSubmit={handleSubmit} className="space-y-6 mt-6">
-//         <div>
-//           <label className="block text-sm font-medium text-gray-700 mb-1">Screen Name*</label>
-//           <input
-//             type="text"
-//             value={screenName}
-//             onChange={(e) => setScreenName(e.target.value)}
-//             maxLength={6}
-//             required
-//             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-//           />
-//         </div>
-
-//         <div>
-//           <label className="block text-sm font-medium text-gray-700 mb-1">Postcode*</label>
-//           <input
-//             type="text"
-//             value={postcode}
-//             onChange={(e) => setPostcode(e.target.value)}
-//             required
-//             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-//           />
-//         </div>
-
-//         <div>
-//           <label className="block text-sm font-medium text-gray-700 mb-1">Profile Headline</label>
-//           <input
-//             type="text"
-//             value={profileHeadline}
-//             onChange={(e) => setProfileHeadline(e.target.value)}
-//             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-//           />
-//         </div>
-
-//         <div>
-//           <label className="block text-lg font-semibold text-gray-700 mb-2">Services Offered*</label>
-//           <p className="text-sm text-gray-600 mb-4">Select all relevant security services:</p>
-          
-//           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-//             {services.map((service) => (
-//               <div key={service} className="flex items-center bg-gray-100 p-3 rounded-md shadow-md hover:bg-gray-200 transition">
-//                 <input
-//                   type="checkbox"
-//                   id={service}
-//                   checked={selectedServices.includes(service)}
-//                   onChange={() => handleServiceToggle(service)}
-//                   className="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500"
-//                 />
-//                 <label htmlFor={service} className="ml-3 flex items-center text-gray-700 font-medium">
-//                   <FaCheckCircle className={selectedServices.includes(service) ? "text-blue-500 mr-2" : "text-gray-400 mr-2"} />
-//                   {service}
-//                 </label>
-//               </div>
-//             ))}
+//   <div style={{marginTop:'90px'}} className="min-h-screen bg-gray-100 p-4 md:p-8 lg:px-32">
+//           <div className="absolute top-4 left-4 mt-18 flex items-center text-gray-600 hover:text-black">
+//             <button
+//               className="flex items-center text-gray-600 hover:text-black transition-all duration-200 mb-6"
+//               onClick={() => router.back()}
+//             >
+//               <ArrowLeft className="w-6 h-6 mr-2" />
+//             </button>
+//           </div>
+//         {/* Header */}
+//         <h1 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-6">
+//           Find <span className="text-black">Security Providers</span> Near You
+//         </h1>
+  
+//         {/* Search Form - Responsive */}
+//         <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+//           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+//             {/* Search Type */}
+//             <div className="flex flex-col">
+//               <label className="text-gray-900 font-medium flex items-center gap-2">
+//                 <FaBuilding /> I'm looking for
+//               </label>
+//               <select
+//                 value={searchType}
+//                 onChange={(e) => setSearchType(e.target.value)}
+//                 className="w-full p-3 border border-gray-400 rounded-md focus:ring-2 focus:ring-black"
+//               >
+//                 <option value="SECURITY COMPANY">SECURITY COMPANY</option>
+//                 <option value="SECURITY GUARD">SECURITY GUARD</option>
+//                 <option value="ALARM SYSTEM">ALARM SYSTEM</option>
+//               </select>
+//             </div>
+  
+//             {/* Distance */}
+//             <div className="flex flex-col">
+//               <label className="text-gray-900 font-medium flex items-center gap-2">
+//                 <FaRoute /> Within
+//               </label>
+//               <select
+//                 value={distance}
+//                 onChange={(e) => setDistance(e.target.value)}
+//                 className="w-full p-3 border border-gray-400 rounded-md focus:ring-2 focus:ring-black"
+//               >
+//                 <option value="5 Miles">5 Miles</option>
+//                 <option value="10 Miles">10 Miles</option>
+//                 <option value="25 Miles">25 Miles</option>
+//                 <option value="50 Miles">50 Miles</option>
+//               </select>
+//             </div>
+  
+//             {/* Postcode */}
+//             <div className="flex flex-col">
+//               <label className="text-gray-900 font-medium flex items-center gap-2">
+//                 <FaMapMarkerAlt /> Postcode
+//               </label>
+//               <input
+//                 type="text"
+//                 value={postcode}
+//                 onChange={(e) => setPostcode(e.target.value)}
+//                 placeholder="Enter Postcode"
+//                 className="w-full p-3 border border-gray-400 rounded-md focus:ring-2 focus:ring-black"
+//               />
+//             </div>
+  
+//             {/* Filter */}
+//             <div className="flex flex-col">
+//               <label className="text-gray-900 font-medium flex items-center gap-2">
+//                 <FaFilter /> Filter Results
+//               </label>
+//               <select
+//                 value={filter}
+//                 onChange={(e) => setFilter(e.target.value)}
+//                 className="w-full p-3 border border-gray-400 rounded-md focus:ring-2 focus:ring-black"
+//               >
+//                 <option>All Results</option>
+//                 <option>Top Rated</option>
+//                 <option>Most Affordable</option>
+//                 <option>24/7 Available</option>
+//               </select>
+//             </div>
+  
+//             {/* Search Button */}
+//             <div className="flex items-end">
+//               <button
+//                 className="w-full py-3 bg-gradient-to-r from-black to-gray-900 text-white rounded-md font-medium hover:from-gray-800 hover:to-gray-900 transition flex justify-center items-center gap-2"
+//                 onClick={() => console.log("Search Submitted")}
+//               >
+//                 <FaSearch /> Search
+//               </button>
+//             </div>
 //           </div>
 //         </div>
-
-//         <div>
-//           <label className="block text-sm font-medium text-gray-700 mb-1">Other Services:</label>
-//           <input
-//             type="text"
-//             value={otherService}
-//             onChange={(e) => setOtherService(e.target.value)}
-//             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-//             placeholder="Enter any additional service"
-//           />
 //         </div>
-
-//         <button
-//           type="submit"
-//           className="w-full md:w-auto px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-//         >
-//           Save Profile
-//         </button>
-//       </form>
-//     </div>
 //   );
 // };
 
-// export default JobPosting;
+// export default ViewJobs;
+
