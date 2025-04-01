@@ -1,13 +1,15 @@
-
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaBuilding, FaClipboardList, FaIndustry, FaMapMarkerAlt, FaPhone, FaUserTie } from "react-icons/fa";
 import { BsPostcard } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
 import { MdReport } from "react-icons/md";
 import { Globe, Mail, Lock } from "lucide-react";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
+import { FaCheck } from "react-icons/fa";
+import Select from "react-select";
+
 interface BusinessFormProps {
   id: number;
   title: string;
@@ -17,14 +19,32 @@ interface BusinessFormProps {
 const BusinessForm: React.FC<BusinessFormProps> = ({ id, title, onSubmit }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
-  
+  const [passwordValidations, setPasswordValidations] = useState({
+    length: false,
+    hasUpper: false,
+    hasLower: false,
+    hasNumber: false,
+    hasSpecial: false,
+    isValid: false
+  });
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [showAllErrors, setShowAllErrors] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const serviceOptions = [
+    { value: "Online training", label: "Online Training" },
+    { value: "Certification courses", label: "Certification Courses" },
+    { value: "Physical security", label: "Physical Security" },
+    { value: "Cybersecurity", label: "Cybersecurity" },
+  ];
   const [formData, setFormData] = useState({
     companyName: "",
     registrationNumber: "",
     address: "",
     password: "",
     postCode: "",
-    industryType: "",  // Ensure it is not `undefined`
+    industryType: "",
     contactPerson: "",
     jobTitle: "",
     email: "",
@@ -36,7 +56,6 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ id, title, onSubmit }) => {
     receiveEmails: false,
     acceptTerms: false,
   });
-  
 
   useEffect(() => {
     const handleResize = () => {
@@ -47,29 +66,133 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ id, title, onSubmit }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleChange = (e: any) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
+  // Validate entire form whenever form data changes
+  useEffect(() => {
+    const isValid = validateForm();
+    setIsFormValid(isValid);
+  }, [formData, passwordValidations]);
+
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
   };
 
-  const handleSubmit = (e: any) => {
+  const validatePassword = (password: string) => {
+    const validations = {
+      length: password.length >= 8,
+      hasUpper: /[A-Z]/.test(password),
+      hasLower: /[a-z]/.test(password),
+      hasNumber: /\d/.test(password),
+      hasSpecial: /[.\-_!@#$%^*]/.test(password),
+      isValid: false
+    };
+    validations.isValid = Object.values(validations).slice(0, 5).every(Boolean);
+    return validations;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    
+    setFormErrors(prev => ({ ...prev, [name]: "" }));
+
+    if (type === "checkbox") {
+      setFormData({
+        ...formData,
+        [name]: checked,
+      });
+    } else {
+      setFormData({ ...formData, [name]: value });
+
+      if (name === "password") {
+        setPasswordValidations(validatePassword(value));
+      }
+    }
+  };
+  const handleMultiSelectChange = (selectedOptions: any, field: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: selectedOptions.map((option: any) => option.value),
+    }));
+  };
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    let isValid = true;
+
+    // Email validation
+    if (!formData.email.trim()) {
+      errors.email = "Email is required";
+      isValid = false;
+    } else if (!validateEmail(formData.email)) {
+      errors.email = "Please enter a valid email";
+      isValid = false;
+    }
+
+    // Password validation
+    if (!formData.password.trim()) {
+      errors.password = "Password is required";
+      isValid = false;
+    } else if (!passwordValidations.isValid) {
+      errors.password = "Password doesn't meet requirements";
+      isValid = false;
+    }
+
+    // Company validation
+    if (!formData.companyName.trim()) {
+      errors.companyName = "Company name is required";
+      isValid = false;
+    }
+
+    // Address validation
+    if (!formData.address.trim()) {
+      errors.address = "Address is required";
+      isValid = false;
+    }
+
+    // Contact person validation
+    if (!formData.contactPerson.trim()) {
+      errors.contactPerson = "Contact person is required";
+      isValid = false;
+    }
+
+    // Terms validation
+    if (!formData.acceptTerms) {
+      errors.acceptTerms = "You must accept the terms and conditions";
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid && Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const isValid = validateForm();
+    setIsFormValid(isValid);
+
+    if (!isValid) {
+      setShowAllErrors(true);
+      setTimeout(() => {
+        const firstError = document.querySelector('.border-red-500');
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      return;
+    }
+
     const formattedData = {
       email: formData.email,
       password: formData.password,
       firstName: formData.companyName.split(" ")[0],
       lastName: formData.companyName.split(" ")[1] || "",
       phoneNumber: formData.phone,
-      
       companyData: {
         companyName: formData.companyName,
         registrationNumber: formData.registrationNumber,
-        address: formData.address,  // <-- Changed from `businessAddress` to `address`
+        address: formData.address,
         postCode: formData.postCode,
-        industryType: formData.industryType, // <-- Ensure this is not `undefined`
+        industryType: formData.industryType,
         contactPerson: formData.contactPerson,
         jobTitle: formData.jobTitle,
         phoneNumber: formData.phone,
@@ -87,41 +210,59 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ id, title, onSubmit }) => {
     
     onSubmit(formattedData);
   };
-  
+
+  const fieldConfig = {
+    companyName: { placeholder: "Enter company name", icon: <FaBuilding size={18}/>, required: true },
+    registrationNumber: { placeholder: "Enter registration number", icon: <FaUserTie size={18}/>, required: false },
+    address: { placeholder: "Enter address", icon: <FaMapMarkerAlt size={18}/>, required: true },
+    postCode: { placeholder: "Enter post code", icon: <BsPostcard size={18}/>, required: false },
+    industryType: { placeholder: "Enter industry type", icon: <FaIndustry size={18}/>, required: false },
+    contactPerson: { placeholder: "Enter contact person", icon: <CgProfile size={18}/>, required: true },
+    jobTitle: { placeholder: "Enter job title", icon: <MdReport size={18}/>, required: false },
+    email: { placeholder: "Enter email", icon: <Mail size={18}/>, type: "email", required: true },
+    phone: { placeholder: "Enter phone number", icon: <FaPhone size={18}/>, type: "tel", required: false },
+    website: { placeholder: "Enter website URL", icon: <Globe size={18}/>, required: false },
+    // serviceRequirements: { placeholder: "Enter service requirements", icon: <FaClipboardList size={18}/>, required: false },
+  };
 
   return (
     <div className="max-w-3xl mt-10 mx-auto bg-white shadow-lg p-6 md:p-8 rounded-lg">
       <h2 className="text-center text-2xl font-bold mb-6">{title}</h2>
-      <form onSubmit={handleSubmit} className="grid gap-4 grid-cols-1 md:grid-cols-2">
-        {["companyName", "registrationNumber", "address", "postCode", "industryType", "contactPerson", "jobTitle", "email", "phone", "website", "serviceRequirements"].map((field, index) => {
-          const fieldProps: any = {
-            companyName: { placeholder: "Enter company name", icon: <FaBuilding size={18}/> },
-            registrationNumber: { placeholder: "Enter registration number", icon: <FaUserTie size={18}/> },
-            address: { placeholder: "Enter address", icon: <FaMapMarkerAlt size={18}/> },
-            postCode: { placeholder: "Enter post code", icon: <BsPostcard size={18}/> },
-            industryType: { placeholder: "Enter industry type", icon: <FaIndustry size={18}/> },
-            contactPerson: { placeholder: "Enter contact person", icon: <CgProfile size={18}/> },
-            jobTitle: { placeholder: "Enter job title", icon: <MdReport size={18}/> },
-            email: { placeholder: "Enter email", icon: <Mail size={18}/>, type: "email" },
-            phone: { placeholder: "Enter phone number", icon: <FaPhone size={18}/>, type: "tel" },
-            website: { placeholder: "Enter website URL", icon: <Globe size={18}/> },
-            serviceRequirements: { placeholder: "Enter service requirements", icon: <FaClipboardList size={18}/> },
-          }[field];
+      <form ref={formRef} onSubmit={handleSubmit} className="grid gap-4 grid-cols-1 md:grid-cols-2">
+        {Object.entries(fieldConfig).map(([field, props]) => {
+          const { icon, ...inputProps } = props;
+          const error = formErrors[field];
+          const showError = showAllErrors && error;
+          
           return (
-            <div key={index} className="relative">
-              {fieldProps.icon && React.cloneElement(fieldProps.icon, { className: "absolute left-3 top-3 text-gray-500" })}
+            <div key={field} className="relative">
+              {icon && React.cloneElement(icon, { className: "absolute left-3 top-3 text-gray-500" })}
               <input
-                type={fieldProps.type || "text"}
+                {...inputProps}
                 name={field}
                 value={(formData as any)[field]}
                 onChange={handleChange}
-                placeholder={fieldProps.placeholder}
-                className="w-full pl-10 pr-4 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+                className={`w-full pl-10 pr-4 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+                  showError ? "border-red-500" : "border-gray-300"
+                }`}
               />
+              {showError && (
+                <p className="mt-1 text-xs text-red-500">{error}</p>
+              )}
             </div>
           );
         })}
-
+        {/* Service Requirements */}
+        <div className="relative">
+          <FaClipboardList className="absolute left-3 top-3 text-gray-500" />
+          <Select
+            isMulti
+            options={serviceOptions}
+            placeholder="Select Service Requirements"
+            className="w-full pl-10"
+            onChange={selected => handleMultiSelectChange(selected, "serviceRequirements")}
+          />
+        </div>
         {/* Password Field */}
         <div className="relative">
           <Lock size={18} className="absolute left-3 top-3 text-gray-500" />
@@ -132,7 +273,9 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ id, title, onSubmit }) => {
             onChange={handleChange}
             required
             placeholder="Password"
-            className="w-full pl-10 pr-10 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+            className={`w-full pl-10 pr-10 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+              (showAllErrors && formErrors.password) ? "border-red-500" : "border-gray-300"
+            }`}
           />
           <button
             type="button"
@@ -141,26 +284,275 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ id, title, onSubmit }) => {
           >
             {passwordVisible ? <IoMdEyeOff /> : <IoMdEye />}
           </button>
+          
+          {(formData.password || showAllErrors) && (
+            <div className="mt-2 text-xs space-y-1">
+              {(!passwordValidations.length || showAllErrors) && (
+                <p className={passwordValidations.length ? "text-green-500" : "text-red-500"}>
+                  {passwordValidations.length ? "✓" : "✗"} At least 8 characters
+                </p>
+              )}
+              {(!passwordValidations.hasUpper || showAllErrors) && (
+                <p className={passwordValidations.hasUpper ? "text-green-500" : "text-red-500"}>
+                  {passwordValidations.hasUpper ? "✓" : "✗"} At least one capital letter
+                </p>
+              )}
+              {(!passwordValidations.hasLower || showAllErrors) && (
+                <p className={passwordValidations.hasLower ? "text-green-500" : "text-red-500"}>
+                  {passwordValidations.hasLower ? "✓" : "✗"} At least one small letter
+                </p>
+              )}
+              {(!passwordValidations.hasNumber || showAllErrors) && (
+                <p className={passwordValidations.hasNumber ? "text-green-500" : "text-red-500"}>
+                  {passwordValidations.hasNumber ? "✓" : "✗"} At least one number
+                </p>
+              )}
+              {(!passwordValidations.hasSpecial || showAllErrors) && (
+                <p className={passwordValidations.hasSpecial ? "text-green-500" : "text-red-500"}>
+                  {passwordValidations.hasSpecial ? "✓" : "✗"} At least one special character (. - _ ! @ # $ % ^ *)
+                </p>
+              )}
+            </div>
+          )}
+          {(showAllErrors && formErrors.password) && (
+            <p className="mt-1 text-xs text-red-500">{formErrors.password}</p>
+          )}
         </div>
 
         {/* Checkboxes */}
         <div className="col-span-1 md:col-span-2 flex flex-col gap-2">
-          {["Interested in premium service package for enhanced visibility?", "Any specific security challenges or requirements?", "Receive updates via email", "acceptTerms"].map((field, index) => (
-            <label key={index} className="flex items-center space-x-2 text-black">
-              <input type="checkbox" name={field} checked={(formData as any)[field]} onChange={handleChange} />
-              <span>{field === "acceptTerms" ? "Accept Terms & Privacy Policy" : `${field.replace(/([A-Z])/g, ' $1')}`}</span>
-            </label>
-          ))}
+          <label className="flex items-center space-x-2 text-black">
+            <input 
+              type="checkbox" 
+              name="premiumService" 
+              checked={formData.premiumService} 
+              onChange={handleChange} 
+            />
+            <span>Interested in premium service package for enhanced visibility?</span>
+          </label>
+          
+          <label className="flex items-center space-x-2 text-black">
+            <input 
+              type="checkbox" 
+              name="securityChallenges" 
+              checked={formData.securityChallenges} 
+              onChange={handleChange} 
+            />
+            <span>Any specific security challenges or requirements?</span>
+          </label>
+          
+          <label className="flex items-center space-x-2 text-black">
+            <input 
+              type="checkbox" 
+              name="receiveEmails" 
+              checked={formData.receiveEmails} 
+              onChange={handleChange} 
+            />
+            <span>Receive updates via email</span>
+          </label>
+          
+          <label className={`flex items-start space-x-2 text-black ${showAllErrors && formErrors.acceptTerms ? "text-red-500" : ""}`}>
+            <input 
+              type="checkbox" 
+              name="acceptTerms" 
+              checked={formData.acceptTerms} 
+              onChange={handleChange} 
+              className={`mt-1 ${showAllErrors && formErrors.acceptTerms ? "border-red-500" : ""}`}
+            />
+            <span>
+              Accept <a href="#" className="underline">Terms & Privacy Policy</a>
+              {showAllErrors && formErrors.acceptTerms && (
+                <span className="block text-xs text-red-500">{formErrors.acceptTerms}</span>
+              )}
+            </span>
+          </label>
         </div>
 
         {/* Submit Button */}
-        <button type="submit" className="bg-black text-white py-3 px-4 rounded w-full font-bold hover:opacity-80 col-span-1 md:col-span-2">Submit</button>
+        <button 
+          type="submit" 
+          className={`bg-black text-white py-3 px-4 rounded w-full font-bold hover:opacity-80 col-span-1 md:col-span-2 ${
+            !isFormValid ? "opacity-70 cursor-not-allowed" : ""
+          }`}
+          disabled={!isFormValid}
+        >
+          <FaCheck className="inline mr-2" /> Submit
+        </button>
       </form>
     </div>
   );
 };
 
 export default BusinessForm;
+
+
+
+
+
+
+
+// "use client";
+
+// import React, { useState, useEffect } from "react";
+// import { FaBuilding, FaClipboardList, FaIndustry, FaMapMarkerAlt, FaPhone, FaUserTie } from "react-icons/fa";
+// import { BsPostcard } from "react-icons/bs";
+// import { CgProfile } from "react-icons/cg";
+// import { MdReport } from "react-icons/md";
+// import { Globe, Mail, Lock } from "lucide-react";
+// import { IoMdEye, IoMdEyeOff } from "react-icons/io";
+// interface BusinessFormProps {
+//   id: number;
+//   title: string;
+//   onSubmit: (data: any) => void;
+// }
+
+// const BusinessForm: React.FC<BusinessFormProps> = ({ id, title, onSubmit }) => {
+//   const [isMobile, setIsMobile] = useState(false);
+//   const [passwordVisible, setPasswordVisible] = useState(false);
+  
+//   const [formData, setFormData] = useState({
+//     companyName: "",
+//     registrationNumber: "",
+//     address: "",
+//     password: "",
+//     postCode: "",
+//     industryType: "",  // Ensure it is not `undefined`
+//     contactPerson: "",
+//     jobTitle: "",
+//     email: "",
+//     phone: "",
+//     website: "",
+//     serviceRequirements: "",
+//     premiumService: false,
+//     securityChallenges: false,
+//     receiveEmails: false,
+//     acceptTerms: false,
+//   });
+  
+
+//   useEffect(() => {
+//     const handleResize = () => {
+//       setIsMobile(window.innerWidth < 768);
+//     };
+//     handleResize();
+//     window.addEventListener("resize", handleResize);
+//     return () => window.removeEventListener("resize", handleResize);
+//   }, []);
+
+//   const handleChange = (e: any) => {
+//     const { name, value, type, checked } = e.target;
+//     setFormData({
+//       ...formData,
+//       [name]: type === "checkbox" ? checked : value,
+//     });
+//   };
+
+//   const handleSubmit = (e: any) => {
+//     e.preventDefault();
+//     const formattedData = {
+//       email: formData.email,
+//       password: formData.password,
+//       firstName: formData.companyName.split(" ")[0],
+//       lastName: formData.companyName.split(" ")[1] || "",
+//       phoneNumber: formData.phone,
+      
+//       companyData: {
+//         companyName: formData.companyName,
+//         registrationNumber: formData.registrationNumber,
+//         address: formData.address,  // <-- Changed from `businessAddress` to `address`
+//         postCode: formData.postCode,
+//         industryType: formData.industryType, // <-- Ensure this is not `undefined`
+//         contactPerson: formData.contactPerson,
+//         jobTitle: formData.jobTitle,
+//         phoneNumber: formData.phone,
+//         website: formData.website,
+//       },
+//       serviceRequirements: formData.serviceRequirements,
+//       securityServicesOfferings: formData.premiumService,
+//       permissions: {
+//         premiumServiceNeed: formData.premiumService,
+//         acceptEmails: formData.receiveEmails,
+//         acceptTerms: formData.acceptTerms,
+//       },
+//       roleId: id,
+//     };
+    
+//     onSubmit(formattedData);
+//   };
+  
+
+//   return (
+//     <div className="max-w-3xl mt-10 mx-auto bg-white shadow-lg p-6 md:p-8 rounded-lg">
+//       <h2 className="text-center text-2xl font-bold mb-6">{title}</h2>
+//       <form onSubmit={handleSubmit} className="grid gap-4 grid-cols-1 md:grid-cols-2">
+//         {["companyName", "registrationNumber", "address", "postCode", "industryType", "contactPerson", "jobTitle", "email", "phone", "website", "serviceRequirements"].map((field, index) => {
+//           const fieldProps: any = {
+//             companyName: { placeholder: "Enter company name", icon: <FaBuilding size={18}/> },
+//             registrationNumber: { placeholder: "Enter registration number", icon: <FaUserTie size={18}/> },
+//             address: { placeholder: "Enter address", icon: <FaMapMarkerAlt size={18}/> },
+//             postCode: { placeholder: "Enter post code", icon: <BsPostcard size={18}/> },
+//             industryType: { placeholder: "Enter industry type", icon: <FaIndustry size={18}/> },
+//             contactPerson: { placeholder: "Enter contact person", icon: <CgProfile size={18}/> },
+//             jobTitle: { placeholder: "Enter job title", icon: <MdReport size={18}/> },
+//             email: { placeholder: "Enter email", icon: <Mail size={18}/>, type: "email" },
+//             phone: { placeholder: "Enter phone number", icon: <FaPhone size={18}/>, type: "tel" },
+//             website: { placeholder: "Enter website URL", icon: <Globe size={18}/> },
+//             serviceRequirements: { placeholder: "Enter service requirements", icon: <FaClipboardList size={18}/> },
+//           }[field];
+//           return (
+//             <div key={index} className="relative">
+//               {fieldProps.icon && React.cloneElement(fieldProps.icon, { className: "absolute left-3 top-3 text-gray-500" })}
+//               <input
+//                 type={fieldProps.type || "text"}
+//                 name={field}
+//                 value={(formData as any)[field]}
+//                 onChange={handleChange}
+//                 placeholder={fieldProps.placeholder}
+//                 className="w-full pl-10 pr-4 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+//               />
+//             </div>
+//           );
+//         })}
+
+//         {/* Password Field */}
+//         <div className="relative">
+//           <Lock size={18} className="absolute left-3 top-3 text-gray-500" />
+//           <input
+//             type={passwordVisible ? "text" : "password"}
+//             name="password"
+//             value={formData.password}
+//             onChange={handleChange}
+//             required
+//             placeholder="Password"
+//             className="w-full pl-10 pr-10 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+//           />
+//           <button
+//             type="button"
+//             className="absolute right-3 top-3 text-gray-500"
+//             onClick={() => setPasswordVisible(!passwordVisible)}
+//           >
+//             {passwordVisible ? <IoMdEyeOff /> : <IoMdEye />}
+//           </button>
+//         </div>
+
+//         {/* Checkboxes */}
+//         <div className="col-span-1 md:col-span-2 flex flex-col gap-2">
+//           {["Interested in premium service package for enhanced visibility?", "Any specific security challenges or requirements?", "Receive updates via email", "acceptTerms"].map((field, index) => (
+//             <label key={index} className="flex items-center space-x-2 text-black">
+//               <input type="checkbox" name={field} checked={(formData as any)[field]} onChange={handleChange} />
+//               <span>{field === "acceptTerms" ? "Accept Terms & Privacy Policy" : `${field.replace(/([A-Z])/g, ' $1')}`}</span>
+//             </label>
+//           ))}
+//         </div>
+
+//         {/* Submit Button */}
+//         <button type="submit" className="bg-black text-white py-3 px-4 rounded w-full font-bold hover:opacity-80 col-span-1 md:col-span-2">Submit</button>
+//       </form>
+//     </div>
+//   );
+// };
+
+// export default BusinessForm;
 
 
 

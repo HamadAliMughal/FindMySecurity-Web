@@ -1,17 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { LockIcon } from "lucide-react";
 import { FaEnvelope, FaMapMarkerAlt, FaUser, FaPhone } from "react-icons/fa";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
+
 interface ClientGeneralFormProps {
   id: number;
   title: string;
-  onSubmit: (data: any) => void; // Callback function to pass data to parent
+  onSubmit: (data: any) => void;
 }
 
 const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubmit }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [passwordValidations, setPasswordValidations] = useState({
+    length: false,
+    hasUpper: false,
+    hasLower: false,
+    hasNumber: false,
+    hasSpecial: false,
+    isValid: false
+  });
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [showAllErrors, setShowAllErrors] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -23,8 +37,35 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
     address: "",
   });
 
+  // Validate entire form whenever form data changes
+  useEffect(() => {
+    const isValid = validateForm();
+    setIsFormValid(isValid);
+  }, [formData, passwordValidations]);
+
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
+  const validatePassword = (password: string) => {
+    const validations = {
+      length: password.length >= 8,
+      hasUpper: /[A-Z]/.test(password),
+      hasLower: /[a-z]/.test(password),
+      hasNumber: /\d/.test(password),
+      hasSpecial: /[.\-_!@#$%^*]/.test(password),
+      isValid: false
+    };
+    validations.isValid = Object.values(validations).slice(0, 5).every(Boolean);
+    return validations;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
+    
+    setFormErrors(prev => ({ ...prev, [name]: "" }));
+
     if (["day", "month", "year"].includes(name)) {
       setFormData({
         ...formData,
@@ -32,11 +73,78 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
       });
     } else {
       setFormData({ ...formData, [name]: value });
+
+      if (name === "password") {
+        setPasswordValidations(validatePassword(value));
+      }
     }
+  };
+
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    let isValid = true;
+
+    // Email validation
+    if (!formData.email.trim()) {
+      errors.email = "Email is required";
+      isValid = false;
+    } else if (!validateEmail(formData.email)) {
+      errors.email = "Please enter a valid email";
+      isValid = false;
+    }
+
+    // Password validation
+    if (!formData.password.trim()) {
+      errors.password = "Password is required";
+      isValid = false;
+    } else if (!passwordValidations.isValid) {
+      errors.password = "Password doesn't meet requirements";
+      isValid = false;
+    }
+
+    // Name validation
+    if (!formData.firstName.trim()) {
+      errors.firstName = "First name is required";
+      isValid = false;
+    }
+
+    if (!formData.lastName.trim()) {
+      errors.lastName = "Last name is required";
+      isValid = false;
+    }
+
+    // Date of birth validation
+    if (!formData.dateOfBirth.day || !formData.dateOfBirth.month || !formData.dateOfBirth.year) {
+      errors.dateOfBirth = "Date of birth is required";
+      isValid = false;
+    }
+
+    // Address validation
+    if (!formData.address.trim()) {
+      errors.address = "Address is required";
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid && Object.keys(errors).length === 0;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const isValid = validateForm();
+    setIsFormValid(isValid);
+
+    if (!isValid) {
+      setShowAllErrors(true);
+      setTimeout(() => {
+        const firstError = document.querySelector('.border-red-500');
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      return;
+    }
 
     const { day, month, year } = formData.dateOfBirth;
     const formattedDateOfBirth = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
@@ -54,7 +162,6 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
       roleId: id,
     };
 
-    // Send data back to the parent component
     onSubmit(submissionData);
   };
 
@@ -62,7 +169,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
     <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-md">
       <h2 className="text-2xl font-bold text-center my-4 text-black">Free Registration For {title}</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
         {/* Email Address */}
         <div className="relative">
           <FaEnvelope className="absolute left-3 top-3 text-gray-500" />
@@ -73,8 +180,13 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
             onChange={handleChange}
             required
             placeholder="Email Address"
-            className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+            className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+              (showAllErrors && formErrors.email) ? "border-red-500" : "border-gray-300"
+            }`}
           />
+          {(showAllErrors && formErrors.email) && (
+            <p className="mt-1 text-xs text-red-500">{formErrors.email}</p>
+          )}
         </div>
 
         {/* Password */}
@@ -87,7 +199,9 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
             onChange={handleChange}
             required
             placeholder="Password"
-            className="w-full pl-10 pr-10 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+            className={`w-full pl-10 pr-10 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+              (showAllErrors && formErrors.password) ? "border-red-500" : "border-gray-300"
+            }`}
           />
           <button
             type="button"
@@ -96,6 +210,39 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
           >
             {passwordVisible ? <IoMdEyeOff /> : <IoMdEye />}
           </button>
+          
+          {(formData.password || showAllErrors) && (
+            <div className="mt-2 text-xs space-y-1">
+              {(!passwordValidations.length || showAllErrors) && (
+                <p className={passwordValidations.length ? "text-green-500" : "text-red-500"}>
+                  {passwordValidations.length ? "✓" : "✗"} At least 8 characters
+                </p>
+              )}
+              {(!passwordValidations.hasUpper || showAllErrors) && (
+                <p className={passwordValidations.hasUpper ? "text-green-500" : "text-red-500"}>
+                  {passwordValidations.hasUpper ? "✓" : "✗"} At least one capital letter
+                </p>
+              )}
+              {(!passwordValidations.hasLower || showAllErrors) && (
+                <p className={passwordValidations.hasLower ? "text-green-500" : "text-red-500"}>
+                  {passwordValidations.hasLower ? "✓" : "✗"} At least one small letter
+                </p>
+              )}
+              {(!passwordValidations.hasNumber || showAllErrors) && (
+                <p className={passwordValidations.hasNumber ? "text-green-500" : "text-red-500"}>
+                  {passwordValidations.hasNumber ? "✓" : "✗"} At least one number
+                </p>
+              )}
+              {(!passwordValidations.hasSpecial || showAllErrors) && (
+                <p className={passwordValidations.hasSpecial ? "text-green-500" : "text-red-500"}>
+                  {passwordValidations.hasSpecial ? "✓" : "✗"} At least one special character (. - _ ! @ # $ % ^ *)
+                </p>
+              )}
+            </div>
+          )}
+          {(showAllErrors && formErrors.password) && (
+            <p className="mt-1 text-xs text-red-500">{formErrors.password}</p>
+          )}
         </div>
 
         {/* Name Fields */}
@@ -108,8 +255,13 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
               value={formData.firstName}
               onChange={handleChange}
               placeholder="First Name"
-              className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+              className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+                (showAllErrors && formErrors.firstName) ? "border-red-500" : "border-gray-300"
+              }`}
             />
+            {(showAllErrors && formErrors.firstName) && (
+              <p className="mt-1 text-xs text-red-500">{formErrors.firstName}</p>
+            )}
           </div>
           <div className="relative">
             <FaUser className="absolute left-3 top-3 text-gray-500" />
@@ -119,8 +271,13 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
               value={formData.lastName}
               onChange={handleChange}
               placeholder="Last Name"
-              className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+              className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+                (showAllErrors && formErrors.lastName) ? "border-red-500" : "border-gray-300"
+              }`}
             />
+            {(showAllErrors && formErrors.lastName) && (
+              <p className="mt-1 text-xs text-red-500">{formErrors.lastName}</p>
+            )}
           </div>
         </div>
 
@@ -154,25 +311,49 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
         <div>
           <label className="block text-sm font-medium">Date of Birth</label>
           <div className="grid grid-cols-3 gap-2">
-            <select name="day" value={formData.dateOfBirth.day} onChange={handleChange} className="w-full px-3 py-2 border rounded-md bg-gray-100">
+            <select 
+              name="day" 
+              value={formData.dateOfBirth.day} 
+              onChange={handleChange} 
+              className={`w-full px-3 py-2 border rounded-md bg-gray-100 ${
+                (showAllErrors && formErrors.dateOfBirth) ? "border-red-500" : ""
+              }`}
+            >
               <option value="">DD</option>
               {[...Array(31)].map((_, i) => (
                 <option key={i} value={String(i + 1)}>{i + 1}</option>
               ))}
             </select>
-            <select name="month" value={formData.dateOfBirth.month} onChange={handleChange} className="w-full px-3 py-2 border rounded-md bg-gray-100">
+            <select 
+              name="month" 
+              value={formData.dateOfBirth.month} 
+              onChange={handleChange} 
+              className={`w-full px-3 py-2 border rounded-md bg-gray-100 ${
+                (showAllErrors && formErrors.dateOfBirth) ? "border-red-500" : ""
+              }`}
+            >
               <option value="">MM</option>
               {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
                 <option key={m} value={String(m)}>{m}</option>
               ))}
             </select>
-            <select name="year" value={formData.dateOfBirth.year} onChange={handleChange} className="w-full px-3 py-2 border rounded-md bg-gray-100">
+            <select 
+              name="year" 
+              value={formData.dateOfBirth.year} 
+              onChange={handleChange} 
+              className={`w-full px-3 py-2 border rounded-md bg-gray-100 ${
+                (showAllErrors && formErrors.dateOfBirth) ? "border-red-500" : ""
+              }`}
+            >
               <option value="">YYYY</option>
               {[...Array(100)].map((_, i) => (
                 <option key={i} value={String(2024 - i)}>{2024 - i}</option>
               ))}
             </select>
           </div>
+          {(showAllErrors && formErrors.dateOfBirth) && (
+            <p className="mt-1 text-xs text-red-500">{formErrors.dateOfBirth}</p>
+          )}
         </div>
 
         {/* Address */}
@@ -184,12 +365,23 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
             value={formData.address}
             onChange={handleChange}
             placeholder="Full Address"
-            className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+            className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+              (showAllErrors && formErrors.address) ? "border-red-500" : "border-gray-300"
+            }`}
           />
+          {(showAllErrors && formErrors.address) && (
+            <p className="mt-1 text-xs text-red-500">{formErrors.address}</p>
+          )}
         </div>
 
         {/* Submit Button */}
-        <button type="submit" className="w-full py-3 bg-black text-white font-bold rounded-md hover:bg-blue-700">
+        <button 
+          type="submit" 
+          className={`w-full py-3 text-white font-bold rounded-md transition-colors ${
+            isFormValid ? "bg-black hover:bg-gray-800" : "bg-gray-400 cursor-not-allowed"
+          }`}
+          disabled={!isFormValid}
+        >
           Join now for free
         </button>
       </form>
@@ -198,3 +390,206 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
 };
 
 export default ClientGeneralForm;
+
+
+
+// "use client";
+
+// import { useState } from "react";
+// import { LockIcon } from "lucide-react";
+// import { FaEnvelope, FaMapMarkerAlt, FaUser, FaPhone } from "react-icons/fa";
+// import { IoMdEye, IoMdEyeOff } from "react-icons/io";
+// interface ClientGeneralFormProps {
+//   id: number;
+//   title: string;
+//   onSubmit: (data: any) => void; // Callback function to pass data to parent
+// }
+
+// const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubmit }) => {
+//   const [passwordVisible, setPasswordVisible] = useState(false);
+//   const [formData, setFormData] = useState({
+//     email: "",
+//     password: "",
+//     firstName: "",
+//     lastName: "",
+//     screenName: "",
+//     phoneNumber: "",
+//     dateOfBirth: { day: "", month: "", year: "" },
+//     address: "",
+//   });
+
+//   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+//     const { name, value, type } = e.target;
+//     if (["day", "month", "year"].includes(name)) {
+//       setFormData({
+//         ...formData,
+//         dateOfBirth: { ...formData.dateOfBirth, [name]: value },
+//       });
+//     } else {
+//       setFormData({ ...formData, [name]: value });
+//     }
+//   };
+
+//   const handleSubmit = (e: React.FormEvent) => {
+//     e.preventDefault();
+
+//     const { day, month, year } = formData.dateOfBirth;
+//     const formattedDateOfBirth = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+
+//     const submissionData = {
+//       email: formData.email,
+//       password: formData.password,
+//       firstName: formData.firstName,
+//       lastName: formData.lastName,
+//       screenName: formData.screenName,
+//       phoneNumber: formData.phoneNumber,
+//       dateOfBirth: formattedDateOfBirth,
+//       address: formData.address,
+//       permissions: {},
+//       roleId: id,
+//     };
+
+//     // Send data back to the parent component
+//     onSubmit(submissionData);
+//   };
+
+//   return (
+//     <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-md">
+//       <h2 className="text-2xl font-bold text-center my-4 text-black">Free Registration For {title}</h2>
+
+//       <form onSubmit={handleSubmit} className="space-y-4">
+//         {/* Email Address */}
+//         <div className="relative">
+//           <FaEnvelope className="absolute left-3 top-3 text-gray-500" />
+//           <input
+//             type="email"
+//             name="email"
+//             value={formData.email}
+//             onChange={handleChange}
+//             required
+//             placeholder="Email Address"
+//             className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+//           />
+//         </div>
+
+//         {/* Password */}
+//         <div className="relative">
+//           <LockIcon className="absolute left-3 top-3 text-gray-500" />
+//           <input
+//             type={passwordVisible ? "text" : "password"}
+//             name="password"
+//             value={formData.password}
+//             onChange={handleChange}
+//             required
+//             placeholder="Password"
+//             className="w-full pl-10 pr-10 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+//           />
+//           <button
+//             type="button"
+//             className="absolute right-3 top-3 text-gray-500"
+//             onClick={() => setPasswordVisible(!passwordVisible)}
+//           >
+//             {passwordVisible ? <IoMdEyeOff /> : <IoMdEye />}
+//           </button>
+//         </div>
+
+//         {/* Name Fields */}
+//         <div className="grid grid-cols-2 gap-4">
+//           <div className="relative">
+//             <FaUser className="absolute left-3 top-3 text-gray-500" />
+//             <input
+//               type="text"
+//               name="firstName"
+//               value={formData.firstName}
+//               onChange={handleChange}
+//               placeholder="First Name"
+//               className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+//             />
+//           </div>
+//           <div className="relative">
+//             <FaUser className="absolute left-3 top-3 text-gray-500" />
+//             <input
+//               type="text"
+//               name="lastName"
+//               value={formData.lastName}
+//               onChange={handleChange}
+//               placeholder="Last Name"
+//               className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+//             />
+//           </div>
+//         </div>
+
+//         {/* Screen Name */}
+//         <div className="relative">
+//           <FaUser className="absolute left-3 top-3 text-gray-500" />
+//           <input
+//             type="text"
+//             name="screenName"
+//             value={formData.screenName}
+//             onChange={handleChange}
+//             placeholder="Screen Name"
+//             className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+//           />
+//         </div>
+
+//         {/* Phone Number */}
+//         <div className="relative">
+//           <FaPhone className="absolute left-3 top-3 text-gray-500" />
+//           <input
+//             type="text"
+//             name="phoneNumber"
+//             value={formData.phoneNumber}
+//             onChange={handleChange}
+//             placeholder="Phone Number"
+//             className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+//           />
+//         </div>
+
+//         {/* Date of Birth */}
+//         <div>
+//           <label className="block text-sm font-medium">Date of Birth</label>
+//           <div className="grid grid-cols-3 gap-2">
+//             <select name="day" value={formData.dateOfBirth.day} onChange={handleChange} className="w-full px-3 py-2 border rounded-md bg-gray-100">
+//               <option value="">DD</option>
+//               {[...Array(31)].map((_, i) => (
+//                 <option key={i} value={String(i + 1)}>{i + 1}</option>
+//               ))}
+//             </select>
+//             <select name="month" value={formData.dateOfBirth.month} onChange={handleChange} className="w-full px-3 py-2 border rounded-md bg-gray-100">
+//               <option value="">MM</option>
+//               {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+//                 <option key={m} value={String(m)}>{m}</option>
+//               ))}
+//             </select>
+//             <select name="year" value={formData.dateOfBirth.year} onChange={handleChange} className="w-full px-3 py-2 border rounded-md bg-gray-100">
+//               <option value="">YYYY</option>
+//               {[...Array(100)].map((_, i) => (
+//                 <option key={i} value={String(2024 - i)}>{2024 - i}</option>
+//               ))}
+//             </select>
+//           </div>
+//         </div>
+
+//         {/* Address */}
+//         <div className="relative">
+//           <FaMapMarkerAlt className="absolute left-3 top-3 text-gray-500" />
+//           <input
+//             type="text"
+//             name="address"
+//             value={formData.address}
+//             onChange={handleChange}
+//             placeholder="Full Address"
+//             className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+//           />
+//         </div>
+
+//         {/* Submit Button */}
+//         <button type="submit" className="w-full py-3 bg-black text-white font-bold rounded-md hover:bg-blue-700">
+//           Join now for free
+//         </button>
+//       </form>
+//     </div>
+//   );
+// };
+
+// export default ClientGeneralForm;
