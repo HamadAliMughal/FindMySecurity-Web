@@ -24,18 +24,44 @@ const ConnectingBusiness = () => {
     { id: 3, position: { lat: 51.505, lng: -0.13 }, title: "Security Company C" },
   ];
 
-  // Load Google Maps only on the client side
   useEffect(() => {
     setIsLoaded(true);
-    const storedData =
-    localStorage.getItem("profileData") || localStorage.getItem("loginData");
-  if (storedData) {
-    setProfileData(JSON.parse(storedData));
-  } else {
-    router.push("/"); // Redirect if no profile data is found
-  }
+    const searchMode = localStorage.getItem("searchMode");
+    
+    // Only run this code for advanced searches
+    if (searchMode === "advanced") {  // Fixed typo from "advance" to "advanced"
+      const storedData =
+        localStorage.getItem("profileData") || localStorage.getItem("loginData");
+      
+      if (storedData) {
+        setProfileData(JSON.parse(storedData));
+      } else {
+        router.push("/"); // Redirect if no profile data is found
+      }
+    }
+    
+    // For basic searches, we don't need to check profile data
   }, [router]);
-  if (!profileData) return null;
+  
+  if (!isLoaded || (localStorage.getItem("searchMode") === "advanced" && !profileData)) {
+    return null;
+  }
+//   // Load Google Maps only on the client side
+//   useEffect(() => {
+//     setIsLoaded(true);
+//     const searchMode = localStorage.getItem("searchMode");
+//     if(searchMode == "advance"){
+//         const storedData =
+//         localStorage.getItem("profileData") || localStorage.getItem("loginData");
+//       if (storedData) {
+//         setProfileData(JSON.parse(storedData));
+//       } else {
+//         router.push("/"); // Redirect if no profile data is found
+//       }
+//     }
+   
+//   }, [router]);
+//   if (!profileData) return null;
 
   // Ensure the map has a proper height
   const mapStyles = { width: "100%", height: "400px", borderRadius: "12px" };

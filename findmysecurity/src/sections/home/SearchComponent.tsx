@@ -181,7 +181,40 @@ export default function SearchComponent({ lookingForData, searchData,title }: Se
 
         {/* <button > */}
        {/* Disable the link when required fields are empty */}
+       
        <Link
+  href={
+    (showAdvanced
+      ? searchValues.lookingFor && searchValues.subCategory && searchValues.distance && searchValues.experience && searchValues.postcode
+      : searchValues.lookingFor && searchValues.subCategory && searchValues.postcode)
+      ? "/connecting-business"
+      : "#"
+  }
+  className={`flex items-center px-4 py-2 rounded-lg ${
+    (showAdvanced
+      ? searchValues.lookingFor && searchValues.subCategory && searchValues.distance && searchValues.experience && searchValues.postcode
+      : searchValues.lookingFor && searchValues.subCategory && searchValues.postcode)
+      ? "bg-black text-white hover:bg-gray-800"
+      : "bg-gray-400 text-gray-600 cursor-not-allowed"
+  }`}
+  onClick={(e) => {
+    if (
+      (showAdvanced
+        ? !searchValues.lookingFor || !searchValues.subCategory || !searchValues.distance || !searchValues.experience || !searchValues.postcode
+        : !searchValues.lookingFor || !searchValues.postcode)
+    ) {
+      e.preventDefault();
+    } else {
+      // Save to localStorage when valid and navigating
+      localStorage.setItem('searchValues', JSON.stringify(searchValues));
+      localStorage.setItem('searchMode', showAdvanced ? 'advanced' : 'basic');
+    }
+  }}
+>
+  <FaSearch className="mr-2" />
+  Go
+</Link>
+       {/* <Link
   href={
     // Check if either Basic or Advanced search fields are filled
     (showAdvanced
@@ -210,7 +243,7 @@ export default function SearchComponent({ lookingForData, searchData,title }: Se
 >
   <FaSearch className="mr-2" />
   Go
-</Link>
+</Link> */}
 
        
           {/* <Link href='/connecting-business' className="flex items-center px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800">
