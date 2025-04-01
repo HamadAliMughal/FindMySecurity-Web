@@ -10,7 +10,6 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [show2FA, setShow2FA] = useState(false);
   const [sessionToken, setSessionToken] = useState(""); // Store token for 2FA verification
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -22,7 +21,6 @@ const SignIn = () => {
       });
 
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }else{
@@ -45,8 +43,8 @@ const SignIn = () => {
       setShow2FA(false);
      
     }else if(code === sessionToken){
-
-    
+  
+        
  router.push('/profile')
     }
   };

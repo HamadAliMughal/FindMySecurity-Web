@@ -46,7 +46,6 @@ export default function RegistrationSelector() {
 
           // Optional: Store data in localStorage
       localStorage.setItem("profileData", JSON.stringify(responseData));
-
     // Redirect to profile page
     router.push("/profile");
      // Redirect after success

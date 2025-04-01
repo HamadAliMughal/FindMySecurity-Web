@@ -11,7 +11,6 @@ import {
   FaUserShield,
   FaCogs,
   FaAd,
-  FaSignOutAlt,
   FaBriefcase,
 } from "react-icons/fa";
 import { ArrowLeft } from "lucide-react";
@@ -20,8 +19,15 @@ import "../globals.css";
 const UserProfile: React.FC = () => {
   const [profileData, setProfileData] = useState<any>(null);
   const router = useRouter();
+  const [roleId, setRoleId] = useState(0);
 
   useEffect(() => {
+    
+    const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
+    const data = storedData1 ? JSON.parse(storedData1) : null;
+    setRoleId(data?.result?.role?.id || data?.result?.id)
+    console.log("Received Role ID:", roleId); // Log roleId in console
+
     const storedData =
       localStorage.getItem("profileData") || localStorage.getItem("loginData");
     if (storedData) {
@@ -29,7 +35,7 @@ const UserProfile: React.FC = () => {
     } else {
       router.push("/"); // Redirect if no profile data is found
     }
-  }, [router]);
+  }, [router, roleId]); // Re-run effect when roleId changes
 
   if (!profileData) return null;
 
@@ -104,12 +110,24 @@ const UserProfile: React.FC = () => {
             <span className="truncate">{profileData?.result?.email || "Email"}</span>
           </button>
           {/* Post Job */}
+          {
+          roleId ===5 || roleId ===7?(
           <button
             className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
             onClick={() => router.push("/job-posting")}
           >
             <FaBriefcase className="mr-2" /> Post a Job
           </button>
+           ) :
+           (
+            <button
+            className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+            onClick={() => router.push("/view-job")}
+          >
+            <FaBriefcase className="mr-2" /> View Jobs
+          </button>
+           )
+          }
         </div>
 
         {/* Upgrade Membership */}
@@ -122,8 +140,7 @@ const UserProfile: React.FC = () => {
           My Profile
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {[
-            { icon: <FaSearch />, label: "My Searches" },
+          {[{ icon: <FaSearch />, label: "My Searches" },
             { icon: <FaHeart />, label: "My Favourites" },
             { icon: <FaUserShield />, label: "Visitors" },
             { icon: <FaSearch />, label: "Advance Search" },
@@ -145,6 +162,162 @@ const UserProfile: React.FC = () => {
 };
 
 export default UserProfile;
+
+
+
+
+
+
+
+
+
+// "use client";
+
+// import React, { useEffect, useState } from "react";
+// import { useRouter } from "next/navigation";
+// import {
+//   FaMobileAlt,
+//   FaHome,
+//   FaEnvelope,
+//   FaSearch,
+//   FaHeart,
+//   FaUserShield,
+//   FaCogs,
+//   FaAd,
+//   FaSignOutAlt,
+//   FaBriefcase,
+// } from "react-icons/fa";
+// import { ArrowLeft } from "lucide-react";
+// import "../globals.css";
+
+// const UserProfile: React.FC = () => {
+//   const [profileData, setProfileData] = useState<any>(null);
+//   const router = useRouter();
+
+//   useEffect(() => {
+//     const storedData =
+//       localStorage.getItem("profileData") || localStorage.getItem("loginData");
+//     if (storedData) {
+//       setProfileData(JSON.parse(storedData));
+//     } else {
+//       router.push("/"); // Redirect if no profile data is found
+//     }
+//   }, [router]);
+
+//   if (!profileData) return null;
+
+//   return (
+//     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
+//       {/* Back Button */}
+//       <button
+//         className="absolute top-4 left-4 flex items-center text-gray-600 hover:text-black"
+//         onClick={() => router.push("/")}
+//       >
+//         <ArrowLeft className="w-6 h-6 mr-2" /> Back
+//       </button>
+
+//       {/* Profile Card */}
+//       <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-6 relative mt-12 md:mt-16">
+//         {/* Profile Header */}
+//         <div className="flex flex-col items-center md:flex-row md:items-center md:space-x-6">
+//           {/* Profile Picture */}
+//           <div
+//             className="w-28 h-28 bg-gray-300 rounded-full border-4 border-gray-200 shadow-md"
+//             style={{
+//               backgroundImage: `url(${profileData?.profileImage || "/images/profile.jpg"})`,
+//               backgroundSize: "cover",
+//               backgroundPosition: "center",
+//             }}
+//           ></div>
+//           {/* Profile Details */}
+//           <div className="text-center md:text-left">
+//             <h2 className="text-2xl font-semibold text-gray-800">
+//               {profileData?.result?.firstName +
+//                 " " +
+//                 profileData?.result?.lastName || "Mr. Y"}
+//             </h2>
+//             <p className="text-gray-500">
+//               {profileData?.result?.role?.name ||
+//                 profileData?.result?.role?.roleName ||
+//                 "Security Officer"}
+//             </p>
+//             <span className="text-sm text-yellow-500">
+//               ✅ Usually responds within 1 hour
+//             </span>
+//           </div>
+//         </div>
+
+//         {/* Membership Info */}
+//         <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-4">
+//           {["Industry", "Member since Jan 2016", "Last Updated Jan 2025", "Last Login 28 Jan 2025"].map(
+//             (info, index) => (
+//               <span key={index} className="bg-black text-white px-3 py-1 rounded-full text-sm">
+//                 {info}
+//               </span>
+//             )
+//           )}
+//         </div>
+
+//         {/* Contact Buttons */}
+//         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
+//           {/* Phone */}
+//           <button className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600">
+//             <FaMobileAlt className="mr-2" /> {profileData?.result?.phoneNumber || "Mobile"}
+//           </button>
+//           {/* Address */}
+//           <div className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-800">
+//             <FaHome className="mr-2" />
+//             <span className="truncate">
+//               {profileData?.result?.address || profileData?.result?.role?.address || "Home"}
+//             </span>
+//           </div>
+//           {/* Email */}
+//           <button className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-800">
+//             <FaEnvelope className="mr-2" />
+//             <span className="truncate">{profileData?.result?.email || "Email"}</span>
+//           </button>
+//           {/* Post Job */}
+//           <button
+//             className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+//             onClick={() => router.push("/job-posting")}
+//           >
+//             <FaBriefcase className="mr-2" /> Post a Job
+//           </button>
+//         </div>
+
+//         {/* Upgrade Membership */}
+//         <button className="mt-4 w-full bg-orange-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-orange-600">
+//           Upgrade My Membership
+//         </button>
+
+//         {/* Profile Actions */}
+//         <h3 className="text-lg font-semibold my-6 text-gray-800 text-center md:text-left">
+//           My Profile
+//         </h3>
+//         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+//           {[
+//             { icon: <FaSearch />, label: "My Searches" },
+//             { icon: <FaHeart />, label: "My Favourites" },
+//             { icon: <FaUserShield />, label: "Visitors" },
+//             { icon: <FaSearch />, label: "Advance Search" },
+//             { icon: <FaCogs />, label: "Customer Support" },
+//             { icon: <FaAd />, label: "Post Free Ad" },
+//           ].map((item, index) => (
+//             <div
+//               key={index}
+//               className="p-4 bg-gray-100 rounded-lg shadow-sm hover:bg-gray-200 transition text-center"
+//             >
+//               <div className="text-black text-2xl mx-auto">{item.icon}</div>
+//               <p className="text-gray-700 mt-2">{item.label}</p>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default UserProfile;
 
 
 
