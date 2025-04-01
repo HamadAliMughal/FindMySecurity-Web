@@ -3,27 +3,28 @@
 import React, { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Image from "next/image"; 
 import { FaSearch, FaMapMarkerAlt, FaFilter, FaBuilding, FaRoute } from "react-icons/fa";
 import { FaStar, FaRegStar, FaThumbsUp, FaListUl } from "react-icons/fa";
 // Define the default data structure
-const defaultData = {
-  screenName: "",
-  postcode: "London",
-  profileHeadline: "",
-  selectedServices: [],
-  otherService: "",
-  gender: "",
-  aboutMe: "",
-  experience: "",
-  availability: "",
-  selectedDates: [],
-  qualifications: "",
-  hourlyRate: "",
-  profilePhoto: null,
-  homeTelephone: "",
-  mobileTelephone: "",
-  website: ""
-};
+// const defaultData = {
+//   screenName: "",
+//   postcode: "London",
+//   profileHeadline: "",
+//   selectedServices: [],
+//   otherService: "",
+//   gender: "",
+//   aboutMe: "",
+//   experience: "",
+//   availability: "",
+//   selectedDates: [],
+//   qualifications: "",
+//   hourlyRate: "",
+//   profilePhoto: null,
+//   homeTelephone: "",
+//   mobileTelephone: "",
+//   website: ""
+// };
 
 const ViewJobs: React.FC = () => {
   const router = useRouter();
@@ -33,7 +34,7 @@ const ViewJobs: React.FC = () => {
   const [postcode, setPostcode] = useState<string>("");
   const [filter, setFilter] = useState<string>("All Results");
 
-  const [jobData, setJobData] = useState<any>(defaultData); // State to hold the job data
+  const [jobData, setJobData] = useState<any>({}); // State to hold the job data
 
   // Use useEffect to fetch data from localStorage when the component mounts
   useEffect(() => {
@@ -53,15 +54,16 @@ const ViewJobs: React.FC = () => {
     });
   };
   const profileData = {
-    name: "Mr. X",
-    title: "Security Officer in London",
-    rate: "From £14.00/hour",
+    name: jobData.screenName || "Mr. X",
+    title: jobData.profileHeadline || "Security Officer in London",
+    rate:  `From $${jobData.hourlyRate}/hour` || "From £14.00/hour",
     responseTime: "Usually responds within 12 hours",
     description: "A well-trained SIA Close Protection Officer with over 10 years of experience in the security industry, specialising in high-risk environments, VIP protection, and threat assessment. Adapt at risk mitigation, conflict resolution, and crisis management, ensuring the safety and security of clients at all times. Highly skilled in physical intervention, surveillance, and defensive tactics, with a strong ability to assess security threats in real-time. Experienced in working with high-profile individuals, ......",
     lastLogin: "Logged in 29 January 25",
     rating: 4.5,
     reviews: 12,
-    profileImage: "/profile-placeholder.jpg" // Replace with your image path
+    profileImage: jobData.profilePhoto || "/images/profile.jpg"
+    // Replace with your image path
   };
 
   // Function to render star ratings
@@ -178,11 +180,13 @@ const ViewJobs: React.FC = () => {
       <div className="mb-6 p-6 bg-white rounded-lg shadow-lg">
       <div className="flex items-start gap-4 mb-4">
         <div className="flex-shrink-0">
-          <img 
-            src={profileData.profileImage} 
-            alt={profileData.name}
-            className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
-          />
+        <Image 
+          src={profileData.profileImage} 
+          alt={profileData.name}
+          width={80}  // Corresponding to `w-20` (tailwind class, 5rem = 80px)
+          height={80} // Corresponding to `h-20` (tailwind class, 5rem = 80px)
+          className="rounded-full object-cover border-2 border-gray-200"
+        />
         </div>
         <div>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">{profileData.name}</h1>
