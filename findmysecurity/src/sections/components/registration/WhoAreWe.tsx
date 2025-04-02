@@ -19,10 +19,11 @@ export default function RegistrationSelector() {
   const router = useRouter();
 
   // Function to handle form submission and send data to API
-  const handleFormSubmit = async (formData: any) => {
-  
 
+
+  const handleFormSubmit = async (formData: any) => {
     try {
+      // Attempt registration directly
       const response = await fetch("https://findmysecurity-backend.onrender.com/api/auth/register", {
         method: "POST",
         headers: {
@@ -30,29 +31,78 @@ export default function RegistrationSelector() {
         },
         body: JSON.stringify(formData),
       });
-      
-      // Log response status and body
+  
       console.log("Response Status:", response.status);
       const responseData = await response.json();
       console.log("Response Data:", responseData);
-      
-      
-      if (!response.ok) {
-        throw new Error(responseData.message || "Failed to register. Please try again.");
-      }
-      localStorage.setItem("loginData",JSON.stringify(responseData));
   
-      console.log("Registration Success:", responseData);
-
-          // Optional: Store data in localStorage
+      if (!response.ok) {
+        // Handle specific error cases
+        if (response.status === 500 && responseData.error === 'Email already exists') {
+          alert("This email is already registered. Please use a different email.");
+        } else {
+          // Handle other error cases
+          const errorMessage = responseData.message || responseData.error || "Registration failed. Please try again.";
+          throw new Error(errorMessage);
+        }
+        return;
+      }
+  
+      // Success case
+      alert("User registered successfully");
+      localStorage.setItem("loginData", JSON.stringify(responseData));
       localStorage.setItem("profileData", JSON.stringify(responseData));
-    // Redirect to profile page
-    router.push("/profile");
-     // Redirect after success
+      router.push("/profile");
+  
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Registration error:", error);
+      
+      // More specific error messages
+      if (error instanceof Error) {
+        if (error.message.includes("Failed to fetch")) {
+          alert("Network error. Please check your internet connection.");
+        } else {
+          alert(error.message || "An unexpected error occurred. Please try again.");
+        }
+      } else {
+        alert("An unknown error occurred. Please try again.");
+      }
     }
   };
+  // const handleFormSubmit = async (formData: any) => {
+     
+    
+  //   try {
+     
+  
+  //     // Proceed with registration if email is unique
+  //     const response = await fetch("https://findmysecurity-backend.onrender.com/api/auth/register", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(formData),
+  //     });
+  //     console.log("Response Status:", response.status);
+  //     const responseData = await response.json();
+  //     console.log("Response Data:", responseData);
+      
+  //     if (!response.ok) {
+  //       throw new Error(responseData.message || "Failed to register. Please try again.");
+  //     }
+  //     alert("User registered Successfully")
+  //     localStorage.setItem("loginData", JSON.stringify(responseData));
+  //     console.log("Registration Success:", responseData);
+  
+  //     // Store profile data & redirect
+  //     localStorage.setItem("profileData", JSON.stringify(responseData));
+  //     router.push("/profile");
+  
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //   }
+  // };
+  
 
   // Function to render the correct form based on selection
   const renderForm = () => {
@@ -117,3 +167,39 @@ export default function RegistrationSelector() {
     </div>
   );
 }
+
+
+ // const handleFormSubmit = async (formData: any) => {
+
+  //   try {
+  //     const response1 = await fetch("https://findmysecurity-backend.onrender.com/api/auth/check-email")
+  //     const response = await fetch("https://findmysecurity-backend.onrender.com/api/auth/register", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(formData),
+  //     });
+      
+  //     // Log response status and body
+  //     console.log("Response Status:", response.status);
+  //     const responseData = await response.json();
+  //     console.log("Response Data:", responseData);
+      
+      
+  //     if (!response.ok) {
+  //       throw new Error(responseData.message || "Failed to register. Please try again.");
+  //     }
+  //     localStorage.setItem("loginData",JSON.stringify(responseData));
+  
+  //     console.log("Registration Success:", responseData);
+
+  //         // Optional: Store data in localStorage
+  //     localStorage.setItem("profileData", JSON.stringify(responseData));
+  //   // Redirect to profile page
+  //   router.push("/profile");
+  //    // Redirect after success
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //   }
+  // };
