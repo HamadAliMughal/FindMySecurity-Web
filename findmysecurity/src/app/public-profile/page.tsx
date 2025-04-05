@@ -1,15 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Calendar, momentLocalizer } from "react-big-calendar";
-import moment from "moment";
-import "react-big-calendar/lib/css/react-big-calendar.css";
 import { FaCheckCircle } from "react-icons/fa";
 import { CheckCircle, Loader2, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft} from "lucide-react";
-const localizer = momentLocalizer(moment);
+import { ArrowLeft } from "lucide-react";
 
 interface FormData {
   screenName: string;
@@ -21,21 +17,33 @@ interface FormData {
   aboutMe: string;
   experience: string;
   availability: string;
-  selectedDates: Date[];
   qualifications: string;
   hourlyRate: string;
-  profilePhoto: File | null;
+  profilePhoto: string | null;
   homeTelephone: string;
   mobileTelephone: string;
   website: string;
+  weeklySchedule: {
+    [timeSlot: string]: {
+      [day: string]: boolean;
+    };
+  };
 }
 
 const JobPosting: React.FC = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [profileData, setProfileData] = useState<any>(null);
- 
+  const days = ['Mon', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const timeSlots = [
+    'Before School',
+    'Morning',
+    'Afternoon',
+    'After School',
+    'Evening',
+    'Overnight'
+  ];
+
   // Initialize state with localStorage data or defaults
   const [formData, setFormData] = useState<FormData>(() => {
     const defaultData = {
@@ -48,87 +56,94 @@ const JobPosting: React.FC = () => {
       aboutMe: "",
       experience: "",
       availability: "",
-      selectedDates: [],
       qualifications: "",
       hourlyRate: "",
       profilePhoto: null,
       homeTelephone: "",
       mobileTelephone: "",
-      website: ""
+      website: "",
+      weeklySchedule: (() => {
+        const initialSchedule: any = {};
+        timeSlots.forEach(slot => {
+          initialSchedule[slot] = {};
+          days.forEach(day => {
+            initialSchedule[slot][day] = false;
+          });
+        });
+        return initialSchedule;
+      })()
     };
 
     if (typeof window === 'undefined') return defaultData;
 
     try {
       const savedData = localStorage.getItem('createdPublicProfiles');
+      console.log("savedData",savedData)
       if (!savedData) return defaultData;
 
       const parsedData = JSON.parse(savedData);
       return {
         ...defaultData,
         ...parsedData,
-        selectedDates: parsedData.selectedDates?.map((date: string) => new Date(date)) || []
+        weeklySchedule: parsedData.weeklySchedule || defaultData.weeklySchedule
       };
     } catch (error) {
       console.error("Error parsing saved form data:", error);
       return defaultData;
     }
   });
-  // Update localStorage whenever formData changes
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+
+  // Handle localStorage quota issues
+  const safeLocalStorageSet = (key: string, value: string) => {
+    try {
+      localStorage.setItem(key, value);
+    } catch (error) {
+      console.error("LocalStorage quota exceeded:", error);
+    }
+  };
+
+  
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      const file = e.target.files[0];
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          handleInputChange("profilePhoto", event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
     try {
-      const dataToStore = {
-        ...formData,
-        selectedDates: formData.selectedDates.map(date => date.toISOString()),
-        profilePhoto: null // Don't store File object in localStorage
-      };
-      localStorage.setItem('createdPublicProfiles', JSON.stringify(dataToStore));
-    } catch (error) {
-      console.error("Error saving form data:", error);
-    }
-    const storedData =
-    localStorage.getItem("profileData") || localStorage.getItem("loginData");
-  if (storedData) {
-    setProfileData(JSON.parse(storedData));
-  } else {
-    router.push("/"); // Redirect if no profile data is found
-  }
-  }, [formData,router]);
-  if (!profileData) return null;
+      // Prepare form data for submission
+      const dataToStore = { ...formData };
+      console.log("dataToStore",dataToStore)
+      safeLocalStorageSet("createdPublicProfiles", JSON.stringify(dataToStore));
 
+      // Simulate form submission delay
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      setShowModal(true);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("Error submitting the form. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleInputChange = <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
-  };
-
-  const handleSelectSlot = (slotInfo: { start: Date }) => {
-    setFormData(prev => {
-      const isAlreadySelected = prev.selectedDates.some(selectedDate => 
-        moment(selectedDate).isSame(slotInfo.start, "day")
-      );
-
-      const newDates = isAlreadySelected
-        ? prev.selectedDates.filter(selectedDate => 
-            !moment(selectedDate).isSame(slotInfo.start, "day")
-          )
-        : [...prev.selectedDates, slotInfo.start];
-
-      return {
-        ...prev,
-        selectedDates: newDates
-      };
-    });
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      handleInputChange('profilePhoto', e.target.files[0]);
-    }
   };
 
   const services = [
@@ -159,38 +174,36 @@ const JobPosting: React.FC = () => {
         : [...prev.selectedServices, service]
     }));
   };
-
+  const handleCheckboxChange = (timeSlot: string, day: string) => {
+    setFormData(prev => ({
+      ...prev,
+      weeklySchedule: {
+        ...prev.weeklySchedule,
+        [timeSlot]: {
+          ...prev.weeklySchedule[timeSlot],
+          [day]: !prev.weeklySchedule[timeSlot][day]
+        }
+      }
+    }));
+  };
   // const handleSubmit = async (e: React.FormEvent) => {
   //   e.preventDefault();
   //   setIsSubmitting(true);
-    
+
   //   try {
-  //     console.log("Submitting form data:", formData);
-  //     // Here you would typically send the data to your backend
-  //     // await submitFormData(formData);
-  //     // router.push('/success');
+  //     // Save to localStorage before submitting
+  //     localStorage.setItem('createdPublicProfiles', JSON.stringify(formData));
+
+  //     // Simulate API request delay
+  //     await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  //     setShowModal(true);
   //   } catch (error) {
   //     console.error("Form submission error:", error);
   //   } finally {
   //     setIsSubmitting(false);
   //   }
   // };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      // Simulate API request delay (Replace with actual API call)
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      setShowModal(true); // Show success modal
-    } catch (error) {
-      console.error("Form submission error:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
   const closeModalAndRedirect = () => {
     setShowModal(false);
     router.push("/profile"); // Redirect to profile page
@@ -374,22 +387,38 @@ const JobPosting: React.FC = () => {
             />
           </div>
 
-          {/* Calendar Table */}
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Weekly Availability</h3>
-            <Calendar
-              localizer={localizer}
-              selectable
-              events={formData.selectedDates.map((date: Date) => ({
-                start: date,
-                end: moment(date).add(1, "hours").toDate(),
-                title: "Available",
-              }))}
-              startAccessor="start"
-              endAccessor="end"
-              style={{ height: 500 }}
-              onSelectSlot={handleSelectSlot}
-            />
+          {/* Weekly Schedule Table with Checkboxes */}
+          <div className="mt-8">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Detailed Weekly Availability</h3>
+            <div className="overflow-x-auto">
+              <table className="min-w-full border border-gray-200">
+                <thead>
+                  <tr>
+                    <th className="border border-gray-300 px-4 py-2 bg-gray-100">Time Slot</th>
+                    {days.map(day => (
+                      <th key={day} className="border border-gray-300 px-4 py-2 bg-gray-100">{day}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {timeSlots.map(timeSlot => (
+                    <tr key={timeSlot}>
+                      <td className="border border-gray-300 px-4 py-2">{timeSlot}</td>
+                      {days.map(day => (
+                        <td key={`${timeSlot}-${day}`} className="border border-gray-300 px-4 py-2 text-center">
+                          <input
+                            type="checkbox"
+                            checked={formData.weeklySchedule[timeSlot][day]}
+                            onChange={() => handleCheckboxChange(timeSlot, day)}
+                            className="h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
+                          />
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -442,25 +471,34 @@ const JobPosting: React.FC = () => {
 
         {/* Profile Photo Section */}
         <div className="border-t border-gray-200 pt-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Profile Photo</h2>
-          <p className="text-sm text-gray-600 mb-4">
-            Your photo must be of yourself or your setting only. No children or logos.
-          </p>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Upload a new Profile Photo*</label>
-            <input
-              type="file"
-              onChange={handleFileChange}
-              accept="image/*"
-              className="block w-full text-sm text-gray-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-md file:border-0
-                file:text-sm file:font-semibold
-                file:bg-blue-50 file:text-blue-700
-                hover:file:bg-blue-100"
-            />
-          </div>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Profile Photo</h2>
+        <p className="text-sm text-gray-600 mb-4">
+          Your photo must be of yourself or your setting only. No children or logos.
+        </p>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Upload a new Profile Photo*</label>
+          <input
+            type="file"
+            onChange={handleFileChange}
+            accept="image/*"
+            className="block w-full text-sm text-gray-500
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-md file:border-0
+              file:text-sm file:font-semibold
+              file:bg-blue-50 file:text-blue-700
+              hover:file:bg-blue-100"
+          />
+          {formData.profilePhoto && (
+            <div className="mt-4">
+              <img
+                src={formData.profilePhoto}
+                alt="Profile preview"
+                className="h-32 w-32 object-cover rounded-md"
+              />
+            </div>
+          )}
         </div>
+      </div>
 
         {/* Direct Contact Details Section */}
         <div className="border-t border-gray-200 pt-6">

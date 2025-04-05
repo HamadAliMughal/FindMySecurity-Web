@@ -18,86 +18,43 @@ import "../globals.css";
 
 const UserProfile: React.FC = () => {
   const [profileData, setProfileData] = useState<any>(null);
+  const [publicProfileData, setPublicProfileData] = useState<any>(null);
   const router = useRouter();
   const [roleId, setRoleId] = useState(0);
   const [profileCreated, setProfileCreated] = useState(false);
 
-
   useEffect(() => {
-     const storedData1 =
-    localStorage.getItem("loginData") || localStorage.getItem("profileData");
-  const data = storedData1 ? JSON.parse(storedData1) : null;
+    // Get login or profile data from localStorage
+    const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
+    const data = storedData1 ? JSON.parse(storedData1) : null;
 
-  const currentRoleId = data?.result?.role?.id || data?.result?.id;
-  const userEmail = data?.result?.email;
+    const currentRoleId = data?.result?.role?.id || data?.result?.id;
+    setRoleId(currentRoleId);
+    setProfileData(data);
 
-  setRoleId(currentRoleId);
-  setProfileData(data);
+    if (!data) {
+      router.push("/"); // Redirect to home if no data found
+      return;
+    }
 
-  if (!data || !userEmail) {
-    router.push("/");
-    return;
-  }
-
-  const createdProfiles = JSON.parse(
-    localStorage.getItem("createdPublicProfiles") || "{}"
-  );
-  const alreadyCreated = data[userEmail] === true;
-
-  setProfileCreated(alreadyCreated); // 👈 store this in state to use in render
-
-  if (currentRoleId === 3 && !alreadyCreated) {
-    const interval = setInterval(() => {
-      if (window.confirm("Make your public profile?")) {
-        const updatedProfiles = { ...createdProfiles, [userEmail]: true };
-        localStorage.setItem(
-          "createdPublicProfiles",
-          JSON.stringify(updatedProfiles)
-        );
-        setProfileCreated(true); // 👈 update state immediately
-        router.push("/public-profile");
-      }
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }
+    // Get the created profile data
+    const createdProfiles = localStorage.getItem("createdPublicProfiles");
+    if (currentRoleId === 3 && !createdProfiles) {
+      const interval = setInterval(() => {
+        if (window.confirm("Make your public profile?")) {
+          setProfileCreated(false);
+          router.push("/public-profile");
+        }
+      }, 5000);
+      return () => clearInterval(interval);
+    } else if (currentRoleId === 3 && createdProfiles) {
+      // Parse the created profile data and set it in state
+      setPublicProfileData(JSON.parse(createdProfiles)); // Parse the stored data correctly
+      setProfileCreated(true);
+    }
   }, [router]);
-  
+
   if (!profileData) return null;
-  
- 
-  // const [profileData, setProfileData] = useState<any>(null);
-  // const router = useRouter();
-  // const [roleId, setRoleId] = useState(0);
-
-  // useEffect(() => {
-    
-  //   const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
-  //   const data = storedData1 ? JSON.parse(storedData1) : null;
-  //   setRoleId(data?.result?.role?.id || data?.result?.id)
-  //   console.log("Received Role ID:", roleId); // Log roleId in console
-  //   const currentRoleId = data?.result?.role?.id || data?.result?.id;
-
-  //   const storedData =
-  //     localStorage.getItem("profileData") || localStorage.getItem("loginData");
-  //   if (storedData) {
-  //     setProfileData(JSON.parse(storedData));
-  //   } else {
-  //     router.push("/"); // Redirect if no profile data is found
-  //   }
-
-  //   if (currentRoleId === 3) {
-  //     const interval = setInterval(() => {
-  //       if (window.confirm("Make your public profile?")) {
-  //         router.push("/public-profile"); // redirect on OK
-  //       }
-  //     }, 5000); // show every 5 seconds
-  
-  //     return () => clearInterval(interval); // clear interval on unmount
-  //   }
-  // }, [router, roleId]); // Re-run effect when roleId changes
-
-  // if (!profileData) return null;
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
@@ -117,22 +74,20 @@ const UserProfile: React.FC = () => {
           <div
             className="w-28 h-28 rounded-full shadow-lg shadow-gray-400 hover:scale-105 transition-transform duration-300"
             style={{
-              backgroundImage: `url(${profileData?.profileImage || "/images/profile.png"})`,
+              backgroundImage: `url(${publicProfileData?.profilePhoto || "/images/profile.png"})`,
               backgroundSize: "cover",
-              // backgroundPosition: "center",
             }}
           ></div>
           {/* Profile Details */}
           <div className="text-center md:text-left">
             <h2 className="text-2xl font-semibold text-gray-800">
-              {profileData?.result?.firstName +
-                " " +
-                profileData?.result?.lastName || "Mr. Y"}
+              {profileData?.result?.firstName + " " + profileData?.result?.lastName || "Mr. Y"}
+            </h2>
+            <h2 className="text-2xl font-semibold text-gray-800">
+              {publicProfileData?.screenName || "Mr."}
             </h2>
             <p className="text-gray-500">
-              {profileData?.result?.role?.name ||
-                profileData?.result?.role?.roleName ||
-                "Security Officer"}
+              {profileData?.result?.role?.name || profileData?.result?.role?.roleName || "Security Officer"}
             </p>
             <span className="text-sm text-yellow-500">
               ✅ Usually responds within 1 hour
@@ -170,34 +125,30 @@ const UserProfile: React.FC = () => {
             <span className="truncate">{profileData?.result?.email || "Email"}</span>
           </button>
           {roleId === 3 && !profileCreated && (
-  <button
-    className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
-    onClick={() => router.push("/public-profile")}
-  >
-    <FaBriefcase className="mr-2" /> Create Public Profile
-  </button>
-)}
+            <button
+              className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+              onClick={() => router.push("/public-profile")}
+            >
+              <FaBriefcase className="mr-2" /> Create Public Profile
+            </button>
+          )}
 
           {/* Post Job */}
-          {
-          roleId ===5 || roleId ===7?(
-     
-          <button
-            className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
-            onClick={() => router.push("/job-posting")}
-          >
-            <FaBriefcase className="mr-2" /> Post a Job
-          </button>
-           ) :
-           (
+          {roleId === 5 || roleId === 7 ? (
             <button
-            className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
-            onClick={() => router.push("/view-job")}
-          >
-            <FaBriefcase className="mr-2" /> View Jobs
-          </button>
-           )
-          }
+              className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+              onClick={() => router.push("/job-posting")}
+            >
+              <FaBriefcase className="mr-2" /> Post a Job
+            </button>
+          ) : (
+            <button
+              className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+              onClick={() => router.push("/view-job")}
+            >
+              <FaBriefcase className="mr-2" /> View Jobs
+            </button>
+          )}
         </div>
 
         {/* Upgrade Membership */}
@@ -232,6 +183,214 @@ const UserProfile: React.FC = () => {
 };
 
 export default UserProfile;
+
+
+
+
+
+
+
+
+
+
+
+// "use client";
+
+// import React, { useEffect, useState } from "react";
+// import { useRouter } from "next/navigation";
+// import {
+//   FaMobileAlt,
+//   FaHome,
+//   FaEnvelope,
+//   FaSearch,
+//   FaHeart,
+//   FaUserShield,
+//   FaCogs,
+//   FaAd,
+//   FaBriefcase,
+// } from "react-icons/fa";
+// import { ArrowLeft } from "lucide-react";
+// import "../globals.css";
+
+// const UserProfile: React.FC = () => {
+//   const [profileData, setProfileData] = useState<any>(null);
+//   const [publicProfileData, setPublicProfileData] = useState<any>(null);
+//   const router = useRouter();
+//   const [roleId, setRoleId] = useState(0);
+//   const [profileCreated, setProfileCreated] = useState(false);
+
+
+//   useEffect(() => {
+//      const storedData1 =
+//     localStorage.getItem("loginData") || localStorage.getItem("profileData");
+//   const data = storedData1 ? JSON.parse(storedData1) : null;
+
+//   const currentRoleId = data?.result?.role?.id || data?.result?.id;
+//   setRoleId(currentRoleId);
+//   setProfileData(data);
+
+//   if (!data) {
+//     router.push("/");
+//     return;
+//   }
+
+//   const createdProfiles = localStorage.getItem("createdPublicProfiles")
+//   if (currentRoleId === 3 && !createdProfiles) {
+//     const interval = setInterval(() => {
+//       if (window.confirm("Make your public profile?")) {
+//         setProfileCreated(false); // 👈 update state immediately
+//         router.push("/public-profile");
+//       }
+//     }, 5000);
+
+//     return () => clearInterval(interval);
+//   }
+//   else if(currentRoleId === 3 && createdProfiles){
+//     setPublicProfileData(createdProfiles)
+//     setProfileCreated(true); // 👈 update state immediately
+
+//   }
+//   }, [router]);
+  
+//   if (!profileData) return null;
+  
+
+//   return (
+//     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
+//       {/* Back Button */}
+//       <button
+//         className="absolute top-4 left-4 mt-20 z-2 flex items-center text-gray-600 hover:text-black"
+//         onClick={() => router.push("/")}
+//       >
+//         <ArrowLeft className="w-6 h-6 mr-2" />
+//       </button>
+
+//       {/* Profile Card */}
+//       <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-6 relative mt-12 md:mt-16">
+//         {/* Profile Header */}
+//         <div className="flex flex-col items-center md:flex-row md:items-center md:space-x-6">
+//           {/* Profile Picture */}
+//           <div
+//             className="w-28 h-28 rounded-full shadow-lg shadow-gray-400 hover:scale-105 transition-transform duration-300"
+//             style={{
+//               backgroundImage: `url(${publicProfileData?.profilePhoto || "/images/profile.png"})`,
+//               backgroundSize: "cover",
+//               // backgroundPosition: "center",
+//             }}
+//           ></div>
+//           {/* Profile Details */}
+//           <div className="text-center md:text-left">
+//             <h2 className="text-2xl font-semibold text-gray-800">
+//               {profileData?.result?.firstName +
+//                 " " +
+//                 profileData?.result?.lastName || "Mr. Y"}
+//             </h2>
+//             <h2 className="text-2xl font-semibold text-gray-800">
+//               {publicProfileData.screenName || "Mr."}
+//             </h2>
+//             <p className="text-gray-500">
+//               {profileData?.result?.role?.name ||
+//                 profileData?.result?.role?.roleName ||
+//                 "Security Officer"}
+//             </p>
+//             <span className="text-sm text-yellow-500">
+//               ✅ Usually responds within 1 hour
+//             </span>
+//           </div>
+//         </div>
+
+//         {/* Membership Info */}
+//         <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-4">
+//           {["Industry", "Member since Jan 2016", "Last Updated Jan 2025", "Last Login 28 Jan 2025"].map(
+//             (info, index) => (
+//               <span key={index} className="bg-black text-white px-3 py-1 rounded-full text-sm">
+//                 {info}
+//               </span>
+//             )
+//           )}
+//         </div>
+
+//         {/* Contact Buttons */}
+//         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
+//           {/* Phone */}
+//           <button className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600">
+//             <FaMobileAlt className="mr-2" /> {profileData?.result?.phoneNumber || "Mobile"}
+//           </button>
+//           {/* Address */}
+//           <div className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-800">
+//             <FaHome className="mr-2" />
+//             <span className="truncate">
+//               {profileData?.result?.address || profileData?.result?.role?.address || "Home"}
+//             </span>
+//           </div>
+//           {/* Email */}
+//           <button className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-800">
+//             <FaEnvelope className="mr-2" />
+//             <span className="truncate">{profileData?.result?.email || "Email"}</span>
+//           </button>
+//           {roleId === 3 && !profileCreated && (
+//   <button
+//     className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+//     onClick={() => router.push("/public-profile")}
+//   >
+//     <FaBriefcase className="mr-2" /> Create Public Profile
+//   </button>
+// )}
+
+//           {/* Post Job */}
+//           {
+//           roleId ===5 || roleId ===7?(
+     
+//           <button
+//             className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+//             onClick={() => router.push("/job-posting")}
+//           >
+//             <FaBriefcase className="mr-2" /> Post a Job
+//           </button>
+//            ) :
+//            (
+//             <button
+//             className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+//             onClick={() => router.push("/view-job")}
+//           >
+//             <FaBriefcase className="mr-2" /> View Jobs
+//           </button>
+//            )
+//           }
+//         </div>
+
+//         {/* Upgrade Membership */}
+//         <button className="mt-4 w-full bg-orange-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-orange-600">
+//           Upgrade My Membership
+//         </button>
+
+//         {/* Profile Actions */}
+//         <h3 className="text-lg font-semibold my-6 text-gray-800 text-center md:text-left">
+//           My Profile
+//         </h3>
+//         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+//           {[{ icon: <FaSearch />, label: "My Searches" },
+//             { icon: <FaHeart />, label: "My Favourites" },
+//             { icon: <FaUserShield />, label: "Visitors" },
+//             { icon: <FaSearch />, label: "Advance Search" },
+//             { icon: <FaCogs />, label: "Customer Support" },
+//             { icon: <FaAd />, label: "Post Free Ad" },
+//           ].map((item, index) => (
+//             <div
+//               key={index}
+//               className="p-4 bg-gray-100 rounded-lg shadow-sm hover:bg-gray-200 transition text-center"
+//             >
+//               <div className="text-black text-2xl mx-auto">{item.icon}</div>
+//               <p className="text-gray-700 mt-2">{item.label}</p>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default UserProfile;
 
 
 
