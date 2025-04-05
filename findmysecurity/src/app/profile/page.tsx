@@ -20,24 +20,84 @@ const UserProfile: React.FC = () => {
   const [profileData, setProfileData] = useState<any>(null);
   const router = useRouter();
   const [roleId, setRoleId] = useState(0);
+  const [profileCreated, setProfileCreated] = useState(false);
+
 
   useEffect(() => {
-    
-    const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
-    const data = storedData1 ? JSON.parse(storedData1) : null;
-    setRoleId(data?.result?.role?.id || data?.result?.id)
-    console.log("Received Role ID:", roleId); // Log roleId in console
+     const storedData1 =
+    localStorage.getItem("loginData") || localStorage.getItem("profileData");
+  const data = storedData1 ? JSON.parse(storedData1) : null;
 
-    const storedData =
-      localStorage.getItem("profileData") || localStorage.getItem("loginData");
-    if (storedData) {
-      setProfileData(JSON.parse(storedData));
-    } else {
-      router.push("/"); // Redirect if no profile data is found
-    }
-  }, [router, roleId]); // Re-run effect when roleId changes
+  const currentRoleId = data?.result?.role?.id || data?.result?.id;
+  const userEmail = data?.result?.email;
 
+  setRoleId(currentRoleId);
+  setProfileData(data);
+
+  if (!data || !userEmail) {
+    router.push("/");
+    return;
+  }
+
+  const createdProfiles = JSON.parse(
+    localStorage.getItem("createdPublicProfiles") || "{}"
+  );
+  const alreadyCreated = data[userEmail] === true;
+
+  setProfileCreated(alreadyCreated); // 👈 store this in state to use in render
+
+  if (currentRoleId === 3 && !alreadyCreated) {
+    const interval = setInterval(() => {
+      if (window.confirm("Make your public profile?")) {
+        const updatedProfiles = { ...createdProfiles, [userEmail]: true };
+        localStorage.setItem(
+          "createdPublicProfiles",
+          JSON.stringify(updatedProfiles)
+        );
+        setProfileCreated(true); // 👈 update state immediately
+        router.push("/public-profile");
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }
+  }, [router]);
+  
   if (!profileData) return null;
+  
+ 
+  // const [profileData, setProfileData] = useState<any>(null);
+  // const router = useRouter();
+  // const [roleId, setRoleId] = useState(0);
+
+  // useEffect(() => {
+    
+  //   const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
+  //   const data = storedData1 ? JSON.parse(storedData1) : null;
+  //   setRoleId(data?.result?.role?.id || data?.result?.id)
+  //   console.log("Received Role ID:", roleId); // Log roleId in console
+  //   const currentRoleId = data?.result?.role?.id || data?.result?.id;
+
+  //   const storedData =
+  //     localStorage.getItem("profileData") || localStorage.getItem("loginData");
+  //   if (storedData) {
+  //     setProfileData(JSON.parse(storedData));
+  //   } else {
+  //     router.push("/"); // Redirect if no profile data is found
+  //   }
+
+  //   if (currentRoleId === 3) {
+  //     const interval = setInterval(() => {
+  //       if (window.confirm("Make your public profile?")) {
+  //         router.push("/public-profile"); // redirect on OK
+  //       }
+  //     }, 5000); // show every 5 seconds
+  
+  //     return () => clearInterval(interval); // clear interval on unmount
+  //   }
+  // }, [router, roleId]); // Re-run effect when roleId changes
+
+  // if (!profileData) return null;
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
@@ -55,11 +115,11 @@ const UserProfile: React.FC = () => {
         <div className="flex flex-col items-center md:flex-row md:items-center md:space-x-6">
           {/* Profile Picture */}
           <div
-            className="w-28 h-28 bg-gray-300 rounded-full border-4 border-gray-200 shadow-md"
+            className="w-28 h-28 rounded-full shadow-lg shadow-gray-400 hover:scale-105 transition-transform duration-300"
             style={{
-              backgroundImage: `url(${profileData?.profileImage || "/images/profile.jpg"})`,
+              backgroundImage: `url(${profileData?.profileImage || "/images/profile.png"})`,
               backgroundSize: "cover",
-              backgroundPosition: "center",
+              // backgroundPosition: "center",
             }}
           ></div>
           {/* Profile Details */}
@@ -109,9 +169,19 @@ const UserProfile: React.FC = () => {
             <FaEnvelope className="mr-2" />
             <span className="truncate">{profileData?.result?.email || "Email"}</span>
           </button>
+          {roleId === 3 && !profileCreated && (
+  <button
+    className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+    onClick={() => router.push("/public-profile")}
+  >
+    <FaBriefcase className="mr-2" /> Create Public Profile
+  </button>
+)}
+
           {/* Post Job */}
           {
           roleId ===5 || roleId ===7?(
+     
           <button
             className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
             onClick={() => router.push("/job-posting")}

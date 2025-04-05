@@ -60,7 +60,7 @@ const JobPosting: React.FC = () => {
     if (typeof window === 'undefined') return defaultData;
 
     try {
-      const savedData = localStorage.getItem('jobPostingFormData');
+      const savedData = localStorage.getItem('createdPublicProfiles');
       if (!savedData) return defaultData;
 
       const parsedData = JSON.parse(savedData);
@@ -84,7 +84,7 @@ const JobPosting: React.FC = () => {
         selectedDates: formData.selectedDates.map(date => date.toISOString()),
         profilePhoto: null // Don't store File object in localStorage
       };
-      localStorage.setItem('jobPostingFormData', JSON.stringify(dataToStore));
+      localStorage.setItem('createdPublicProfiles', JSON.stringify(dataToStore));
     } catch (error) {
       console.error("Error saving form data:", error);
     }
