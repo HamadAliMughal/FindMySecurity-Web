@@ -36,10 +36,10 @@ const JobPosting: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const days = ['Mon', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const timeSlots = [
-    'Before School',
+    // 'Before School',
     'Morning',
     'Afternoon',
-    'After School',
+    // 'After School',
     'Evening',
     'Overnight'
   ];
