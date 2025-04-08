@@ -222,7 +222,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
     // Add the selected plan to the submission data
     const finalData = {
       ...formSubmissionData,
-      membershipPlan: plan
+      // membershipPlan: plan
     };
     
     // Close the dialog and submit the form with the selected plan
@@ -234,7 +234,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
     // If user closes the dialog without selecting a plan, submit with basic plan
     const finalData = {
       ...formSubmissionData,
-      membershipPlan: 'basic'
+      // membershipPlan: 'basic'
     };
     setShowMembershipDialog(false);
     onSubmit(finalData);

@@ -37,6 +37,8 @@ export default function Navbar() {
     localStorage.removeItem("loginData"); // Remove user session
     localStorage.removeItem("profileData"); // Remove user session
     localStorage.removeItem("roleId"); // Remove user session
+    localStorage.removeItem("createdPublicProfiles"); // Remove user session
+
     setProfileData(null); // Update state to reflect logout
     router.push('/')
   };

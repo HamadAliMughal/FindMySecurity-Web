@@ -116,7 +116,45 @@ const JobPosting: React.FC = () => {
       reader.readAsDataURL(file);
     }
   };
-
+  
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setIsSubmitting(true);
+  
+  //   try {
+  //     // Prepare form data for submission
+  //     const dataToStore = { ...formData };
+  //     console.log("dataToStore", dataToStore);
+  
+  //     // Save the form data to localStorage
+  //     safeLocalStorageSet("createdPublicProfiles", JSON.stringify(dataToStore));
+  
+  //     // Send the form data to the API
+      // const response = await fetch("https://findmysecurity-backend.onrender.com/api/profile/individual", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(dataToStore),
+      // });
+  
+  //     if (response.ok) {
+  //       // Simulate form submission delay
+  //       await new Promise((resolve) => setTimeout(resolve, 2000));
+  
+  //       // Show success modal after successful submission
+  //       setShowModal(true);
+  //     } else {
+  //       throw new Error("Failed to submit form");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error submitting form:", error);
+  //     alert("Error submitting the form. Please try again.");
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+  
 const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
