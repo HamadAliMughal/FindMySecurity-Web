@@ -12,7 +12,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="font-sans">
+    <html lang="en">
       <body>
         {/* Top Navigation */}
         <Navbar />

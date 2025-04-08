@@ -6,11 +6,7 @@ module.exports = {
       "./app/**/*.{js,ts,jsx,tsx}" // Add this for Next.js App Router support
     ],
     theme: {
-      extend: {
-        fontFamily: {
-          sans: ['"Open Sans"', 'sans-serif'],
-        },
-      },
+      extend: {},
     },
     plugins: [require('@tailwindcss/forms')],
   };
