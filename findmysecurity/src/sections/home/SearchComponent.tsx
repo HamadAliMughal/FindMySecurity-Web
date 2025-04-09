@@ -75,7 +75,7 @@ export default function SearchComponent({ lookingForData, searchData,title }: Se
 
     if (field === "lookingFor") {
       return (
-        <div ref={dropdownRef} className="absolute top-12 bg-white text-black rounded shadow-lg z-50 border border-gray-300 w-64">
+        <div ref={dropdownRef} className="absolute top-12 bg-white text-black text-left rounded shadow-lg z-50 border border-gray-300 w-64">
           {lookingForData.map((category) => (
             <div
               key={category.id}
@@ -103,7 +103,7 @@ export default function SearchComponent({ lookingForData, searchData,title }: Se
     if (!options.length) return null;
 
     return (
-      <div ref={dropdownRef} className="absolute top-12 bg-white text-black rounded shadow-lg z-50 border border-gray-300 w-64">
+      <div ref={dropdownRef} className="absolute top-12 bg-white text-left text-black rounded shadow-lg z-50 border border-gray-300 w-64">
         {options.map((option) => (
           <div
             key={option}
