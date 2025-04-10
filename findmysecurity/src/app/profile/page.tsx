@@ -260,7 +260,7 @@ const UserProfile: React.FC = () => {
             <thead>
               <tr className="bg-gray-200">
                 <th className="p-2 border">Time</th>
-                {["Mon", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+                {["Mon","Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
                   <th key={day} className="p-2 border">{day}</th>
                 ))}
               </tr>
@@ -269,7 +269,7 @@ const UserProfile: React.FC = () => {
               {Object.entries(publicProfileData.weeklySchedule).map(([time, days]: any) => (
                 <tr key={time}>
                   <td className="p-2 border font-medium">{time}</td>
-                  {["Mon", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+                  {["Mon","Tue","Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
                     <td key={day} className="p-2 border text-center">
                       {days[day] ? "✅" : "❌"}
                     </td>

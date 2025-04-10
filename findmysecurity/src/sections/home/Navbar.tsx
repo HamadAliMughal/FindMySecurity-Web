@@ -46,7 +46,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="bg-black bg-opacity-90 backdrop-blur-md px-0 sm:px-0 md:px-0 lg:px-0 xl:px-26 text-white fixed top-0 left-0 shadow-md z-50 w-full">
+      <nav className="bg-black bg-opacity-90 backdrop-blur-md px-0 sm:px-0 md:px-0 lg:px-0 xl:px-16 text-white fixed top-0 left-0 shadow-md z-50 w-full">
       <div className="container mx-auto px-3 py-5 flex items-center justify-between">
 
         {/* Logo */}

@@ -34,7 +34,7 @@ const JobPosting: React.FC = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const days = ['Mon', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const timeSlots = [
     // 'Before School',
     'Morning',
