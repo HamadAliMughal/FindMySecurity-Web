@@ -235,21 +235,23 @@ const UserProfile: React.FC = () => {
           My Profile
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {[{ icon: <FaSearch />, label: "My Searches" },
-            { icon: <FaHeart />, label: "My Favourites" },
-            { icon: <FaUserShield />, label: "Visitors" },
-            { icon: <FaSearch />, label: "Advance Search" },
-            { icon: <FaCogs />, label: "Customer Support" },
-            { icon: <FaAd />, label: "Post Free Ad" },
-          ].map((item, index) => (
-            <div
-              key={index}
-              className="p-4 bg-gray-100 rounded-lg shadow-sm hover:bg-gray-200 transition text-center"
-            >
-              <div className="text-black text-2xl mx-auto">{item.icon}</div>
-              <p className="text-gray-700 mt-2">{item.label}</p>
-            </div>
-          ))}
+        {[
+  { icon: <FaSearch />, label: "My Searches" },
+  { icon: <FaHeart />, label: "My Favourites" },
+  { icon: <FaUserShield />, label: "Visitors" },
+  { icon: <FaSearch />, label: "Advance Search" },
+  { icon: <FaCogs />, label: "Customer Support" },
+  { icon: <FaAd />, label: "Post Free Ad", route: "/post-ad" },
+].map((item, index) => (
+  <div
+    key={index}
+    onClick={() => item.route && router.push(item.route)}
+    className="cursor-pointer p-4 bg-gray-100 rounded-lg shadow-sm hover:bg-gray-200 transition text-center"
+  >
+    <div className="text-2xl">{item.icon}</div>
+    <p className="text-sm mt-1 text-center">{item.label}</p>
+  </div>
+))}
         </div>
          {/* Weekly Schedule */}
          {publicProfileData && <div className="mt-6">
