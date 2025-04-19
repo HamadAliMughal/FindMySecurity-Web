@@ -192,11 +192,12 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
       password: formData.password,
       firstName: formData.companyName.split(" ")[0],
       lastName: formData.companyName.split(" ")[1] || "",
+      address: formData.address,
       phoneNumber: formData.phone,
       companyData: {
         companyName: formData.companyName,
         registrationNumber: formData.registrationNumber,
-        businessAddress: formData.address,
+        address: formData.address,
         postCode: formData.postcode,
         contactPerson: formData.contactPerson,
         jobTitle: formData.jobTitle,
@@ -210,7 +211,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
         acceptEmails: formData.receiveEmails,
         acceptTerms: formData.acceptTerms,
       },
-      roleId: id,
+      roleId: Number(id),
     };
 
     // Save the submission data and show the membership dialog

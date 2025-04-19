@@ -28,7 +28,7 @@ const UserProfile: React.FC = () => {
     const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
     const data = storedData1 ? JSON.parse(storedData1) : null;
 
-    const currentRoleId = data?.result?.role?.id || data?.result?.id;
+    const currentRoleId = data?.role?.id || data?.roleId;
     setRoleId(currentRoleId);
     setProfileData(data);
 
@@ -39,7 +39,7 @@ const UserProfile: React.FC = () => {
 
     // Get the created profile data
     const createdProfiles = localStorage.getItem("createdPublicProfiles");
-    if (currentRoleId === 3 && !createdProfiles) {
+    if (currentRoleId === 2 && !createdProfiles) {
       
 
       const interval = setInterval(() => {
@@ -49,7 +49,7 @@ const UserProfile: React.FC = () => {
         }
       }, 5000);
       return () => clearInterval(interval);
-    } else if (currentRoleId === 3 && createdProfiles) {
+    } else if (currentRoleId === 2 && createdProfiles) {
       // Parse the created profile data and set it in state
       setPublicProfileData(JSON.parse(createdProfiles)); // Parse the stored data correctly
       setProfileCreated(true);
@@ -61,7 +61,7 @@ const UserProfile: React.FC = () => {
     const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
     const data = storedData1 ? JSON.parse(storedData1) : null;
 
-    const currentRoleId = data?.result?.role?.id || data?.result?.id;
+    const currentRoleId = data?.role?.id || data?.roleId;
     setRoleId(currentRoleId);
     setProfileData(data);
 
@@ -72,7 +72,7 @@ const UserProfile: React.FC = () => {
 
     // Get the created profile data
     const createdProfiles = localStorage.getItem("createdPublicProfiles");
-    if (currentRoleId === 3 && !createdProfiles) {
+    if (currentRoleId === 2 && !createdProfiles) {
       const interval = setInterval(() => {
         if (window.confirm("Make your public profile?")) {
           setProfileCreated(false);
@@ -80,7 +80,7 @@ const UserProfile: React.FC = () => {
         }
       }, 5000);
       return () => clearInterval(interval);
-    } else if (currentRoleId === 3 && createdProfiles) {
+    } else if (currentRoleId === 2 && createdProfiles) {
       setPublicProfileData(JSON.parse(createdProfiles)); // Parse the stored data correctly
       setProfileCreated(true);
     }
@@ -147,13 +147,13 @@ const UserProfile: React.FC = () => {
           {/* Profile Details */}
           <div className="text-center md:text-left">
             <h2 className="text-2xl font-semibold text-gray-800">
-              {profileData?.result?.firstName + " " + profileData?.result?.lastName || "Mr. Y"}
+              {profileData?.firstName + " " + profileData?.lastName || "Mr. Y"}
             </h2>
             <h2 className="text-2xl font-semibold text-gray-800">
-              {publicProfileData?.screenName || "Mr."}
+              {profileData?.screenName || "Mr."}
             </h2>
             <p className="text-gray-500">
-              {profileData?.result?.role?.name || profileData?.result?.role?.roleName || "Security Officer"}
+              {profileData?.role?.name || profileData?.role?.roleName || "Security Officer"}
             </p>
             <span className="text-sm text-yellow-500">
               ✅ Usually responds within 1 hour
@@ -176,21 +176,21 @@ const UserProfile: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
           {/* Phone */}
           <button className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600">
-            <FaMobileAlt className="mr-2" /> {profileData?.result?.phoneNumber || "Mobile"}
+            <FaMobileAlt className="mr-2" /> {profileData?.phoneNumber || "Mobile"}
           </button>
           {/* Address */}
           <div className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-800">
             <FaHome className="mr-2" />
             <span className="truncate">
-              {profileData?.result?.address || profileData?.result?.role?.address || "Home"}
+              {profileData?.address || profileData?.role?.address || "Home"}
             </span>
           </div>
           {/* Email */}
           <button className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-800">
             <FaEnvelope className="mr-2" />
-            <span className="truncate">{profileData?.result?.email || "Email"}</span>
+            <span className="truncate">{profileData?.email || "Email"}</span>
           </button>
-          {roleId === 3 && !profileCreated && (
+          {roleId === 2 && !profileCreated && (
             <button
               className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
               onClick={() => router.push("/public-profile")}
@@ -200,7 +200,7 @@ const UserProfile: React.FC = () => {
           )}
 
           {/* Post Job */}
-          {roleId === 5 || roleId === 7 ? (
+          {roleId === 4 || roleId === 7 ? (
             <button
               className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
               onClick={() => router.push("/job-posting")}
@@ -208,12 +208,18 @@ const UserProfile: React.FC = () => {
               <FaBriefcase className="mr-2" /> Post a Job
             </button>
           ) : (
-            <button
+        <>{  roleId!=2 ?  <button
               className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
               onClick={() => router.push("/view-job")}
             >
-              <FaBriefcase className="mr-2" /> View Jobs
-            </button>
+              <FaBriefcase className="mr-2" /> Hire Professional
+            </button>:<button
+              className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+              onClick={() => router.push("/view-ads")}
+            >
+              <FaBriefcase className="mr-2" /> View Job Ads
+            </button> }
+            </> 
           )}
             <button
               className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
@@ -243,6 +249,7 @@ const UserProfile: React.FC = () => {
   { icon: <FaCogs />, label: "Customer Support" },
   { icon: <FaAd />, label: "Post Free Ad", route: "/post-ad" },
 ].map((item, index) => (
+  
   <div
     key={index}
     onClick={() => item.route && router.push(item.route)}
@@ -251,6 +258,7 @@ const UserProfile: React.FC = () => {
     <div className="text-2xl">{item.icon}</div>
     <p className="text-sm mt-1 text-center">{item.label}</p>
   </div>
+
 ))}
         </div>
          {/* Weekly Schedule */}

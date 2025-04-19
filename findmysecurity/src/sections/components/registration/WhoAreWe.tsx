@@ -4,12 +4,13 @@ import { useRouter } from "next/navigation";
 import ClientGeneralForm from "./ClientRegistrationForm";
 import SecurityCompanyForm from "./SecurityCompanyRegForm";
 import BusinessForm from "./CorporateForm";
+import axios from "axios";
 
 const options = [
-  { id: 4, title: "Looking for Security Professional", icon: ShieldCheck, description: "Find trained and verified security professionals for your needs." },
-  { id: 3, title: "Security Professionals", icon: User, description: "Register yourself as a security professional and find opportunities." },
-  { id: 5, title: "Security Companies", icon: Building, description: "Register your security company and connect with clients." },
-  { id: 6, title: "Training Providers", icon: BookOpen, description: "Offer security training courses and certifications." },
+  { id: 3, title: "Looking for Security Professional", icon: ShieldCheck, description: "Find trained and verified security professionals for your needs." },
+  { id: 2, title: "Security Professionals", icon: User, description: "Register yourself as a security professional and find opportunities." },
+  { id: 4, title: "Security Companies", icon: Building, description: "Register your security company and connect with clients." },
+  { id: 5, title: "Training Providers", icon: BookOpen, description: "Offer security training courses and certifications." },
   { id: 7, title: "Businesses", icon: Briefcase, description: "Discover top-tier security professionals, companies, and training providers tailored to your specific needs." },
 ];
 
@@ -23,52 +24,53 @@ export default function RegistrationSelector() {
 
   const handleFormSubmit = async (formData: any) => {
     try {
-      // Attempt registration directly
-      const response = await fetch("https://findmysecurity-backend.onrender.com/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await axios.post(
+        "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/auth/register",
+        formData
+        // If you're sending JSON, you can add headers here:
+        // {
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   }
+        // }
+      );
   
       console.log("Response Status:", response.status);
-      const responseData = await response.json();
-      console.log("Response Data:", responseData);
+      console.log("Response Data:", response.data);
   
-      if (!response.ok) {
-        // Handle specific error cases
-        if (response.status === 500 && responseData.error === 'Email already exists') {
+      alert("User registered successfully");
+      localStorage.setItem("loginData", JSON.stringify(response.data));
+      localStorage.setItem("profileData", JSON.stringify(response.data));
+      // router.push("/profile");
+     if (response.status===400){
+      if(response?.message==="Email address is not verified. The following identities failed the check in region EU-NORTH-1: devilbila966@gmail.com"){
+        router.push("/signin");
+      }
+     }
+    } catch (error: any) {
+      console.error("Registration error:", error);
+  
+      if (axios.isAxiosError(error)) {
+        if (!error.response) {
+          alert("Network error. Please check your internet connection.");
+          return;
+        }
+  
+        const status = error.response.status;
+        const responseData = error.response.data;
+  
+        if (status === 500 && responseData?.error === 'Email already exists') {
           alert("This email is already registered. Please use a different email.");
         } else {
-          // Handle other error cases
-          const errorMessage = responseData.message || responseData.error || "Registration failed. Please try again.";
-          throw new Error(errorMessage);
-        }
-        return;
-      }
-  
-      // Success case
-      alert("User registered successfully");
-      localStorage.setItem("loginData", JSON.stringify(responseData));
-      localStorage.setItem("profileData", JSON.stringify(responseData));
-      router.push("/profile");
-  
-    } catch (error) {
-      console.error("Registration error:", error);
-      
-      // More specific error messages
-      if (error instanceof Error) {
-        if (error.message.includes("Failed to fetch")) {
-          alert("Network error. Please check your internet connection.");
-        } else {
-          alert(error.message || "An unexpected error occurred. Please try again.");
+          const errorMessage = responseData?.message || responseData?.error || "Registration failed. Please try again.";
+          alert(errorMessage);
         }
       } else {
         alert("An unknown error occurred. Please try again.");
       }
     }
   };
+  
   // const handleFormSubmit = async (formData: any) => {
      
     
@@ -107,14 +109,14 @@ export default function RegistrationSelector() {
   // Function to render the correct form based on selection
   const renderForm = () => {
     switch (selected) {
-      case 4:
-        return <ClientGeneralForm id={4} title="Looking for Security Professional" onSubmit={handleFormSubmit} />;
       case 3:
-        return <ClientGeneralForm id={3} title="Individual Security Professional" onSubmit={handleFormSubmit} />;
+        return <ClientGeneralForm id={3} title="Looking for Security Professional" onSubmit={handleFormSubmit} />;
+      case 2:
+        return <ClientGeneralForm id={2} title="Individual Security Professional" onSubmit={handleFormSubmit} />;
+      case 4:
+        return <SecurityCompanyForm id={4} title="Security Companies" onSubmit={handleFormSubmit} />;
       case 5:
-        return <SecurityCompanyForm id={5} title="Security Companies" onSubmit={handleFormSubmit} />;
-      case 6:
-        return <SecurityCompanyForm id={6} title="Course Provider" onSubmit={handleFormSubmit} />;
+        return <SecurityCompanyForm id={5} title="Course Provider" onSubmit={handleFormSubmit} />;
       case 7:
         return <BusinessForm id={7} title="Corporate Clients" onSubmit={handleFormSubmit} />;
       default:

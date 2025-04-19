@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import "./page-globals.css";
+import axios from "axios";
 import { ArrowLeft } from "lucide-react";
 import TwoFAPopup from "@/sections/components/Login/TwoFAPopup";
 
@@ -14,27 +15,23 @@ const SignIn = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("https://findmysecurity-backend.onrender.com/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await axios.post(
+        "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/auth/login",
+        { email, password },
+        { headers: { "Content-Type": "application/json" } }
+      );
+    
+      const data = response.data;
       
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }else{
-        console.log("Login Success:", data.result);
-        setSessionToken(data.result.code);
-        alert(data.result.code)
-       // localStorage.setItem("loginData",JSON.stringify(data));
-        setShow2FA(true);
-      }
-
+      console.log("Login Success:", data);
+      setSessionToken(data.code);
+      alert(data.code);
+      // localStorage.setItem("loginData", JSON.stringify(data));
+      setShow2FA(true);
     
     } catch (error) {
       console.error("Login failed:", error);
-      alert(error);
+      alert(error.response?.data?.message || "Login failed");
     }
   };
 

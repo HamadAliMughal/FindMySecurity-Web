@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
+import axios from "axios";
 interface TwoFAPopupProps {
   onVerify: (code: string) => void;
   email :any;
@@ -61,29 +62,29 @@ export default function TwoFAPopup({ onVerify, email }: TwoFAPopupProps) {
     }
     setError("");
   
+
     try {
-      const response = await fetch("https://findmysecurity-backend.onrender.com/api/auth/login/verify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, code }),
+      const response = await axios.post("https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/auth/login/verify", {
+        email,
+        code,
       });
-  
-      const data = await response.json();
-  
-      if (response.ok) {
-        console.log("Verification Success:", data);
-        localStorage.setItem("loginData", JSON.stringify(data)); // Store in localStorage
-        onVerify(code);
-        setSuccess(true);
-        setIsOpen(false);
-      } else {
-        setError(data.message || "Verification failed. Please try again.");
-      }
+    
+      const data = response.data;
+    
+      console.log("Verification Success:", data);
+      localStorage.setItem("loginData", JSON.stringify(data)); // Store in localStorage
+      onVerify(code);
+      setSuccess(true);
+      setIsOpen(false);
+    
     } catch (error) {
-      setError("An error occurred. Please try again.");
+      if (error.response) {
+        setError(error.response.data.message || "Verification failed. Please try again.");
+      } else {
+        setError("An error occurred. Please try again.");
+      }
     }
+    
   };
   
   return (
