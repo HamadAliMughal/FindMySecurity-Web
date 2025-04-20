@@ -17,7 +17,12 @@ const features = [
   { title: "Trainer & Assessor Certification", image: "/images/training_providers_pic1.jpg" },
 ];
 
-export default function TrainingProviders() {
+export default function TrainingProviders({ initialSearchMode = "basic" }: { initialSearchMode?: "basic" | "advanced" }) {
+  const handleSearchSubmit = (searchValues: any) => {
+    console.log("Search submitted with values:", searchValues);
+    // Handle the search submission logic, e.g., make API requests or filter results.
+  };
+
   return (
     <section
       className="py-10 bg-cover bg-center bg-no-repeat"
@@ -58,14 +63,20 @@ export default function TrainingProviders() {
                   <h3 className="text-sm font-semibold text-gray-900">{feature.title}</h3>
                 </div>
               </div>
-              
-
             );
           })}
         </div>
+
+        {/* Search Component */}
         <div className="flex justify-center w-full mt-10">
-        <SearchComponent lookingForData={lookingForData} searchData={searchData} title="Training Providers" />
-          </div>
+          <SearchComponent
+            lookingForData={lookingForData}
+            searchData={searchData}
+            title="Training Providers"
+            onSearchSubmit={handleSearchSubmit} // Pass the callback to handle the submit
+            searchMode={initialSearchMode} // Pass the searchMode prop to SearchComponent
+          />
+        </div>
       </div>
     </section>
   );

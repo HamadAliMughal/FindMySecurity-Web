@@ -4,7 +4,12 @@ import lookingForData from "@/sections/data/secuirty_professional.json";
 import searchData from "@/sections/data/hero_section.json";
 import SearchComponent from "./SearchComponent";
 
-export default function Hero() {
+export default function Hero({ initialSearchMode = "basic" }: { initialSearchMode?: "basic" | "advanced" }) {
+  const handleSearchSubmit = (searchValues: any) => {
+    console.log("Search submitted with values:", searchValues);
+    // Handle the search submission logic, e.g., make API requests or filter results.
+  };
+
   return (
     <section className="relative w-full min-h-screen flex flex-col items-center justify-center text-center bg-gray-900 text-white px-4 md:px-8">
       {/* Background Image */}
@@ -26,11 +31,14 @@ export default function Hero() {
           lookingForData={lookingForData}
           searchData={searchData}
           title="Professionals"
+          onSearchSubmit={handleSearchSubmit} // Pass the callback to handle the submit
+          searchMode={initialSearchMode} // Pass the searchMode prop to SearchComponent
         />
       </div>
     </section>
   );
 }
+
 
 
 
