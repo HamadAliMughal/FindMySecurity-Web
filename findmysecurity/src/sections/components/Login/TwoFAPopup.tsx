@@ -78,8 +78,8 @@ export default function TwoFAPopup({ onVerify, email }: TwoFAPopupProps) {
       setIsOpen(false);
     
     } catch (error) {
-      if (error.response) {
-        setError(error.response.data.message || "Verification failed. Please try again.");
+      if (error) {
+        setError( String(error) || "Verification failed. Please try again.");
       } else {
         setError("An error occurred. Please try again.");
       }

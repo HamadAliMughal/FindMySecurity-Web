@@ -31,7 +31,7 @@ interface LookingForItem {
   roles: string[];
 }
 
-export default function ConnectingBusiness({ initialSearchMode = "basic" }: { initialSearchMode?: "basic" | "advanced" }) {
+export default function ConnectingBusiness() {
   const router = useRouter();
   const [isLoaded, setIsLoaded] = useState(false);
   const [profileData, setProfileData] = useState<any>(null);
@@ -39,7 +39,8 @@ export default function ConnectingBusiness({ initialSearchMode = "basic" }: { in
   const [lookingForData, setLookingForData] = useState<LookingForItem[]>([]);
   const [showSearchComponent, setShowSearchComponent] = useState(false);
   const [searchTitle, setSearchTitle] = useState<string | null>(null);
-  const [searchMode, setSearchMode] = useState<string>(initialSearchMode);
+  // const [searchMode, setSearchMode] = useState<string>(initialSearchMode);
+  const [searchMode, setSearchMode] = useState<"basic" | "advanced">("basic");
 
   const defaultCenter = { lat: 51.5074, lng: -0.1278 };
   const markers: MarkerData[] = [
@@ -49,18 +50,23 @@ export default function ConnectingBusiness({ initialSearchMode = "basic" }: { in
   ];
 
   useEffect(() => {
-    const storedSearchMode = localStorage.getItem("searchMode");
+    const storedMode = localStorage.getItem("searchMode");
+
+    if (storedMode === "basic" || storedMode === "advanced") {
+      setSearchMode(storedMode); // ✅ Now TypeScript is happy
+    } else {
+      setSearchMode("basic"); // optional fallback
+    }
     const values = localStorage.getItem("searchValues");
     const title = localStorage.getItem("title");
 
-    if (!storedSearchMode) {
+    if (!storedMode) {
       router.push("/");
       return;
     }
 
-    setSearchMode(storedSearchMode);
 
-    if (storedSearchMode === "advanced") {
+    if (storedMode === "advanced") {
       const storedData = localStorage.getItem("profileData") || localStorage.getItem("loginData");
       if (storedData) {
         setProfileData(JSON.parse(storedData));

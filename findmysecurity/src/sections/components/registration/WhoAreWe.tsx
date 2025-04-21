@@ -43,9 +43,9 @@ export default function RegistrationSelector() {
       localStorage.setItem("profileData", JSON.stringify(response.data));
       // router.push("/profile");
      if (response.status===400){
-      if(response?.message==="Email address is not verified. The following identities failed the check in region EU-NORTH-1: devilbila966@gmail.com"){
+      
         router.push("/signin");
-      }
+      
      }
     } catch (error: any) {
       console.error("Registration error:", error);

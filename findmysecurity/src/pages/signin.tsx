@@ -31,7 +31,7 @@ const SignIn = () => {
     
     } catch (error) {
       console.error("Login failed:", error);
-      alert(error.response?.data?.message || "Login failed");
+      alert(error || "Login failed");
     }
   };
 
