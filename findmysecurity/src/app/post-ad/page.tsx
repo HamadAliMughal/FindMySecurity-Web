@@ -27,9 +27,9 @@ export default function JobPostingForm() {
     if (loginData) {
       try {
         const parsed = JSON.parse(loginData);
-        const roleId = parsed?.result?.role?.id;
+        const roleId = parsed?.role?.id;
         console.log('Parsed loginData:', roleId);
-        if ([3, 4, 5].includes(Number(roleId))) {
+        if ([6,1,3, 4, 5].includes(Number(roleId))) {
           setAllowed(true);
           return;
         }
