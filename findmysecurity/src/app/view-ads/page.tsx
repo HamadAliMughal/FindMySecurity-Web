@@ -2,7 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FaSearch, FaMapMarkerAlt, FaMoneyBillWave, FaCalendarAlt, FaBriefcase } from "react-icons/fa";
+import {
+  FaSearch,
+  FaMapMarkerAlt,
+  FaMoneyBillWave,
+  FaCalendarAlt,
+  FaBriefcase,
+  FaTag,
+} from "react-icons/fa";
 
 const PostAdLister: React.FC = () => {
   const router = useRouter();
@@ -25,7 +32,9 @@ const PostAdLister: React.FC = () => {
   const handleSearch = async () => {
     setSearched(true);
     try {
-      const res = await fetch(`/api/reed-job?keyword=${keyword}&location=${location} &minSalary=${rateFilter}`);
+      const res = await fetch(
+        `/api/reed-job?keyword=${keyword}&location=${location}&minSalary=${rateFilter}`
+      );
       const data = await res.json();
       if (res.ok) {
         setAdzunaJobs(data || []);
@@ -43,6 +52,11 @@ const PostAdLister: React.FC = () => {
     const matchRate = rateFilter !== null ? parseFloat(post.payRate) <= rateFilter : true;
     return matchTitle && matchLocation && matchRate;
   });
+
+  const mergedJobs = [
+    ...filteredLocal.map((j) => ({ ...j, source: "local" })),
+    ...(searched ? adzunaJobs.map((j) => ({ ...j, source: "adzuna" })) : []),
+  ];
 
   return (
     <div style={{ marginTop: "90px" }} className="min-h-screen bg-gray-100 p-6 md:px-32">
@@ -100,59 +114,64 @@ const PostAdLister: React.FC = () => {
       </div>
 
       {/* Listings */}
-      {[...filteredLocal.map(j => ({ ...j, source: "local" })), ...(searched ? adzunaJobs.map(j => ({ ...j, source: "adzuna" })) : [])]
-        .map((post, idx) => (
-          <div
-            key={idx}
-            className="bg-white rounded-lg shadow-md p-6 mb-6 hover:shadow-lg transition duration-300"
-          >
-            <div className="flex justify-between items-start gap-4">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
-                  <FaBriefcase className="text-white text-3xl" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{post.title}</h2>
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-gray-700">
-                    <p><strong>Type:</strong> {post.type}</p>
-                    <p><strong>Category:</strong> {post.category}</p>
-                    <p><strong>Location:</strong> {post.location}</p>
-                    <p><strong>Region:</strong> {post.region}</p>
-                    <p><strong>Postcode:</strong> {post.postcode}</p>
-                    <p><strong>Pay:</strong> ${post.payRate} ({post.payType})</p>
-                    <p><strong>Experience:</strong> {post.experience}</p>
-                    <p><strong>Shift:</strong> {post.shift}</p>
-                    <p><strong>Certifications:</strong> {post.certifications}</p>
-                    <p className="col-span-2"><strong>Description:</strong> {post.description}</p>
-                    <p className="col-span-2 flex items-center gap-2">
-                      <FaCalendarAlt />
-                      <span><strong>Deadline:</strong> {post.deadline}</span>
-                    </p>
-                  </div>
-                </div>
+      {mergedJobs.map((post, idx) => (
+        <div
+          key={idx}
+          className="bg-white rounded-lg shadow-md p-6 mb-6 hover:shadow-lg transition duration-300"
+        >
+          <div className="flex justify-between items-start gap-4">
+            <div className="flex items-start gap-4">
+              <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
+                <FaBriefcase className="text-white text-3xl" />
               </div>
               <div>
-                {post.source === "local" ? (
-                  <button
-                    onClick={() => router.push(`/job/${idx}`)}
-                    className="text-sm px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
-                  >
-                  Apply  
-                  </button>
-                ) : (
-                  <a
-                    href={post.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                  >
-                    Visit
-                  </a>
-                )}
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">{post.title}</h2>
+                <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-gray-700">
+                  <p><strong>Type:</strong> {post.type}</p>
+                  <p><strong>Category:</strong> {post.category}</p>
+                  <p><strong>Location:</strong> {post.location}</p>
+                  <p><strong>Region:</strong> {post.region}</p>
+                  <p><strong>Postcode:</strong> {post.postcode}</p>
+                  <p><strong>Pay:</strong> ${post.payRate} ({post.payType})</p>
+                  <p><strong>Experience:</strong> {post.experience}</p>
+                  <p><strong>Shift:</strong> {post.shift}</p>
+                  <p><strong>Certifications:</strong> {post.certifications}</p>
+                  <p className="col-span-2"><strong>Description:</strong> {post.description}</p>
+                  <p className="col-span-2 flex items-center gap-2">
+                    <FaCalendarAlt />
+                    <span><strong>Deadline:</strong> {post.deadline}</span>
+                  </p>
+                </div>
               </div>
             </div>
+
+            {/* Action & Tag */}
+            <div className="flex flex-col items-end gap-2">
+              {post.source === "local" ? (
+                <button
+                  onClick={() => router.push(`/job/${idx}`)}
+                  className="text-sm px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+                >
+                  Apply
+                </button>
+              ) : (
+                <a
+                  href={post.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Visit
+                </a>
+              )}
+              <span className="flex items-center bg-gray-200 text-xs px-2 py-1 rounded-full text-gray-700">
+                <FaTag className="mr-1" />
+                {post.source === "local" ? "FindMySecurity" : "Adzuna"}
+              </span>
+            </div>
           </div>
-        ))}
+        </div>
+      ))}
     </div>
   );
 };
