@@ -38,6 +38,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
     phoneNumber: "",
     dateOfBirth: { day: "", month: "", year: "" },
     address: "",
+    postcode: "",
   });
 
   // Validate entire form whenever form data changes
@@ -128,6 +129,12 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
       isValid = false;
     }
 
+    // Address validation
+    if (!formData.postcode.trim()) {
+      errors.address = "Post Code is required";
+      isValid = false;
+    }
+
     setFormErrors(errors);
     return isValid && Object.keys(errors).length === 0;
   };
@@ -161,6 +168,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
       phoneNumber: formData.phoneNumber,
       dateOfBirth: formattedDateOfBirth,
       address: formData.address,
+      postcode: formData.postcode,
       permissions: {},
       roleId: id,
     };
@@ -401,6 +409,23 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
           )}
         </div>
 
+        {/* PostCode */}
+        <div className="relative">
+          <FaMapMarkerAlt className="absolute left-3 top-3 text-gray-500" />
+          <input
+            type="text"
+            name="postcode"
+            value={formData.postcode}
+            onChange={handleChange}
+            placeholder="Post Code"
+            className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+              (showAllErrors && formErrors.address) ? "border-red-500" : "border-gray-300"
+            }`}
+          />
+          {(showAllErrors && formErrors.address) && (
+            <p className="mt-1 text-xs text-red-500">{formErrors.address}</p>
+          )}
+        </div>
         {/* Submit Button */}
         <button 
           type="submit" 
