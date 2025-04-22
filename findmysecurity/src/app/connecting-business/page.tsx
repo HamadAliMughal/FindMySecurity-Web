@@ -51,18 +51,23 @@ export default function ConnectingBusiness() {
   ];
 
   useEffect(() => {
-    const storedSearchMode = localStorage.getItem("searchMode");
+    const storedMode = localStorage.getItem("searchMode");
+
+    if (storedMode === "basic" || storedMode === "advanced") {
+      setSearchMode(storedMode); // ✅ Now TypeScript is happy
+    } else {
+      setSearchMode("basic"); // optional fallback
+    }
     const values = localStorage.getItem("searchValues");
     const title = localStorage.getItem("title");
 
-    if (!storedSearchMode) {
+    if (!storedMode) {
       router.push("/");
       return;
     }
 
-    setSearchMode(storedSearchMode);
 
-    if (storedSearchMode === "advanced") {
+    if (storedMode === "advanced") {
       const storedData = localStorage.getItem("profileData") || localStorage.getItem("loginData");
       if (storedData) {
         setProfileData(JSON.parse(storedData));
