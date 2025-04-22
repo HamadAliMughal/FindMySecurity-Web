@@ -18,6 +18,7 @@ const features = [
 ];
 
 export default function TrainingProviders({ initialSearchMode = "basic" }: { initialSearchMode?: "basic" | "advanced" }) {
+  
   const handleSearchSubmit = (searchValues: any) => {
     console.log("Search submitted with values:", searchValues);
     // Handle the search submission logic, e.g., make API requests or filter results.
@@ -75,6 +76,7 @@ export default function TrainingProviders({ initialSearchMode = "basic" }: { ini
             title="Training Providers"
             onSearchSubmit={handleSearchSubmit} // Pass the callback to handle the submit
             searchMode={initialSearchMode} // Pass the searchMode prop to SearchComponent
+            hideExperienceField={true} 
           />
         </div>
       </div>

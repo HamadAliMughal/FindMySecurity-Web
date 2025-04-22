@@ -31,8 +31,9 @@ interface LookingForItem {
   roles: string[];
 }
 
-export default function ConnectingBusiness({ initialSearchMode = "basic" }: { initialSearchMode?: "basic" | "advanced" }) {
+export default function ConnectingBusiness() {
   const router = useRouter();
+  const initialSearchMode: "basic" | "advanced" = "basic";
   const [isLoaded, setIsLoaded] = useState(false);
   const [profileData, setProfileData] = useState<any>(null);
   const [searchValues, setSearchValues] = useState<SearchValues | null>(null);
@@ -40,6 +41,7 @@ export default function ConnectingBusiness({ initialSearchMode = "basic" }: { in
   const [showSearchComponent, setShowSearchComponent] = useState(false);
   const [searchTitle, setSearchTitle] = useState<string | null>(null);
   const [searchMode, setSearchMode] = useState<string>(initialSearchMode);
+  const [hideExperience, setHideExperience] = useState(false);
 
   const defaultCenter = { lat: 51.5074, lng: -0.1278 };
   const markers: MarkerData[] = [
@@ -81,10 +83,13 @@ export default function ConnectingBusiness({ initialSearchMode = "basic" }: { in
 
       if (normalizedTitle.includes("professional")) {
         data = securityProfessionals;
+        setHideExperience(false);
       } else if (normalizedTitle.includes("compan")) {
         data = securityCompanies;
+        setHideExperience(true);
       } else if (normalizedTitle.includes("train")) {
         data = trainingProviders;
+        setHideExperience(true);
       } else {
         console.warn("Unknown title:", cleanedTitle);
         data = securityProfessionals;
@@ -122,13 +127,15 @@ export default function ConnectingBusiness({ initialSearchMode = "basic" }: { in
 
   if (!isLoaded) return null;
 
+  const lowerTitle = (searchTitle || "").toLowerCase();
+  const isCompanyOrTraining = lowerTitle.includes("compan") || lowerTitle.includes("train");
+
   return (
     <section className="relative w-full min-h-screen bg-gray-100 text-gray-900 px-4 sm:px-6 md:px-10 lg:px-32 pt-24 pb-16">
       {/* Back Button */}
-      <div className="absolute top-6 left-6 z-20">
+      <div className="absolute top-24 left-6 z-20">
         <button className="flex items-center text-gray-600 hover:text-black transition-all" onClick={handleBack}>
           <ArrowLeft className="w-5 h-5 mr-2" />
-          <span className="text-sm font-medium">Back</span>
         </button>
       </div>
 
@@ -147,6 +154,8 @@ export default function ConnectingBusiness({ initialSearchMode = "basic" }: { in
             searchMode={searchMode as "basic" | "advanced"}
             onSearchSubmit={handleSearchSubmit}
             onSearchModeChange={handleSearchModeChange}
+            hideExperienceField={hideExperience} 
+            
           />
         </div>
       )}
@@ -156,6 +165,8 @@ export default function ConnectingBusiness({ initialSearchMode = "basic" }: { in
         <div className="relative z-10 w-full max-w-4xl mx-auto mb-10 bg-white p-6 rounded-xl shadow-md border border-gray-200">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {Object.entries(searchValues).map(([key, value]) => {
+              if (key === "experience" && isCompanyOrTraining) return null;
+
               if (searchMode === "basic" && (key === "lookingFor" || key === "subCategory" || key === "postcode")) {
                 return (
                   <div key={key} className="space-y-1">
@@ -187,16 +198,17 @@ export default function ConnectingBusiness({ initialSearchMode = "basic" }: { in
               return null;
             })}
             {/* Refine Search Button */}
-          {!showSearchComponent && (
-            <div className="flex justify-center mt-6">
+            {!showSearchComponent && (
+              <div className="flex justify-center -ml-24 mt-6">
               <button
-                className="flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-md hover:bg-gray-800 transition"
-                onClick={handleRefineSearch}
-              >
-                🔍 Refine Search
-              </button>
-            </div>
-          )}
+  className="flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-md hover:bg-gray-800 hover:scale-105 transition-all duration-300"
+  onClick={handleRefineSearch}
+>
+  🔍 Refine Search
+</button>
+
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -217,6 +229,231 @@ export default function ConnectingBusiness({ initialSearchMode = "basic" }: { in
     </section>
   );
 }
+
+
+
+
+
+
+// "use client";
+
+// import React, { useEffect, useState } from "react";
+// import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+// import { ArrowLeft } from "lucide-react";
+// import { useRouter } from "next/navigation";
+// import SearchComponent from "@/sections/home/SearchComponent";
+// import securityProfessionals from "@/sections/data/secuirty_professional.json";
+// import securityCompanies from "@/sections/data/secuirty_services.json";
+// import trainingProviders from "@/sections/data/training_providers.json";
+// import searchData from "@/sections/data/hero_section.json";
+
+// interface MarkerData {
+//   id: number;
+//   position: { lat: number; lng: number };
+//   title: string;
+// }
+
+// interface SearchValues {
+//   lookingFor?: string;
+//   jobTitle?: string;
+//   experience?: string;
+//   location?: string;
+//   postcode?: string;
+//   [key: string]: any;
+// }
+
+// interface LookingForItem {
+//   title: string;
+//   id: string;
+//   roles: string[];
+// }
+
+// export default function ConnectingBusiness() {
+//   const router = useRouter();
+//   const initialSearchMode: "basic" | "advanced" = "basic";
+//   const [isLoaded, setIsLoaded] = useState(false);
+//   const [profileData, setProfileData] = useState<any>(null);
+//   const [searchValues, setSearchValues] = useState<SearchValues | null>(null);
+//   const [lookingForData, setLookingForData] = useState<LookingForItem[]>([]);
+//   const [showSearchComponent, setShowSearchComponent] = useState(false);
+//   const [searchTitle, setSearchTitle] = useState<string | null>(null);
+//   const [searchMode, setSearchMode] = useState<string>(initialSearchMode);
+
+//   const defaultCenter = { lat: 51.5074, lng: -0.1278 };
+//   const markers: MarkerData[] = [
+//     { id: 1, position: { lat: 51.5074, lng: -0.1278 }, title: "Security Company A" },
+//     { id: 2, position: { lat: 51.511, lng: -0.12 }, title: "Security Company B" },
+//     { id: 3, position: { lat: 51.505, lng: -0.13 }, title: "Security Company C" },
+//   ];
+
+//   useEffect(() => {
+//     const storedSearchMode = localStorage.getItem("searchMode");
+//     const values = localStorage.getItem("searchValues");
+//     const title = localStorage.getItem("title");
+
+//     if (!storedSearchMode) {
+//       router.push("/");
+//       return;
+//     }
+
+//     setSearchMode(storedSearchMode);
+
+//     if (storedSearchMode === "advanced") {
+//       const storedData = localStorage.getItem("profileData") || localStorage.getItem("loginData");
+//       if (storedData) {
+//         setProfileData(JSON.parse(storedData));
+//       } else {
+//         router.push("/");
+//         return;
+//       }
+//     }
+
+//     if (values && title) {
+//       const parsedValues: SearchValues = JSON.parse(values);
+//       setSearchValues(parsedValues);
+//       const cleanedTitle = title.replace(/['"]+/g, "").trim();
+//       setSearchTitle(cleanedTitle);
+
+//       let data: LookingForItem[] = [];
+//       const normalizedTitle = cleanedTitle.toLowerCase();
+
+//       if (normalizedTitle.includes("professional")) {
+//         data = securityProfessionals;
+//       } else if (normalizedTitle.includes("compan")) {
+//         data = securityCompanies;
+//       } else if (normalizedTitle.includes("train")) {
+//         data = trainingProviders;
+//       } else {
+//         console.warn("Unknown title:", cleanedTitle);
+//         data = securityProfessionals;
+//       }
+
+//       setLookingForData(data);
+//     }
+
+//     setIsLoaded(true);
+//   }, [router]);
+
+//   const handleBack = () => {
+//     localStorage.removeItem("searchMode");
+//     localStorage.removeItem("searchValues");
+//     localStorage.removeItem("title");
+//     router.back();
+//   };
+
+//   const handleRefineSearch = () => {
+//     setShowSearchComponent(true);
+//   };
+
+//   const handleSearchSubmit = (newSearchValues: SearchValues) => {
+//     setSearchValues(newSearchValues);
+//     localStorage.setItem("searchValues", JSON.stringify(newSearchValues));
+//     setShowSearchComponent(false);
+//   };
+
+//   const handleSearchModeChange = (mode: "basic" | "advanced") => {
+//     setSearchMode(mode);
+//     localStorage.setItem("searchMode", mode);
+//   };
+
+//   const mapStyles = { width: "100%", height: "400px", borderRadius: "12px" };
+
+//   if (!isLoaded) return null;
+
+//   return (
+//     <section className="relative w-full min-h-screen bg-gray-100 text-gray-900 px-4 sm:px-6 md:px-10 lg:px-32 pt-24 pb-16">
+//       {/* Back Button */}
+//       <div className="absolute top-24 left-6 z-20">
+//         <button className="flex items-center text-gray-600 hover:text-black transition-all" onClick={handleBack}>
+//           <ArrowLeft className="w-5 h-5 mr-2" />
+//         </button>
+//       </div>
+
+//       {/* Page Title */}
+//       <h1 className="text-3xl lg:text-4xl font-extrabold text-center mb-10 leading-tight">
+//         Find <span className="text-black">{searchTitle || "Security Providers"}</span> Near You
+//       </h1>
+
+//       {/* Search Component */}
+//       {showSearchComponent && (
+//         <div className="relative z-10 flex justify-center mb-8 w-full max-w-4xl mx-auto">
+//           <SearchComponent
+//             lookingForData={lookingForData}
+//             searchData={searchData}
+//             title={searchTitle || "Professionals"}
+//             searchMode={searchMode as "basic" | "advanced"}
+//             onSearchSubmit={handleSearchSubmit}
+//             onSearchModeChange={handleSearchModeChange}
+//           />
+//         </div>
+//       )}
+
+//       {/* Search Values Display */}
+//       {searchValues && !showSearchComponent && (
+//         <div className="relative z-10 w-full max-w-4xl mx-auto mb-10 bg-white p-6 rounded-xl shadow-md border border-gray-200">
+//           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+//             {Object.entries(searchValues).map(([key, value]) => {
+//               if (searchMode === "basic" && (key === "lookingFor" || key === "subCategory" || key === "postcode")) {
+//                 return (
+//                   <div key={key} className="space-y-1">
+//                     <label className="block text-sm font-medium text-gray-700 capitalize">{key}</label>
+//                     <input
+//                       type="text"
+//                       readOnly
+//                       value={value}
+//                       className="w-full px-3 py-2 border rounded-md bg-gray-50 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-black focus:outline-none cursor-not-allowed transition"
+//                     />
+//                   </div>
+//                 );
+//               }
+
+//               if (searchMode === "advanced") {
+//                 return (
+//                   <div key={key} className="space-y-1">
+//                     <label className="block text-sm font-medium text-gray-700 capitalize">{key}</label>
+//                     <input
+//                       type="text"
+//                       readOnly
+//                       value={value}
+//                       className="w-full px-3 py-2 border rounded-md bg-gray-50 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-black focus:outline-none cursor-not-allowed transition"
+//                     />
+//                   </div>
+//                 );
+//               }
+
+//               return null;
+//             })}
+//             {/* Refine Search Button */}
+//           {!showSearchComponent && (
+//             <div className="flex justify-center -ml-24 mt-6">
+//               <button
+//                 className="flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-md hover:bg-gray-800 transition"
+//                 onClick={handleRefineSearch}
+//               >
+//                 🔍 Refine Search
+//               </button>
+//             </div>
+//           )}
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Google Map Section */}
+//       <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-4xl mx-auto mb-10">
+//         <h2 className="text-lg md:text-xl font-semibold mb-4">Security Companies Near You</h2>
+//         <div className="h-80 sm:h-96 w-full rounded-md overflow-hidden border">
+//           <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAP_API || ""}>
+//             <GoogleMap mapContainerStyle={mapStyles} center={defaultCenter} zoom={13}>
+//               {markers.map((marker) => (
+//                 <Marker key={marker.id} position={marker.position} title={marker.title} />
+//               ))}
+//             </GoogleMap>
+//           </LoadScript>
+//         </div>
+//       </div>
+//     </section>
+//   );
+// }
 
 
 

@@ -5,6 +5,7 @@ import searchData from "@/sections/data/hero_section.json";
 import SearchComponent from "./SearchComponent";
 
 export default function Hero({ initialSearchMode = "basic" }: { initialSearchMode?: "basic" | "advanced" }) {
+  
   const handleSearchSubmit = (searchValues: any) => {
     console.log("Search submitted with values:", searchValues);
     // Handle the search submission logic, e.g., make API requests or filter results.

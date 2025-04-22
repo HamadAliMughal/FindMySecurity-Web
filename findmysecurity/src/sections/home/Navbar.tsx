@@ -62,14 +62,14 @@ export default function Navbar() {
           <span>FindMySecurity</span>
         </Link>
         <button
-          className="lg:hidden text-white text-3xl"
+          className="xl:hidden text-white text-3xl"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? <Cross /> : <Menu />}
         </button>
 
         {/* Desktop Menu */}
-        <div className="hidden lg:flex space-x-4">
+        <div className="hidden xl:flex space-x-4">
           {/* Solution Dropdown */}
           <DynamicDropdown jsonFile="secuirty_professional.json" title="Security Professionals" basePath="/professionals/" />
           <DynamicDropdown jsonFile="secuirty_services.json" title="Security Services" basePath="/services/" />
@@ -83,7 +83,7 @@ export default function Navbar() {
         </div>
         {profileData ? (
           <>
-            <div className="hidden lg:flex items-center space-x-4">
+            <div className="hidden xl:flex items-center space-x-4">
 
               <button onClick={handleLogout} className="text-white flex items-center space-x-2 ease-in-out hover:text-gray-200">
                 <LogOut className="h-4 w-4" />
@@ -109,7 +109,7 @@ export default function Navbar() {
         )
           : (
             <>
-              <div className="hidden lg:flex items-center space-x-4">
+              <div className="hidden xl:flex items-center space-x-4">
                 {/* <Link href="/signup" className="bg-white text-black px-4 py-1 font-bold rounded-full text-center ease-in-out hover:bg-gray-200">
                   Sign Up
                 </Link> */}
@@ -140,7 +140,7 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div 
         
-        className="lg:hidden bg-black text-white p-4 max-h-[90vh] overflow-y-auto"
+        className="xl:hidden bg-black text-white p-4 max-h-[90vh] overflow-y-auto"
         // className="md:hidden bg-black text-white p-4"
         >
 
