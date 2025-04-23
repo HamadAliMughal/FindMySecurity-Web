@@ -6,7 +6,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const app_id = process.env.ADZUNA_APP_ID;
   const app_key = process.env.ADZUNA_APP_KEY;
 
-  const endpoint = `https://api.adzuna.com/v1/api/jobs/gb/search/1?app_id=${app_id}&app_key=${app_key}&results_per_page=20&what=${keyword}&where=${location}&salary_max=${minSalary}`;
+  const endpoint = `https://api.adzuna.com/v1/api/jobs/gb/search/1?app_id=${app_id}&app_key=${app_key}&results_per_page=20&what=Security ${keyword}&where=${location}&salary_max=${minSalary}`;
 
   try {
     const response = await fetch(endpoint);
