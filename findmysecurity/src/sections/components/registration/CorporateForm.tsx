@@ -6,6 +6,8 @@ import { LockIcon } from "lucide-react";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import Select from "react-select";
 import MembershipDialog from "./MembershipDialog";
+import TextField from '@mui/material/TextField';
+
 
 interface ClientGeneralFormProps {
   id: number;
@@ -89,7 +91,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
     return validations;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type, checked } = e.target as HTMLInputElement;
     
     setFormErrors(prev => ({ ...prev, [name]: "" }));
@@ -250,52 +252,133 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative flex items-center">
               <FaBuilding className="absolute left-3 text-gray-700" />
-              <input
+              <TextField
                 type="text" 
                 name="companyName" 
-                placeholder="Company Name"
+                label="Company Name"
                 value={formData.companyName} 
                 onChange={handleChange}
-                className={`w-full pl-10 pr-3 py-3 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black ${
-                  (showAllErrors && formErrors.companyName) ? "border-red-500" : "border-gray-500"
-                }`}
+                id="outlined-basic"
+                variant="outlined"
+                className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+                  showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+                } focus:border-black`} // Ensuring black border on focus
+                InputLabelProps={{
+                  style: { color: 'gray' }, // Default label color
+                }}
+                inputProps={{
+                  className: "focus:outline-none" // Optional to remove outline when focused
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black", // Black border when focused
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "gray", // Default label color
+                  },
+                  "& .Mui-focused .MuiInputLabel-root": {
+                    color: "black", // Label color when focused
+                  },
+                }}
+                // className={`w-full pl-10 pr-3 py-3 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black ${
+                //   (showAllErrors && formErrors.companyName) ? "border-red-500" : "border-gray-500"
+                // }`}
                 required
               />
               {(showAllErrors && formErrors.companyName) && (
                 <p className="mt-1 text-xs text-red-500">{formErrors.companyName}</p>
               )}
             </div>
-            <input
+            <TextField
               type="text" 
               name="registrationNumber" 
-              placeholder="Registration Number"
+              label="Registration Number"
               value={formData.registrationNumber} 
               onChange={handleChange}
-              className="w-full pl-3 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
+              id="outlined-basic"
+              variant="outlined"
+              className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+                showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+              } focus:border-black`} // Ensuring black border on focus
+              InputLabelProps={{
+                style: { color: 'gray' }, // Default label color
+              }}
+              inputProps={{
+                className: "focus:outline-none" // Optional to remove outline when focused
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "black", // Black border when focused
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "gray", // Default label color
+                },
+                "& .Mui-focused .MuiInputLabel-root": {
+                  color: "black", // Label color when focused
+                },
+              }}
+              // className="w-full pl-3 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
             />
           </div>
 
           {/* Password */}
           <div className="relative">
             <LockIcon className="absolute left-3 top-3 text-gray-500" />
-            <input
+            <TextField
               type={passwordVisible ? "text" : "password"}
               name="password"
               value={formData.password}
               onChange={handleChange}
               required
-              placeholder="Password"
-              className={`w-full pl-10 pr-10 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
-                (showAllErrors && formErrors.password) ? "border-red-500" : "border-gray-500"
-              }`}
+              label="Password"
+              id="outlined-basic"
+                variant="outlined"
+              className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+                showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+              } focus:border-black`} // Ensuring black border on focus
+              InputLabelProps={{
+                style: { color: 'gray' }, // Default label color
+              }}
+              inputProps={{
+                className: "focus:outline-none" // Optional to remove outline when focused
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "black", // Black border when focused
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "gray", // Default label color
+                },
+                "& .Mui-focused .MuiInputLabel-root": {
+                  color: "black", // Label color when focused
+                },
+              }}
+              // className={`w-full pl-10 pr-10 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+              //   (showAllErrors && formErrors.password) ? "border-red-500" : "border-gray-500"
+              // }`}
             />
-            <button
-              type="button"
-              className="absolute right-3 top-3 text-gray-500"
-              onClick={() => setPasswordVisible(!passwordVisible)}
-            >
-              {passwordVisible ? <IoMdEyeOff /> : <IoMdEye />}
-            </button>
+             <button
+                  type="button"
+                  className="absolute right-3 top-4 text-gray-500"
+                  onClick={() => setPasswordVisible(!passwordVisible)}
+                >
+                  {passwordVisible ? <IoMdEyeOff className="w-6 h-6" /> : <IoMdEye className="w-6 h-6"/>}
+                </button>
             
             {(formData.password || showAllErrors) && (
               <div className="mt-2 text-xs space-y-1">
@@ -335,28 +418,80 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative flex items-center">
               <FaMapMarkerAlt className="absolute left-3 text-gray-700" />
-              <input
+              <TextField
                 type="text" 
                 name="address" 
-                placeholder="Business Address"
+                label="Business Address"
                 value={formData.address} 
                 onChange={handleChange}
-                className={`w-full pl-10 pr-3 py-3 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black ${
-                  (showAllErrors && formErrors.address) ? "border-red-500" : "border-gray-500"
-                }`}
+                className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+                  showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+                } focus:border-black`} // Ensuring black border on focus
+                InputLabelProps={{
+                  style: { color: 'gray' }, // Default label color
+                }}
+                inputProps={{
+                  className: "focus:outline-none" // Optional to remove outline when focused
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black", // Black border when focused
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "gray", // Default label color
+                  },
+                  "& .Mui-focused .MuiInputLabel-root": {
+                    color: "black", // Label color when focused
+                  },
+                }}
+                // className={`w-full pl-10 pr-3 py-3 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black ${
+                //   (showAllErrors && formErrors.address) ? "border-red-500" : "border-gray-500"
+                // }`}
                 required
               />
               {(showAllErrors && formErrors.address) && (
                 <p className="mt-1 text-xs text-red-500">{formErrors.address}</p>
               )}
             </div>
-            <input
+            <TextField
               type="text" 
               name="postcode" 
-              placeholder="Post Code"
+              label="Post Code"
+              id="outlined-basic"
+                variant="outlined"
               value={formData.postcode} 
               onChange={handleChange}
-              className="w-full pl-3 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
+              className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+                showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+              } focus:border-black`} // Ensuring black border on focus
+              InputLabelProps={{
+                style: { color: 'gray' }, // Default label color
+              }}
+              inputProps={{
+                className: "focus:outline-none" // Optional to remove outline when focused
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "black", // Black border when focused
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "gray", // Default label color
+                },
+                "& .Mui-focused .MuiInputLabel-root": {
+                  color: "black", // Label color when focused
+                },
+              }}
+              // className="w-full pl-3 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
               required
             />
           </div>
@@ -364,13 +499,40 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
           {/* Industry Type */}
           <div className="relative flex items-center">
             <FaIndustry className="absolute left-3 text-gray-700" />
-            <input
+            <TextField
               type="text" 
               name="industryType" 
-              placeholder="Industry Type"
+              label="Industry Type"
+              id="outlined-basic"
+                variant="outlined"
               value={formData.industryType} 
               onChange={handleChange}
-              className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
+              className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+                showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+              } focus:border-black`} // Ensuring black border on focus
+              InputLabelProps={{
+                style: { color: 'gray' }, // Default label color
+              }}
+              inputProps={{
+                className: "focus:outline-none" // Optional to remove outline when focused
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "black", // Black border when focused
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "gray", // Default label color
+                },
+                "& .Mui-focused .MuiInputLabel-root": {
+                  color: "black", // Label color when focused
+                },
+              }}
+              // className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
               required
             />
           </div>
@@ -379,28 +541,82 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative flex items-center">
               <FaUserTie className="absolute left-3 text-gray-700" />
-              <input
+              <TextField
                 type="text" 
                 name="contactPerson" 
-                placeholder="Contact Person"
+                label="Contact Person"
+                id="outlined-basic"
+                variant="outlined"
                 value={formData.contactPerson} 
                 onChange={handleChange}
-                className={`w-full pl-10 pr-3 py-3 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black ${
-                  (showAllErrors && formErrors.contactPerson) ? "border-red-500" : "border-gray-500"
-                }`}
+                className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+                  showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+                } focus:border-black`} // Ensuring black border on focus
+                InputLabelProps={{
+                  style: { color: 'gray' }, // Default label color
+                }}
+                inputProps={{
+                  className: "focus:outline-none" // Optional to remove outline when focused
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black", // Black border when focused
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "gray", // Default label color
+                  },
+                  "& .Mui-focused .MuiInputLabel-root": {
+                    color: "black", // Label color when focused
+                  },
+                }}
+                // className={`w-full pl-10 pr-3 py-3 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black ${
+                //   (showAllErrors && formErrors.contactPerson) ? "border-red-500" : "border-gray-500"
+                // }`}
                 required
               />
               {(showAllErrors && formErrors.contactPerson) && (
                 <p className="mt-1 text-xs text-red-500">{formErrors.contactPerson}</p>
               )}
             </div>
-            <input
+            <TextField
               type="text" 
               name="jobTitle" 
-              placeholder="Job Title"
+              label="Job Title"
+              id="outlined-basic"
+                variant="outlined"
               value={formData.jobTitle} 
               onChange={handleChange}
-              className="w-full pl-3 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
+              className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+                showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+              } focus:border-black`} // Ensuring black border on focus
+              InputLabelProps={{
+                style: { color: 'gray' }, // Default label color
+              }}
+              inputProps={{
+                className: "focus:outline-none" // Optional to remove outline when focused
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "black", // Black border when focused
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "gray", // Default label color
+                },
+                "& .Mui-focused .MuiInputLabel-root": {
+                  color: "black", // Label color when focused
+                },
+              }}
+              // className="w-full pl-3 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
               required
             />
           </div>
@@ -408,15 +624,42 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
           {/* Email */}
           <div className="relative flex items-center">
             <FaEnvelope className="absolute left-3 text-gray-700" />
-            <input
+            <TextField
               type="email" 
               name="email" 
-              placeholder="Email Address"
+              label="Email Address"
+              id="outlined-basic"
+                variant="outlined"
               value={formData.email} 
               onChange={handleChange}
-              className={`w-full pl-10 pr-3 py-3 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black ${
-                (showAllErrors && formErrors.email) ? "border-red-500" : "border-gray-500"
-              }`}
+              className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+                showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+              } focus:border-black`} // Ensuring black border on focus
+              InputLabelProps={{
+                style: { color: 'gray' }, // Default label color
+              }}
+              inputProps={{
+                className: "focus:outline-none" // Optional to remove outline when focused
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "black", // Black border when focused
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "gray", // Default label color
+                },
+                "& .Mui-focused .MuiInputLabel-root": {
+                  color: "black", // Label color when focused
+                },
+              }}
+              // className={`w-full pl-10 pr-3 py-3 border rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black ${
+              //   (showAllErrors && formErrors.email) ? "border-red-500" : "border-gray-500"
+              // }`}
               required
             />
             {(showAllErrors && formErrors.email) && (
@@ -427,13 +670,40 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
           {/* Phone */}
           <div className="relative flex items-center">
             <FaPhone className="absolute left-3 text-gray-700" />
-            <input
+            <TextField
               type="text" 
               name="phone" 
-              placeholder="Phone Number"
+              label="Phone Number"
+              id="outlined-basic"
+                variant="outlined"
               value={formData.phone} 
               onChange={handleChange}
-              className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
+              className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+                showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+              } focus:border-black`} // Ensuring black border on focus
+              InputLabelProps={{
+                style: { color: 'gray' }, // Default label color
+              }}
+              inputProps={{
+                className: "focus:outline-none" // Optional to remove outline when focused
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "black", // Black border when focused
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "gray", // Default label color
+                },
+                "& .Mui-focused .MuiInputLabel-root": {
+                  color: "black", // Label color when focused
+                },
+              }}
+              // className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
               required
             />
           </div>
@@ -441,13 +711,40 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
           {/* Website */}
           <div className="relative flex items-center">
             <FaGlobe className="absolute left-3 text-gray-700" />
-            <input
+            <TextField
               type="text" 
               name="website" 
-              placeholder="Website (if applicable)"
+              label="Website (if applicable)"
+              id="outlined-basic"
+                variant="outlined"
               value={formData.website} 
               onChange={handleChange}
-              className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
+              className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+                showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+              } focus:border-black`} // Ensuring black border on focus
+              InputLabelProps={{
+                style: { color: 'gray' }, // Default label color
+              }}
+              inputProps={{
+                className: "focus:outline-none" // Optional to remove outline when focused
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "black", // Black border when focused
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: "gray", // Default label color
+                },
+                "& .Mui-focused .MuiInputLabel-root": {
+                  color: "black", // Label color when focused
+                },
+              }}
+              // className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
             />
           </div>
 

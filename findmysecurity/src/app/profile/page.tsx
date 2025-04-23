@@ -17,97 +17,64 @@ import { ArrowLeft } from "lucide-react";
 import "../globals.css";
 
 const UserProfile: React.FC = () => {
-  const [profileData, setProfileData] = useState<any>(null);
-  const [publicProfileData, setPublicProfileData] = useState<any>(null);
+  const [loginData, setLoginData] = useState<any>(null);
   const router = useRouter();
   const [roleId, setRoleId] = useState(0);
-  const [profileCreated, setProfileCreated] = useState(false);
 
   useEffect(() => {
-    // Get login or profile data from localStorage
     const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
     const data = storedData1 ? JSON.parse(storedData1) : null;
 
-    const currentRoleId = data?.role?.id || data?.roleId;
-    setRoleId(currentRoleId);
-    setProfileData(data);
+    const roleId = data?.user?.role?.id || data?.user?.roleId || data?.role?.id || data?.roleId;
+    setRoleId(roleId);
+    setLoginData(data);
 
     if (!data) {
-      router.push("/"); // Redirect to home if no data found
+      router.push("/");
       return;
     }
 
-    // Get the created profile data
-    const createdProfiles = localStorage.getItem("createdPublicProfiles");
-    if (currentRoleId === 2 && !createdProfiles) {
-      
-
+    if (
+      roleId === 3 &&
+      !(loginData?.user?.individualProfessional || loginData?.individualProfessional)
+    ) {
       const interval = setInterval(() => {
         if (window.confirm("Make your public profile?")) {
-          setProfileCreated(false);
           router.push("/public-profile");
         }
       }, 5000);
+  
       return () => clearInterval(interval);
-    } else if (currentRoleId === 2 && createdProfiles) {
-      // Parse the created profile data and set it in state
-      setPublicProfileData(JSON.parse(createdProfiles)); // Parse the stored data correctly
-      setProfileCreated(true);
-    }
-  }, [router]);
-
-  useEffect(() => {
-    // Get login or profile data from localStorage
-    const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
-    const data = storedData1 ? JSON.parse(storedData1) : null;
-
-    const currentRoleId = data?.role?.id || data?.roleId;
-    setRoleId(currentRoleId);
-    setProfileData(data);
-
-    if (!data) {
-      router.push("/"); // Redirect to home if no data found
-      return;
     }
 
-    // Get the created profile data
-    const createdProfiles = localStorage.getItem("createdPublicProfiles");
-    if (currentRoleId === 2 && !createdProfiles) {
-      const interval = setInterval(() => {
-        if (window.confirm("Make your public profile?")) {
-          setProfileCreated(false);
-          router.push("/public-profile");
-        }
-      }, 5000);
-      return () => clearInterval(interval);
-    } else if (currentRoleId === 2 && createdProfiles) {
-      setPublicProfileData(JSON.parse(createdProfiles)); // Parse the stored data correctly
-      setProfileCreated(true);
-    }
-  }, [router]);
+  }, [roleId,router]);
+  
 
   const updateProfile = async () => {
     try {
-      // Get the current profile data from localStorage
-      const updatedProfileData = JSON.parse(localStorage.getItem("createdPublicProfiles") || "{}");
+      const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
+      const data = storedData1 ? JSON.parse(storedData1) : null;
 
-      // Send PUT request to update profile
-      const response = await fetch("https://findmysecurity-backend.onrender.com/api/profile/individual", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          profileData: updatedProfileData,
-        }),
-      });
+      const currentRoleId = data?.user?.role?.id || data?.user?.roleId || data?.role?.id || data?.roleId;
+
+      const response = await fetch(
+        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/profile/individual/${currentRoleId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            loginData: storedData1,
+          }),
+        }
+      );
 
       if (response.ok) {
         const responseData = await response.json();
         if (responseData.success) {
           alert("Profile updated successfully!");
-          // Optionally, you can update localStorage again after successful API update
-          localStorage.setItem("createdPublicProfiles", JSON.stringify(updatedProfileData));
+          localStorage.setItem("loginData", JSON.stringify(storedData1));
         } else {
           alert("Failed to update profile.");
         }
@@ -120,11 +87,10 @@ const UserProfile: React.FC = () => {
     }
   };
 
-  if (!profileData) return null;
+  if (!loginData) return null;
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
-      {/* Back Button */}
       <button
         className="absolute top-4 left-4 mt-20 z-2 flex items-center text-gray-600 hover:text-black"
         onClick={() => router.push("/")}
@@ -132,28 +98,30 @@ const UserProfile: React.FC = () => {
         <ArrowLeft className="w-6 h-6 mr-2" />
       </button>
 
-      {/* Profile Card */}
       <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-6 relative mt-12 md:mt-16">
-        {/* Profile Header */}
         <div className="flex flex-col items-center md:flex-row md:items-center md:space-x-6">
-          {/* Profile Picture */}
           <div
             className="w-28 h-28 rounded-full shadow-lg shadow-gray-400 hover:scale-105 transition-transform duration-300"
             style={{
-              backgroundImage: `url(${publicProfileData?.profilePhoto || "/images/profile.png"})`,
+              backgroundImage: `url(${loginData?.user?.individualProfessional?.profilePhoto || "/images/profile.png"})`,
               backgroundSize: "cover",
             }}
           ></div>
-          {/* Profile Details */}
           <div className="text-center md:text-left">
             <h2 className="text-2xl font-semibold text-gray-800">
-              {profileData?.firstName + " " + profileData?.lastName || "Mr. Y"}
+            {loginData?.user?.firstName && loginData?.user?.lastName
+  ? `${loginData.user.firstName} ${loginData.user.lastName}`
+  : loginData?.firstName && loginData?.lastName
+    ? `${loginData.firstName} ${loginData.lastName}`
+    : "Mr. Y"}
+
             </h2>
             <h2 className="text-2xl font-semibold text-gray-800">
-              {profileData?.screenName || "Mr."}
+            {loginData?.user?.screenName ?? loginData?.screenName ?? "Mr."}
+
             </h2>
             <p className="text-gray-500">
-              {profileData?.role?.name || profileData?.role?.roleName || "Security Officer"}
+            {loginData?.user?.role?.name ?? loginData?.user?.role?.roleName ?? "Security Officer"}
             </p>
             <span className="text-sm text-yellow-500">
               ✅ Usually responds within 1 hour
@@ -161,7 +129,6 @@ const UserProfile: React.FC = () => {
           </div>
         </div>
 
-        {/* Membership Info */}
         <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-4">
           {["Industry", "Member since Jan 2016", "Last Updated Jan 2025", "Last Login 28 Jan 2025"].map(
             (info, index) => (
@@ -172,25 +139,22 @@ const UserProfile: React.FC = () => {
           )}
         </div>
 
-        {/* Contact Buttons */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
-          {/* Phone */}
           <button className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600">
-            <FaMobileAlt className="mr-2" /> {profileData?.phoneNumber || "Mobile"}
+            <FaMobileAlt className="mr-2" /> {loginData?.user?.phoneNumber ?? loginData?.phoneNumber ?? "Mobile"}
           </button>
-          {/* Address */}
           <div className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-800">
             <FaHome className="mr-2" />
             <span className="truncate">
-              {profileData?.address || profileData?.role?.address || "Home"}
+            {loginData?.user?.address ?? loginData?.user?.role?.address ?? loginData?.address ?? loginData?.role?.address ?? "Home"}
+
             </span>
           </div>
-          {/* Email */}
           <button className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-800">
             <FaEnvelope className="mr-2" />
-            <span className="truncate">{profileData?.email || "Email"}</span>
+            <span className="truncate">{loginData?.user?.email ??  loginData?.email ?? "Email"}</span>
           </button>
-          {roleId === 2 && !profileCreated && (
+          {roleId === 3 && !(loginData?.user?.individualProfessional || loginData?.individualProfessional) && (
             <button
               className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
               onClick={() => router.push("/public-profile")}
@@ -199,8 +163,7 @@ const UserProfile: React.FC = () => {
             </button>
           )}
 
-          {/* Post Job */}
-          {roleId === 4 || roleId === 7 ? (
+          {roleId === 4 || roleId === 6 || roleId === 5 || roleId === 7 ? (
             <button
               className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
               onClick={() => router.push("/job-posting")}
@@ -208,97 +171,407 @@ const UserProfile: React.FC = () => {
               <FaBriefcase className="mr-2" /> Post a Job
             </button>
           ) : (
-        <>{  roleId!=2 ?  <button
-              className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
-              onClick={() => router.push("/view-job")}
-            >
-              <FaBriefcase className="mr-2" /> Hire Professional
-            </button>:<button
-              className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
-              onClick={() => router.push("/view-ads")}
-            >
-              <FaBriefcase className="mr-2" /> View Job Ads
-            </button> }
-            </> 
+            <>
+              {roleId !== 3 ? (
+                <button
+                  className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+                  onClick={() => router.push("/view-job")}
+                >
+                  <FaBriefcase className="mr-2" /> Hire Professional
+                </button>
+              ) : (
+                <button
+                  className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+                  onClick={() => router.push("/view-ads")}
+                >
+                  <FaBriefcase className="mr-2" /> View Job Ads
+                </button>
+              )}
+            </>
           )}
-            <button
-              className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
-              onClick={() => updateProfile}
-            >
-              <FaBriefcase className="mr-2" /> Update Profile
-            </button>
-
-
+          <button
+            className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+            onClick={updateProfile}
+          >
+            <FaBriefcase className="mr-2" /> Update Profile
+          </button>
         </div>
 
-        {/* Upgrade Membership */}
         <button className="mt-4 w-full bg-orange-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-orange-600">
           Upgrade My Membership
         </button>
 
-        {/* Profile Actions */}
         <h3 className="text-lg font-semibold my-6 text-gray-800 text-center md:text-left">
           My Profile
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-  {[
-    { icon: <FaSearch />, label: "My Searches" },
-    { icon: <FaHeart />, label: "My Favourites" },
-    { icon: <FaUserShield />, label: "Visitors" },
-    { icon: <FaSearch />, label: "Advance Search" },
-    { icon: <FaCogs />, label: "Customer Support" },
-    // Conditionally include Post Free Ad
-    ...(roleId !== 2
-      ? [{ icon: <FaAd />, label: "Post Free Ad", route: "/post-ad" }]
-      : []),
-  ].map((item, index) => (
-    <div
-      key={index}
-      onClick={() => item.route && router.push(item.route)}
-      className="cursor-pointer p-4 bg-gray-100 rounded-lg shadow-sm hover:bg-gray-200 transition text-center"
-    >
-      <div className="text-2xl">{item.icon}</div>
-      <p className="text-sm mt-1 text-center">{item.label}</p>
-    </div>
-  ))}
-</div>
-
-         {/* Weekly Schedule */}
-         {publicProfileData && <div className="mt-6">
-      <h4 className="font-semibold text-gray-800 mb-2">Weekly Schedule</h4>
-      {publicProfileData.weeklySchedule && (
-        <div className="overflow-x-auto text-sm">
-          <table className="w-full border border-gray-200">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="p-2 border">Time</th>
-                {["Mon","Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-                  <th key={day} className="p-2 border">{day}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(publicProfileData.weeklySchedule).map(([time, days]: any) => (
-                <tr key={time}>
-                  <td className="p-2 border font-medium">{time}</td>
-                  {["Mon","Tue","Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-                    <td key={day} className="p-2 border text-center">
-                      {days[day] ? "✅" : "❌"}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {[
+            { icon: <FaSearch />, label: "My Searches" },
+            { icon: <FaHeart />, label: "My Favourites" },
+            { icon: <FaUserShield />, label: "Visitors" },
+            { icon: <FaSearch />, label: "Advance Search" },
+            { icon: <FaCogs />, label: "Customer Support" },
+            ...(roleId !== 3 ? [{ icon: <FaAd />, label: "Post Free Ad", route: "/post-ad" }] : []),
+          ].map((item, index) => (
+            <div
+              key={index}
+              onClick={() => item.route && router.push(item.route)}
+              className="cursor-pointer p-4 bg-gray-100 rounded-lg shadow-sm hover:bg-gray-200 transition text-center"
+            >
+              <div className="text-2xl">{item.icon}</div>
+              <p className="text-sm mt-1 text-center">{item.label}</p>
+            </div>
+          ))}
         </div>
-      )}
-    </div>}
+
+        {roleId == 3 && (loginData?.user || loginData?.individualProfessional) && (
+          <div className="mt-6">
+            <h4 className="font-semibold text-gray-800 mb-2">Weekly Schedule</h4>
+            {loginData?.user?.individualProfessional && (
+              <div className="overflow-x-auto text-sm">
+                <table className="w-full border border-gray-200">
+                  <thead>
+                    <tr className="bg-gray-200">
+                      <th className="p-2 border">Time</th>
+                      {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+                        <th key={day} className="p-2 border">
+                          {day}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(loginData?.user?.individualProfessional?.profileData?.availability?.weeklySchedule).map(([time, days]: any) => (
+                      <tr key={time}>
+                        <td className="p-2 border font-medium">{time}</td>
+                        {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+                          <td key={day} className="p-2 border text-center">
+                            {days[day] ? "✅" : "❌"}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default UserProfile;
+
+
+
+
+
+
+
+
+
+
+// "use client";
+
+// import React, { useEffect, useState } from "react";
+// import { useRouter } from "next/navigation";
+// import {
+//   FaMobileAlt,
+//   FaHome,
+//   FaEnvelope,
+//   FaSearch,
+//   FaHeart,
+//   FaUserShield,
+//   FaCogs,
+//   FaAd,
+//   FaBriefcase,
+// } from "react-icons/fa";
+// import { ArrowLeft } from "lucide-react";
+// import "../globals.css";
+
+// const UserProfile: React.FC = () => {
+//   const [profileData, setProfileData] = useState<any>(null);
+//   const [publicProfileData, setPublicProfileData] = useState<any>(null);
+//   const router = useRouter();
+//   const [roleId, setRoleId] = useState(0);
+//   const [profileCreated, setProfileCreated] = useState(false);
+
+//   useEffect(() => {
+//     // Get login or profile data from localStorage
+//     const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
+//     const data = storedData1 ? JSON.parse(storedData1) : null;
+
+//     const currentRoleId = data?.role?.id || data?.roleId;
+//     setRoleId(currentRoleId);
+//     setProfileData(data);
+
+//     if (!data) {
+//       router.push("/"); // Redirect to home if no data found
+//       return;
+//     }
+
+//     if (currentRoleId === 3 && !storedData1) {
+      
+
+//       const interval = setInterval(() => {
+//         if (window.confirm("Make your public profile?")) {
+//           setProfileCreated(false);
+//           router.push("/public-profile");
+//         }
+//       }, 5000);
+//       return () => clearInterval(interval);
+//     } else if (currentRoleId === 3 && storedData1) {
+//       // Parse the created profile data and set it in state
+//       setPublicProfileData(JSON.parse(storedData1)); // Parse the stored data correctly
+//       setProfileCreated(true);
+//     }
+//   }, [router]);
+
+//   useEffect(() => {
+//     // Get login or profile data from localStorage
+//     const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
+//     const data = storedData1 ? JSON.parse(storedData1) : null;
+
+//     const currentRoleId = data?.role?.id || data?.roleId;
+//     setRoleId(currentRoleId);
+//     setProfileData(data);
+
+//     if (!data) {
+//       router.push("/"); // Redirect to home if no data found
+//       return;
+//     }
+
+//     if (currentRoleId === 3 && !storedData1) {
+//       const interval = setInterval(() => {
+//         if (window.confirm("Make your public profile?")) {
+//           setProfileCreated(false);
+//           router.push("/public-profile");
+//         }
+//       }, 5000);
+//       return () => clearInterval(interval);
+//     } else if (currentRoleId === 3 && storedData1) {
+//       setPublicProfileData(JSON.parse(storedData1)); // Parse the stored data correctly
+//       setProfileCreated(true);
+//     }
+//   }, [router]);
+
+//   const updateProfile = async () => {
+//     try {
+//       // Get the current profile data from localStorage
+//       const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
+//       const data = storedData1 ? JSON.parse(storedData1) : null;
+  
+//       const currentRoleId = data?.role?.id || data?.roleId;
+//       // Send PUT request to update profile
+//       const response = await fetch(`https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/profile/individual/${currentRoleId}`, {
+//         method: "PUT",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({
+//           profileData: storedData1,
+//         }),
+//       });
+
+//       if (response.ok) {
+//         const responseData = await response.json();
+//         if (responseData.success) {
+//           alert("Profile updated successfully!");
+//           // Optionally, you can update localStorage again after successful API update
+//           localStorage.setItem("loginData", JSON.stringify(storedData1));
+//         } else {
+//           alert("Failed to update profile.");
+//         }
+//       } else {
+//         throw new Error("Failed to update profile.");
+//       }
+//     } catch (error) {
+//       console.error("Error updating profile:", error);
+//       alert("Error updating profile. Please try again.");
+//     }
+//   };
+
+//   if (!profileData) return null;
+
+//   return (
+//     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
+//       {/* Back Button */}
+//       <button
+//         className="absolute top-4 left-4 mt-20 z-2 flex items-center text-gray-600 hover:text-black"
+//         onClick={() => router.push("/")}
+//       >
+//         <ArrowLeft className="w-6 h-6 mr-2" />
+//       </button>
+
+//       {/* Profile Card */}
+//       <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-6 relative mt-12 md:mt-16">
+//         {/* Profile Header */}
+//         <div className="flex flex-col items-center md:flex-row md:items-center md:space-x-6">
+//           {/* Profile Picture */}
+//           <div
+//             className="w-28 h-28 rounded-full shadow-lg shadow-gray-400 hover:scale-105 transition-transform duration-300"
+//             style={{
+//               backgroundImage: `url(${publicProfileData?.profilePhoto || "/images/profile.png"})`,
+//               backgroundSize: "cover",
+//             }}
+//           ></div>
+//           {/* Profile Details */}
+//           <div className="text-center md:text-left">
+//             <h2 className="text-2xl font-semibold text-gray-800">
+//               {profileData?.firstName + " " + profileData?.lastName || "Mr. Y"}
+//             </h2>
+//             <h2 className="text-2xl font-semibold text-gray-800">
+//               {profileData?.screenName || "Mr."}
+//             </h2>
+//             <p className="text-gray-500">
+//               {profileData?.role?.name || profileData?.role?.roleName || "Security Officer"}
+//             </p>
+//             <span className="text-sm text-yellow-500">
+//               ✅ Usually responds within 1 hour
+//             </span>
+//           </div>
+//         </div>
+
+//         {/* Membership Info */}
+//         <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-4">
+//           {["Industry", "Member since Jan 2016", "Last Updated Jan 2025", "Last Login 28 Jan 2025"].map(
+//             (info, index) => (
+//               <span key={index} className="bg-black text-white px-3 py-1 rounded-full text-sm">
+//                 {info}
+//               </span>
+//             )
+//           )}
+//         </div>
+
+//         {/* Contact Buttons */}
+//         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
+//           {/* Phone */}
+//           <button className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600">
+//             <FaMobileAlt className="mr-2" /> {profileData?.phoneNumber || "Mobile"}
+//           </button>
+//           {/* Address */}
+//           <div className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-800">
+//             <FaHome className="mr-2" />
+//             <span className="truncate">
+//               {profileData?.address || profileData?.role?.address || "Home"}
+//             </span>
+//           </div>
+//           {/* Email */}
+//           <button className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-800">
+//             <FaEnvelope className="mr-2" />
+//             <span className="truncate">{profileData?.email || "Email"}</span>
+//           </button>
+//           {roleId === 3 && !profileCreated && (
+//             <button
+//               className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+//               onClick={() => router.push("/public-profile")}
+//             >
+//               <FaBriefcase className="mr-2" /> Create Public Profile
+//             </button>
+//           )}
+
+//           {/* Post Job */}
+//           {roleId === 4 || roleId === 6 || roleId === 5 ||roleId === 7 ? (
+//             <button
+//               className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+//               onClick={() => router.push("/job-posting")}
+//             >
+//               <FaBriefcase className="mr-2" /> Post a Job
+//             </button>
+//           ) : (
+//         <>{  roleId!=3 ?  <button
+//               className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+//               onClick={() => router.push("/view-job")}
+//             >
+//               <FaBriefcase className="mr-2" /> Hire Professional
+//             </button>:<button
+//               className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+//               onClick={() => router.push("/view-ads")}
+//             >
+//               <FaBriefcase className="mr-2" /> View Job Ads
+//             </button> }
+//             </> 
+//           )}
+//             <button
+//               className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+//               onClick={() => updateProfile}
+//             >
+//               <FaBriefcase className="mr-2" /> Update Profile
+//             </button>
+
+
+//         </div>
+
+//         {/* Upgrade Membership */}
+//         <button className="mt-4 w-full bg-orange-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-orange-600">
+//           Upgrade My Membership
+//         </button>
+
+//         {/* Profile Actions */}
+//         <h3 className="text-lg font-semibold my-6 text-gray-800 text-center md:text-left">
+//           My Profile
+//         </h3>
+//         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+//   {[
+//     { icon: <FaSearch />, label: "My Searches" },
+//     { icon: <FaHeart />, label: "My Favourites" },
+//     { icon: <FaUserShield />, label: "Visitors" },
+//     { icon: <FaSearch />, label: "Advance Search" },
+//     { icon: <FaCogs />, label: "Customer Support" },
+//     // Conditionally include Post Free Ad
+//     ...(roleId !== 3
+//       ? [{ icon: <FaAd />, label: "Post Free Ad", route: "/post-ad" }]
+//       : []),
+//   ].map((item, index) => (
+//     <div
+//       key={index}
+//       onClick={() => item.route && router.push(item.route)}
+//       className="cursor-pointer p-4 bg-gray-100 rounded-lg shadow-sm hover:bg-gray-200 transition text-center"
+//     >
+//       <div className="text-2xl">{item.icon}</div>
+//       <p className="text-sm mt-1 text-center">{item.label}</p>
+//     </div>
+//   ))}
+// </div>
+
+//          {/* Weekly Schedule */}
+//          {publicProfileData && <div className="mt-6">
+//       <h4 className="font-semibold text-gray-800 mb-2">Weekly Schedule</h4>
+//       {publicProfileData.weeklySchedule && (
+//         <div className="overflow-x-auto text-sm">
+//           <table className="w-full border border-gray-200">
+//             <thead>
+//               <tr className="bg-gray-200">
+//                 <th className="p-2 border">Time</th>
+//                 {["Mon","Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+//                   <th key={day} className="p-2 border">{day}</th>
+//                 ))}
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {Object.entries(publicProfileData.weeklySchedule).map(([time, days]: any) => (
+//                 <tr key={time}>
+//                   <td className="p-2 border font-medium">{time}</td>
+//                   {["Mon","Tue","Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+//                     <td key={day} className="p-2 border text-center">
+//                       {days[day] ? "✅" : "❌"}
+//                     </td>
+//                   ))}
+//                 </tr>
+//               ))}
+//             </tbody>
+//           </table>
+//         </div>
+//       )}
+//     </div>}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default UserProfile;
 
 
 

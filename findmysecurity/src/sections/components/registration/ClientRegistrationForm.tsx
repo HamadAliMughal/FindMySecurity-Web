@@ -5,6 +5,7 @@ import { LockIcon } from "lucide-react";
 import { FaEnvelope, FaMapMarkerAlt, FaUser, FaPhone } from "react-icons/fa";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import MembershipDialog from "./MembershipDialog"; // Adjust the import path as needed
+import TextField from '@mui/material/TextField';
 
 interface ClientGeneralFormProps {
   id: number;
@@ -22,6 +23,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
     hasSpecial: false,
     isValid: false
   });
+  const roleid = id;
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isFormValid, setIsFormValid] = useState(false);
   const [showAllErrors, setShowAllErrors] = useState(false);
@@ -65,23 +67,43 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
     return validations;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = ( e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    
-    setFormErrors(prev => ({ ...prev, [name]: "" }));
 
-    if (["day", "month", "year"].includes(name)) {
-      setFormData({
-        ...formData,
-        dateOfBirth: { ...formData.dateOfBirth, [name]: value },
-      });
-    } else {
-      setFormData({ ...formData, [name]: value });
+  // Clear validation error for this field
+  setFormErrors((prev) => ({ ...prev, [name]: "" }));
 
-      if (name === "password") {
-        setPasswordValidations(validatePassword(value));
-      }
+  // Handle dateOfBirth fields
+  if (["day", "month", "year"].includes(name)) {
+    setFormData((prev) => ({
+      ...prev,
+      dateOfBirth: { ...prev.dateOfBirth, [name]: value },
+    }));
+  } else {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Special handling for password field
+    if (name === "password") {
+      setPasswordValidations(validatePassword(value));
     }
+  }
+    
+    // const { name, value } = e.target;
+    
+    // setFormErrors(prev => ({ ...prev, [name]: "" }));
+
+    // if (["day", "month", "year"].includes(name)) {
+    //   setFormData({
+    //     ...formData,
+    //     dateOfBirth: { ...formData.dateOfBirth, [name]: value },
+    //   });
+    // } else {
+    //   setFormData({ ...formData, [name]: value });
+
+    //   if (name === "password") {
+    //     setPasswordValidations(validatePassword(value));
+    //   }
+    // }
   };
 
   const validateForm = () => {
@@ -202,241 +224,464 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-md">
-      <h2 className="text-2xl font-bold text-center my-4 text-black">Free Registration For {title}</h2>
+      <h2 className="text-2xl font-bold text-center my-4 text-black">
+  Free {roleid === 4 ? "Individuals Seeking Security" : "Registration"} For {title}
+</h2>
+
+      {/* <h2 className="text-2xl font-bold text-center my-4 text-black">Free Registration For {title}</h2> */}
 
       <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-        {/* Email Address */}
-        <div className="relative">
-          <FaEnvelope className="absolute left-3 top-3 text-gray-500" />
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            placeholder="Email Address"
-            className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
-              (showAllErrors && formErrors.email) ? "border-red-500" : "border-gray-300"
-            }`}
-          />
-          {(showAllErrors && formErrors.email) && (
-            <p className="mt-1 text-xs text-red-500">{formErrors.email}</p>
-          )}
-        </div>
+  {/* Email Address */}
+  <div className="relative">
+    <FaEnvelope className="absolute left-3 top-3 text-gray-500" />
+    <TextField
+      type="email"
+      name="email"
+      value={formData.email}
+      onChange={handleChange}
+      required
+            id="outlined-basic"
+      variant="outlined"
+      label="Email Address"
+      className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+        showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+      } focus:border-black`} // Ensuring black border on focus
+      InputLabelProps={{
+        style: { color: 'gray' }, // Default label color
+      }}
+      inputProps={{
+        className: "focus:outline-none" // Optional to remove outline when focused
+      }}
+      sx={{
+        "& .MuiOutlinedInput-root": {
+          "& fieldset": {
+            borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: "black", // Black border when focused
+          },
+        },
+        "& .MuiInputLabel-root": {
+          color: "gray", // Default label color
+        },
+        "& .Mui-focused .MuiInputLabel-root": {
+          color: "black", // Label color when focused
+        },
+      }}
+      // className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+      //   showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+      // }`}
+      
+    />
+    {(showAllErrors && formErrors.email) && (
+      <p className="mt-1 text-xs text-red-500">{formErrors.email}</p>
+    )}
+  </div>
 
-        {/* Password */}
-        <div className="relative">
-          <LockIcon className="absolute left-3 top-3 text-gray-500" />
-          <input
-            type={passwordVisible ? "text" : "password"}
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            placeholder="Password"
-            className={`w-full pl-10 pr-10 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
-              (showAllErrors && formErrors.password) ? "border-red-500" : "border-gray-300"
-            }`}
-          />
-          <button
-            type="button"
-            className="absolute right-3 top-3 text-gray-500"
-            onClick={() => setPasswordVisible(!passwordVisible)}
-          >
-            {passwordVisible ? <IoMdEyeOff /> : <IoMdEye />}
-          </button>
-          
-          {(formData.password || showAllErrors) && (
-            <div className="mt-2 text-xs space-y-1">
-              {(!passwordValidations.length || showAllErrors) && (
-                <p className={passwordValidations.length ? "text-green-500" : "text-red-500"}>
-                  {passwordValidations.length ? "✓" : "✗"} At least 8 characters
-                </p>
-              )}
-              {(!passwordValidations.hasUpper || showAllErrors) && (
-                <p className={passwordValidations.hasUpper ? "text-green-500" : "text-red-500"}>
-                  {passwordValidations.hasUpper ? "✓" : "✗"} At least one capital letter
-                </p>
-              )}
-              {(!passwordValidations.hasLower || showAllErrors) && (
-                <p className={passwordValidations.hasLower ? "text-green-500" : "text-red-500"}>
-                  {passwordValidations.hasLower ? "✓" : "✗"} At least one small letter
-                </p>
-              )}
-              {(!passwordValidations.hasNumber || showAllErrors) && (
-                <p className={passwordValidations.hasNumber ? "text-green-500" : "text-red-500"}>
-                  {passwordValidations.hasNumber ? "✓" : "✗"} At least one number
-                </p>
-              )}
-              {(!passwordValidations.hasSpecial || showAllErrors) && (
-                <p className={passwordValidations.hasSpecial ? "text-green-500" : "text-red-500"}>
-                  {passwordValidations.hasSpecial ? "✓" : "✗"} At least one special character (. - _ ! @ # $ % ^ *)
-                </p>
-              )}
-            </div>
-          )}
-          {(showAllErrors && formErrors.password) && (
-            <p className="mt-1 text-xs text-red-500">{formErrors.password}</p>
-          )}
-        </div>
+  {/* Password */}
+  <div className="relative">
+    <LockIcon className="absolute left-3 top-3 text-gray-500" />
+    <TextField
+      type={passwordVisible ? "text" : "password"}
+      name="password"
+      value={formData.password}
+      onChange={handleChange}
+      required
+      id="outlined-basic"
+      variant="outlined"
+      label="Password"
+      className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+        showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+      } focus:border-black`} // Ensuring black border on focus
+      InputLabelProps={{
+        style: { color: 'gray' }, // Default label color
+      }}
+      inputProps={{
+        className: "focus:outline-none" // Optional to remove outline when focused
+      }}
+      sx={{
+        "& .MuiOutlinedInput-root": {
+          "& fieldset": {
+            borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: "black", // Black border when focused
+          },
+        },
+        "& .MuiInputLabel-root": {
+          color: "gray", // Default label color
+        },
+        "& .Mui-focused .MuiInputLabel-root": {
+          color: "black", // Label color when focused
+        },
+      }}
+      // className={`w-full pl-10 pr-10 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+      //   (showAllErrors && formErrors.password) ? "border-red-500" : "border-gray-300"
+      // }`}
+    />
+    <button
+      type="button"
+      className="absolute right-3 top-4 text-gray-500"
+      onClick={() => setPasswordVisible(!passwordVisible)}
+    >
+      {passwordVisible ? <IoMdEyeOff className="w-6 h-6" /> : <IoMdEye className="w-6 h-6"/>}
+    </button>
 
-        {/* Name Fields */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="relative">
-            <FaUser className="absolute left-3 top-3 text-gray-500" />
-            <input
-              type="text"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              placeholder="First Name"
-              className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
-                (showAllErrors && formErrors.firstName) ? "border-red-500" : "border-gray-300"
-              }`}
-            />
-            {(showAllErrors && formErrors.firstName) && (
-              <p className="mt-1 text-xs text-red-500">{formErrors.firstName}</p>
-            )}
-          </div>
-          <div className="relative">
-            <FaUser className="absolute left-3 top-3 text-gray-500" />
-            <input
-              type="text"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              placeholder="Last Name"
-              className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
-                (showAllErrors && formErrors.lastName) ? "border-red-500" : "border-gray-300"
-              }`}
-            />
-            {(showAllErrors && formErrors.lastName) && (
-              <p className="mt-1 text-xs text-red-500">{formErrors.lastName}</p>
-            )}
-          </div>
-        </div>
+    {(formData.password || showAllErrors) && (
+      <div className="mt-2 text-xs space-y-1">
+        {(!passwordValidations.length || showAllErrors) && (
+          <p className={passwordValidations.length ? "text-green-500" : "text-red-500"}>
+            {passwordValidations.length ? "✓" : "✗"} At least 8 characters
+          </p>
+        )}
+        {(!passwordValidations.hasUpper || showAllErrors) && (
+          <p className={passwordValidations.hasUpper ? "text-green-500" : "text-red-500"}>
+            {passwordValidations.hasUpper ? "✓" : "✗"} At least one capital letter
+          </p>
+        )}
+        {(!passwordValidations.hasLower || showAllErrors) && (
+          <p className={passwordValidations.hasLower ? "text-green-500" : "text-red-500"}>
+            {passwordValidations.hasLower ? "✓" : "✗"} At least one small letter
+          </p>
+        )}
+        {(!passwordValidations.hasNumber || showAllErrors) && (
+          <p className={passwordValidations.hasNumber ? "text-green-500" : "text-red-500"}>
+            {passwordValidations.hasNumber ? "✓" : "✗"} At least one number
+          </p>
+        )}
+        {(!passwordValidations.hasSpecial || showAllErrors) && (
+          <p className={passwordValidations.hasSpecial ? "text-green-500" : "text-red-500"}>
+            {passwordValidations.hasSpecial ? "✓" : "✗"} At least one special character (. - _ ! @ # $ % ^ *)
+          </p>
+        )}
+      </div>
+    )}
+    {(showAllErrors && formErrors.password) && (
+      <p className="mt-1 text-xs text-red-500">{formErrors.password}</p>
+    )}
+  </div>
 
-        {/* Screen Name */}
-        <div className="relative">
-          <FaUser className="absolute left-3 top-3 text-gray-500" />
-          <input
-            type="text"
-            name="screenName"
-            value={formData.screenName}
-            onChange={handleChange}
-            placeholder="Screen Name"
-            className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
-          />
-        </div>
+  {/* Name Fields */}
+  <div className="grid grid-cols-2 gap-4">
+    <div className="relative">
+      <FaUser className="absolute left-3 top-3 text-gray-500" />
+      <TextField
+        type="text"
+        name="firstName"
+        value={formData.firstName}
+        onChange={handleChange}
+              id="outlined-basic"
+      variant="outlined"
+        label="First Name"
+        className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+          showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+        } focus:border-black`} // Ensuring black border on focus
+        InputLabelProps={{
+          style: { color: 'gray' }, // Default label color
+        }}
+        inputProps={{
+          className: "focus:outline-none" // Optional to remove outline when focused
+        }}
+        sx={{
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": {
+              borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: "black", // Black border when focused
+            },
+          },
+          "& .MuiInputLabel-root": {
+            color: "gray", // Default label color
+          },
+          "& .Mui-focused .MuiInputLabel-root": {
+            color: "black", // Label color when focused
+          },
+        }}
+        // className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+        //   (showAllErrors && formErrors.firstName) ? "border-red-500" : "border-gray-300"
+        // }`}
+      />
+      {(showAllErrors && formErrors.firstName) && (
+        <p className="mt-1 text-xs text-red-500">{formErrors.firstName}</p>
+      )}
+    </div>
+    <div className="relative">
+      <FaUser className="absolute left-3 top-3 text-gray-500" />
+      <TextField
+        type="text"
+        name="lastName"
+        value={formData.lastName}
+        onChange={handleChange}
+              id="outlined-basic"
+      variant="outlined"
+        label="Last Name"
+        className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+          showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+        } focus:border-black`} // Ensuring black border on focus
+        InputLabelProps={{
+          style: { color: 'gray' }, // Default label color
+        }}
+        inputProps={{
+          className: "focus:outline-none" // Optional to remove outline when focused
+        }}
+        sx={{
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": {
+              borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: "black", // Black border when focused
+            },
+          },
+          "& .MuiInputLabel-root": {
+            color: "gray", // Default label color
+          },
+          "& .Mui-focused .MuiInputLabel-root": {
+            color: "black", // Label color when focused
+          },
+        }}
+        // className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+        //   (showAllErrors && formErrors.lastName) ? "border-red-500" : "border-gray-300"
+        // }`}
+      />
+      {(showAllErrors && formErrors.lastName) && (
+        <p className="mt-1 text-xs text-red-500">{formErrors.lastName}</p>
+      )}
+    </div>
+  </div>
 
-        {/* Phone Number */}
-        <div className="relative">
-          <FaPhone className="absolute left-3 top-3 text-gray-500" />
-          <input
-            type="text"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            placeholder="Phone Number"
-            className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
-          />
-        </div>
+  {/* Screen Name */}
+  <div className="relative">
+    <FaUser className="absolute left-3 top-3 text-gray-500" />
+    <TextField
+      type="text"
+      name="screenName"
+      value={formData.screenName}
+      onChange={handleChange}
+            id="outlined-basic"
+      variant="outlined"
+      label="Screen Name"
+      className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+        showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+      } focus:border-black`} // Ensuring black border on focus
+      InputLabelProps={{
+        style: { color: 'gray' }, // Default label color
+      }}
+      inputProps={{
+        className: "focus:outline-none" // Optional to remove outline when focused
+      }}
+      sx={{
+        "& .MuiOutlinedInput-root": {
+          "& fieldset": {
+            borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: "black", // Black border when focused
+          },
+        },
+        "& .MuiInputLabel-root": {
+          color: "gray", // Default label color
+        },
+        "& .Mui-focused .MuiInputLabel-root": {
+          color: "black", // Label color when focused
+        },
+      }}
+      // className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+    />
+  </div>
 
-        {/* Date of Birth */}
-        <div>
-          <label className="block text-sm font-medium">Date of Birth</label>
-          <div className="grid grid-cols-3 gap-2">
-            <select 
-              name="day" 
-              value={formData.dateOfBirth.day} 
-              onChange={handleChange} 
-              className={`w-full px-3 py-2 border rounded-md bg-gray-100 ${
-                (showAllErrors && formErrors.dateOfBirth) ? "border-red-500" : ""
-              }`}
-            >
-              <option value="">DD</option>
-              {[...Array(31)].map((_, i) => (
-                <option key={i} value={String(i + 1)}>{i + 1}</option>
-              ))}
-            </select>
-            <select 
-              name="month" 
-              value={formData.dateOfBirth.month} 
-              onChange={handleChange} 
-              className={`w-full px-3 py-2 border rounded-md bg-gray-100 ${
-                (showAllErrors && formErrors.dateOfBirth) ? "border-red-500" : ""
-              }`}
-            >
-              <option value="">MM</option>
-              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                <option key={m} value={String(m)}>{m}</option>
-              ))}
-            </select>
-            <select 
-              name="year" 
-              value={formData.dateOfBirth.year} 
-              onChange={handleChange} 
-              className={`w-full px-3 py-2 border rounded-md bg-gray-100 ${
-                (showAllErrors && formErrors.dateOfBirth) ? "border-red-500" : ""
-              }`}
-            >
-              <option value="">YYYY</option>
-              {[...Array(100)].map((_, i) => (
-                <option key={i} value={String(2024 - i)}>{2024 - i}</option>
-              ))}
-            </select>
-          </div>
-          {(showAllErrors && formErrors.dateOfBirth) && (
-            <p className="mt-1 text-xs text-red-500">{formErrors.dateOfBirth}</p>
-          )}
-        </div>
+  {/* Phone Number */}
+  <div className="relative">
+    <FaPhone className="absolute left-3 top-3 text-gray-500" />
+    <TextField
+      type="text"
+      name="phoneNumber"
+      value={formData.phoneNumber}
+      onChange={handleChange}
+            id="outlined-basic"
+      variant="outlined"
+      label="Phone Number"
+      className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+        showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+      } focus:border-black`} // Ensuring black border on focus
+      InputLabelProps={{
+        style: { color: 'gray' }, // Default label color
+      }}
+      inputProps={{
+        className: "focus:outline-none" // Optional to remove outline when focused
+      }}
+      sx={{
+        "& .MuiOutlinedInput-root": {
+          "& fieldset": {
+            borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: "black", // Black border when focused
+          },
+        },
+        "& .MuiInputLabel-root": {
+          color: "gray", // Default label color
+        },
+        "& .Mui-focused .MuiInputLabel-root": {
+          color: "black", // Label color when focused
+        },
+      }}
+      // className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
+    />
+  </div>
 
-        {/* Address */}
-        <div className="relative">
-          <FaMapMarkerAlt className="absolute left-3 top-3 text-gray-500" />
-          <input
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            placeholder="Full Address"
-            className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
-              (showAllErrors && formErrors.address) ? "border-red-500" : "border-gray-300"
-            }`}
-          />
-          {(showAllErrors && formErrors.address) && (
-            <p className="mt-1 text-xs text-red-500">{formErrors.address}</p>
-          )}
-        </div>
+  {/* Date of Birth */}
+  <div>
+    <label className="block text-sm font-medium">Date of Birth</label>
+    <div className="grid grid-cols-3 gap-2">
+      <select 
+        name="day" 
+        value={formData.dateOfBirth.day} 
+        onChange={handleChange} 
+        className={`w-full px-3 py-2 border rounded-md bg-gray-100 ${
+          (showAllErrors && formErrors.dateOfBirth) ? "border-red-500" : ""
+        }`}
+      >
+        <option value="">DD</option>
+        {[...Array(31)].map((_, i) => (
+          <option key={i} value={String(i + 1)}>{i + 1}</option>
+        ))}
+      </select>
+      <select 
+        name="month" 
+        value={formData.dateOfBirth.month} 
+        onChange={handleChange} 
+        className={`w-full px-3 py-2 border rounded-md bg-gray-100 ${
+          (showAllErrors && formErrors.dateOfBirth) ? "border-red-500" : ""
+        }`}
+      >
+        <option value="">MM</option>
+        {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+          <option key={m} value={String(m)}>{m}</option>
+        ))}
+      </select>
+      <select 
+        name="year" 
+        value={formData.dateOfBirth.year} 
+        onChange={handleChange} 
+        className={`w-full px-3 py-2 border rounded-md bg-gray-100 ${
+          (showAllErrors && formErrors.dateOfBirth) ? "border-red-500" : ""
+        }`}
+      >
+        <option value="">YYYY</option>
+        {[...Array(100)].map((_, i) => (
+          <option key={i} value={String(2024 - i)}>{2024 - i}</option>
+        ))}
+      </select>
+    </div>
+    {(showAllErrors && formErrors.dateOfBirth) && (
+      <p className="mt-1 text-xs text-red-500">{formErrors.dateOfBirth}</p>
+    )}
+  </div>
 
-        {/* PostCode */}
-        <div className="relative">
-          <FaMapMarkerAlt className="absolute left-3 top-3 text-gray-500" />
-          <input
-            type="text"
-            name="postcode"
-            value={formData.postcode}
-            onChange={handleChange}
-            placeholder="Post Code"
-            className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
-              (showAllErrors && formErrors.address) ? "border-red-500" : "border-gray-300"
-            }`}
-          />
-          {(showAllErrors && formErrors.address) && (
-            <p className="mt-1 text-xs text-red-500">{formErrors.address}</p>
-          )}
-        </div>
-        {/* Submit Button */}
-        <button 
-          type="submit" 
-          className={`w-full py-3 text-white font-bold rounded-md transition-colors ${
-            isFormValid ? "bg-black hover:bg-gray-800" : "bg-gray-400 cursor-not-allowed"
-          }`}
-          disabled={!isFormValid}
-        >
-          Join now for free
-        </button>
-      </form>
+  {/* Address */}
+  <div className="relative">
+    <FaMapMarkerAlt className="absolute left-3 top-3 text-gray-500" />
+    <TextField
+      type="text"
+      name="address"
+      value={formData.address}
+      onChange={handleChange}
+            id="outlined-basic"
+      variant="outlined"
+      label="Full Address"
+      className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+        showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+      } focus:border-black`} // Ensuring black border on focus
+      InputLabelProps={{
+        style: { color: 'gray' }, // Default label color
+      }}
+      inputProps={{
+        className: "focus:outline-none" // Optional to remove outline when focused
+      }}
+      sx={{
+        "& .MuiOutlinedInput-root": {
+          "& fieldset": {
+            borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: "black", // Black border when focused
+          },
+        },
+        "& .MuiInputLabel-root": {
+          color: "gray", // Default label color
+        },
+        "& .Mui-focused .MuiInputLabel-root": {
+          color: "black", // Label color when focused
+        },
+      }}
+      // className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+      //   (showAllErrors && formErrors.address) ? "border-red-500" : "border-gray-300"
+      // }`}
+    />
+    {(showAllErrors && formErrors.address) && (
+      <p className="mt-1 text-xs text-red-500">{formErrors.address}</p>
+    )}
+  </div>
+
+  {/* PostCode */}
+  <div className="relative">
+    <FaMapMarkerAlt className="absolute left-3 top-3 text-gray-500" />
+    <TextField
+      type="text"
+      name="postcode"
+      value={formData.postcode}
+      onChange={handleChange}
+            id="outlined-basic"
+      variant="outlined"
+      label="Post Code"
+      className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+        showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
+      } focus:border-black`} // Ensuring black border on focus
+      InputLabelProps={{
+        style: { color: 'gray' }, // Default label color
+      }}
+      inputProps={{
+        className: "focus:outline-none" // Optional to remove outline when focused
+      }}
+      sx={{
+        "& .MuiOutlinedInput-root": {
+          "& fieldset": {
+            borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: "black", // Black border when focused
+          },
+        },
+        "& .MuiInputLabel-root": {
+          color: "gray", // Default label color
+        },
+        "& .Mui-focused .MuiInputLabel-root": {
+          color: "black", // Label color when focused
+        },
+      }}
+      // className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+      //   (showAllErrors && formErrors.address) ? "border-red-500" : "border-gray-300"
+      // }`}
+    />
+    {(showAllErrors && formErrors.address) && (
+      <p className="mt-1 text-xs text-red-500">{formErrors.address}</p>
+    )}
+  </div>
+
+  {/* Submit Button */}
+  <button 
+    type="submit" 
+    className={`w-full py-3 text-white font-bold rounded-md transition-colors ${
+      isFormValid ? "bg-black hover:bg-gray-800" : "bg-gray-400 cursor-not-allowed"
+    }`}
+    disabled={!isFormValid}
+  >
+    Join now for free
+  </button>
+</form>
+
       <MembershipDialog 
         isOpen={showMembershipDialog}
         onClose={handleDialogClose}

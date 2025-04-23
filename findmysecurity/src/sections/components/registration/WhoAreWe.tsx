@@ -14,10 +14,10 @@ interface RegistrationResponse {
 }
 
 const options = [
-  { id: 3, title: "Looking for Security Professional", icon: ShieldCheck, description: "Find trained and verified security professionals for your needs." },
-  { id: 2, title: "Security Professionals", icon: User, description: "Register yourself as a security professional and find opportunities." },
-  { id: 4, title: "Security Companies", icon: Building, description: "Register your security company and connect with clients." },
-  { id: 5, title: "Training Providers", icon: BookOpen, description: "Offer security training courses and certifications." },
+  { id: 4, title: "Looking for Security Professional", icon: ShieldCheck, description: "Find trained and verified security professionals for your needs." },
+  { id: 3, title: "Security Professionals", icon: User, description: "Register yourself as a security professional and find opportunities." },
+  { id: 5, title: "Security Companies", icon: Building, description: "Register your security company and connect with clients." },
+  { id: 6, title: "Training Providers", icon: BookOpen, description: "Offer security training courses and certifications." },
   { id: 7, title: "Businesses", icon: Briefcase, description: "Discover top-tier security professionals, companies, and training providers tailored to your specific needs." },
 ];
 
@@ -74,14 +74,14 @@ export default function RegistrationSelector() {
   // Function to render the correct form based on selection
   const renderForm = () => {
     switch (selected) {
-      case 3:
-        return <ClientGeneralForm id={3} title="Looking for Security Professional" onSubmit={handleFormSubmit} />;
-      case 2:
-        return <ClientGeneralForm id={2} title="Individual Security Professional" onSubmit={handleFormSubmit} />;
       case 4:
-        return <SecurityCompanyForm id={4} title="Security Companies" onSubmit={handleFormSubmit} />;
+        return <ClientGeneralForm id={4} title="Looking for Security Professional" onSubmit={handleFormSubmit} />;
+      case 3:
+        return <ClientGeneralForm id={3} title="Individual Security Professional" onSubmit={handleFormSubmit} />;
       case 5:
-        return <SecurityCompanyForm id={5} title="Course Provider" onSubmit={handleFormSubmit} />;
+        return <SecurityCompanyForm id={5} title="Security Companies" onSubmit={handleFormSubmit} />;
+      case 6:
+        return <SecurityCompanyForm id={6} title="Course Provider" onSubmit={handleFormSubmit} />;
       case 7:
         return <BusinessForm id={7} title="Corporate Clients" onSubmit={handleFormSubmit} />;
       default:

@@ -35,6 +35,7 @@ const JobPosting: React.FC = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const timeSlots = [
     'Morning',
@@ -43,6 +44,16 @@ const JobPosting: React.FC = () => {
     'Overnight'
   ];
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+        // Get login or profile data from localStorage
+        const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
+        const data = storedData1 ? JSON.parse(storedData1) : null;
+    
+        const currentRoleId = data?.id || data?.user?.id ;
+        setUserId(currentRoleId);
+    }
+  }, []);
   // Initialize state with localStorage data or defaults
   const [formData, setFormData] = useState<FormData>(() => {
     const defaultData = {
@@ -77,7 +88,7 @@ const JobPosting: React.FC = () => {
     if (typeof window === 'undefined') return defaultData;
 
     try {
-      const savedData = localStorage.getItem('createdPublicProfiles');
+      const savedData = localStorage.getItem('loginData');
       console.log("savedData",savedData)
       if (!savedData) return defaultData;
 
@@ -129,28 +140,101 @@ const JobPosting: React.FC = () => {
     updatedDocuments.splice(index, 1);
     handleInputChange('compulsoryDocuments', updatedDocuments);
   };
-  
-const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+  
     try {
-      // Prepare form data for submission
-      const dataToStore = { ...formData };
-      console.log("dataToStore",dataToStore)
-      safeLocalStorageSet("createdPublicProfiles", JSON.stringify(dataToStore));
-
-      // Simulate form submission delay
+      if (!userId) throw new Error("User ID not found");
+  
+      // Optimized payload (exclude large fields)
+      const apiData = {
+        profileData: {
+          basicInfo: {
+            screenName: formData.screenName,
+            postcode: formData.postcode,
+            profileHeadline: formData.profileHeadline,
+            gender: formData.gender,
+            profilePhoto: formData.profilePhoto // Excluded (upload separately)
+          },
+          services: {
+            selectedServices: formData.selectedServices,
+            otherService: formData.otherService,
+          },
+          about: {
+            aboutMe: formData.aboutMe.substring(0, 1000), // Truncate long text
+            experience: formData.experience.substring(0, 1000),
+            qualifications: formData.qualifications.substring(0, 1000),
+          },
+           availability: {
+            description: formData.availability,
+            weeklySchedule: formData.weeklySchedule
+          },
+          fees: {
+            description: formData.availability,
+            hourlyRate: formData.hourlyRate
+          },
+          contact: {
+            homeTelephone: formData.homeTelephone,
+            mobileTelephone: formData.mobileTelephone,
+            website: formData.website
+          },
+          documents: formData.compulsoryDocuments.map(file => file.name)
+        },
+      };
+  
+      // Log payload size
+      const payloadSizeKB = JSON.stringify(apiData).length / 1024;
+      console.log(`Payload size: ${payloadSizeKB} KB`);
+  
+      const response = await fetch(
+        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/profile/individual/${userId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(apiData),
+        }
+      );
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Request failed (${response.status})`);
+      }
+  
+      const result = await response.json();
+      safeLocalStorageSet("loginData", JSON.stringify(result));
       await new Promise((resolve) => setTimeout(resolve, 2000));
-
       setShowModal(true);
     } catch (error) {
-      console.error("Error submitting form:", error);
-      alert("Error submitting the form. Please try again.");
+      console.error("Error:", error);
+      alert((error as Error).message || "Submission failed. Try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
+// const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     setIsSubmitting(true);
+
+//     try {
+//       // Prepare form data for submission
+//       const dataToStore = { ...formData };
+//       console.log("dataToStore",dataToStore)
+//       safeLocalStorageSet("createdPublicProfiles", JSON.stringify(dataToStore));
+
+//       // Simulate form submission delay
+//       await new Promise((resolve) => setTimeout(resolve, 2000));
+
+//       setShowModal(true);
+//     } catch (error) {
+//       console.error("Error submitting form:", error);
+//       alert("Error submitting the form. Please try again.");
+//     } finally {
+//       setIsSubmitting(false);
+//     }
+//   };
 
   const handleInputChange = <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setFormData(prev => ({
@@ -458,8 +542,20 @@ const handleSubmit = async (e: React.FormEvent) => {
                   hover:file:bg-blue-100"
               />
             </div>
-            
-            {formData.compulsoryDocuments.length > 0 && (
+            {formData.compulsoryDocuments
+  .filter(file => file !== null)
+  .map((file, index) => (
+    <li key={index} className="flex items-center justify-between bg-gray-100 p-3 rounded-md">
+      <span className="text-gray-700">{file.name}</span>
+      <button
+        type="button"
+        onClick={() => removeDocument(index)}
+      >
+        Remove
+      </button>
+    </li>
+  ))}        
+            {/* {formData.compulsoryDocuments.length > 0 && (
               <div className="mt-4">
                 <h3 className="text-lg font-medium text-gray-700 mb-2">Uploaded Documents:</h3>
                 <ul className="space-y-2">
@@ -477,7 +573,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   ))}
                 </ul>
               </div>
-            )}
+            )} */}
           </div>
         </div>
 
