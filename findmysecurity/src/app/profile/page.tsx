@@ -103,8 +103,6 @@ const UserProfile: React.FC = () => {
       </button>
 
       <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-6 relative mt-12 md:mt-16">
-        
-
         <ActionButtons 
           loginData={loginData} 
           roleId={roleId} 
@@ -114,6 +112,7 @@ const UserProfile: React.FC = () => {
         <ProfileMenu roleId={roleId} />
 
         <WeeklySchedule roleId={roleId} loginData={loginData} />
+       
       </div>
     </div>
   );
