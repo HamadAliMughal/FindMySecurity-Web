@@ -116,12 +116,12 @@ const UserProfile: React.FC = () => {
     : "Mr. Y"}
 
             </h2>
-            <h2 className="text-2xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-gray-800">
             {loginData?.user?.screenName ?? loginData?.screenName ?? "Mr."}
 
             </h2>
             <p className="text-gray-500">
-            {loginData?.user?.role?.name ?? loginData?.user?.role?.roleName ?? "Security Officer"}
+            {loginData?.role?.name ?? loginData?.role?.roleName ?? "Security Officer"}
             </p>
             <span className="text-sm text-yellow-500">
               ✅ Usually responds within 1 hour
@@ -168,7 +168,7 @@ const UserProfile: React.FC = () => {
               className="flex items-center justify-center bg-black text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
               onClick={() => router.push("/job-posting")}
             >
-              <FaBriefcase className="mr-2" /> Post a Job
+              <FaBriefcase className="mr-2" /> View My Ads
             </button>
           ) : (
             <>
