@@ -69,7 +69,7 @@ export default function TwoFAPopup({ onVerify, email }: TwoFAPopupProps) {
 
     try {
       // Make the API call and type the response data
-      const response: AxiosResponse<TwoFAResponseData> = await axios.post(
+      const response: AxiosResponse<any> = await axios.post(
         "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/auth/login/verify",
         { email, code }
       );
@@ -77,7 +77,8 @@ export default function TwoFAPopup({ onVerify, email }: TwoFAPopupProps) {
       const data = response.data;
 
       console.log("Verification Success:", data);
-      localStorage.setItem("loginData", JSON.stringify(data)); // Store in localStorage
+      localStorage.setItem("loginData", JSON.stringify(data));
+      localStorage.setItem("authToken", JSON.stringify(data.token));  // Store in localStorage
       onVerify(code);
       setSuccess(true);
       setIsOpen(false);

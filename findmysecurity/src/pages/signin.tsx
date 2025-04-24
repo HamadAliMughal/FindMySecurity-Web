@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import "./page-globals.css";
 import axios, { AxiosError } from "axios";  // Import AxiosError
@@ -16,36 +16,69 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [show2FA, setShow2FA] = useState(false);
   const [sessionToken, setSessionToken] = useState(""); // Store token for 2FA verification
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     try {
       const response = await axios.post(
         "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/auth/login",
         { email, password },
         { headers: { "Content-Type": "application/json" } }
       );
-    
-      const data = response.data;
+  
+      const data = response.data; // ✅ already parsed JSON
       console.log("Login Success:", data);
-      setSessionToken(data.code);
-      alert(data.code);
-      // localStorage.setItem("loginData", JSON.stringify(data));
-      setShow2FA(true);
-    
+  
+      setSessionToken(data.code); // Used for 2FA validation
+      alert(data.code); // Show 2FA for dev testing
+  
+  
+      setShow2FA(true); // Show 2FA input
     } catch (error) {
-      // Typecast the error as AxiosError
       const axiosError = error as AxiosError;
-
+  
       console.error("Login failed:", axiosError);
-
-      // Check if error.response and error.response.data are present and of the expected type
-      const errorMessage = (axiosError.response?.data as ErrorResponse)?.message || "Login failed";
+  
+      const errorMessage =
+        (axiosError.response?.data as ErrorResponse)?.message || "Login failed";
       alert(errorMessage);
     }
   };
+  
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
 
+  //   try {
+  //     const response = await axios.post(
+  //       "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/auth/login",
+  //       { email, password },
+  //       { headers: { "Content-Type": "application/json" } }
+  //     );
+    
+  //     const data = response.data;
+  //     const responseData = await data.json()
+  //     console.log("Login Success:", data);
+  //     setSessionToken(data.code);
+  //     alert(data.code);
+  //     localStorage.setItem("authToken", responseData.token);
+
+  //     // localStorage.setItem("loginData", JSON.stringify(data));
+  //     setShow2FA(true);
+    
+  //   } catch (error) {
+  //     // Typecast the error as AxiosError
+  //     const axiosError = error as AxiosError;
+
+  //     console.error("Login failed:", axiosError);
+
+  //     // Check if error.response and error.response.data are present and of the expected type
+  //     const errorMessage = (axiosError.response?.data as ErrorResponse)?.message || "Login failed";
+  //     alert(errorMessage);
+  //   }
+  // };
+  // useEffect(()=>{
+  //   localStorage.setItem("authToken", token);
+  // },[])
   const handle2FAVerify = async (code: string) => {
     if(code===""){
       setShow2FA(false);
