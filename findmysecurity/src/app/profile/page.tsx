@@ -56,38 +56,33 @@ const UserProfile: React.FC = () => {
   
   const updateProfile = async (updatedData: any) => {
     try {
-      const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
-      const data = storedData1 ? JSON.parse(storedData1) : null;
+      const storedData = localStorage.getItem("loginData") || localStorage.getItem("profileData");
+      const data = storedData ? JSON.parse(storedData) : null;
   
-      const currentRoleId = data?.role?.id || data?.roleId;
+      const currentRoleId = data?.id || data?.UserId;
   
-      // Ensure we include updated values in the request body
-      const updatedProfileData = {
+      // Merge existing data and updated fields
+      const mergedData = {
         ...data,
-        ...updatedData, // Merge updated values from the form
+        ...updatedData,
       };
   
       const response = await fetch(
-        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/profile/individual/${currentRoleId}`,
+        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/users/${currentRoleId}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            profileData: updatedProfileData, // Send updated data
-          }),
+          body: JSON.stringify(mergedData), // send merged data directly, no wrapper object
         }
       );
   
       if (response.ok) {
         const responseData = await response.json();
-        if (responseData.success) {
-          alert("Profile updated successfully!");
-          localStorage.setItem("loginData", JSON.stringify(updatedProfileData)); // Save updated data
-        } else {
-          alert("Failed to update profile.");
-        }
+  
+        alert("Profile updated successfully!");
+        localStorage.setItem("loginData", JSON.stringify(responseData)); // Save updated data
       } else {
         throw new Error("Failed to update profile.");
       }
@@ -96,6 +91,7 @@ const UserProfile: React.FC = () => {
       alert("Error updating profile. Please try again.");
     }
   };
+  
   
 
   if (!loginData) return null;
