@@ -7,26 +7,30 @@ import "../globals.css";
 import ActionButtons from "./ActionButtons";
 import ProfileMenu from "./ProfileMenu";
 import WeeklySchedule from "./WeeklySchedule";
-
+import axios from "axios";
 const UserProfile: React.FC = () => {
   const [loginData, setLoginData] = useState<any>(null);
   const router = useRouter();
   const [roleId, setRoleId] = useState(0);
-
   useEffect(() => {
+    const token = localStorage.getItem("authToken");
     const fetchUserData = async () => {
       const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
       const data1 = storedData1 ? JSON.parse(storedData1) : null; 
       const currentId = data1?.id || data1?.user?.id;
       try {
-        const response = await fetch(
-          `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/auth/get-user/${currentId}`
-        );
+          const response = await axios.get(
+            `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/auth/get-user/${currentId}`,
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+              },
+            }
+          );
+
   
-        if (!response.ok) throw new Error("User not authenticated");
-  
-        const data = await response.json();
-  
+        const data = await response.data;
+          console.log("data",data)
         const roleId = data?.role?.id || data?.roleId;
         setRoleId(roleId);
         localStorage.setItem("loginData", JSON.stringify(data));
@@ -55,6 +59,8 @@ const UserProfile: React.FC = () => {
   }, [router]);
   
   const updateProfile = async (updatedData: any) => {
+    const token = localStorage.getItem("authToken")
+
     try {
       const storedData = localStorage.getItem("loginData") || localStorage.getItem("profileData");
       const data = storedData ? JSON.parse(storedData) : null;
@@ -73,6 +79,8 @@ const UserProfile: React.FC = () => {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`,
+
           },
           body: JSON.stringify(mergedData), // send merged data directly, no wrapper object
         }

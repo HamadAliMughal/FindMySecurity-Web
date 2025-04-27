@@ -10,7 +10,7 @@ import SearchComponent from "@/sections/home/SearchComponent";
 import SearchValuesDisplay from "./components/SearchValuesDisplay";
 import ProfessionalsList from "./components/ProfessionalsList";
 import MapSection from "./components/MapSection";
-import BackButton from './components/BackButton'
+import BackButton from './BackButton'
 import { ApiResponse, SearchValues, LookingForItem } from "./types";
 
 export default function ConnectingBusiness() {
