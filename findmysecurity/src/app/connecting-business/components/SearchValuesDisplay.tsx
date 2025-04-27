@@ -34,7 +34,7 @@ export default function SearchValuesDisplay({
           );
         })}
       </div>
-      <div className="flex justify-center -ml-24 mt-6">
+      <div className="flex justify-left mt-6">
         <button
           className="flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-md hover:bg-gray-800 hover:scale-105 transition-all duration-300"
           onClick={onRefineSearch}
