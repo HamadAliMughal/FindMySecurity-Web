@@ -152,7 +152,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     // Upload the files (documents and profile image)
     const uploadResponse = await axios.post(
-      'https://your-upload-url.com/upload',
+      'https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/file/upload',
       form,
       {
         headers: {
@@ -209,7 +209,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     // Submit the final form data to your backend
     const response = await fetch(
-      `https://your-api-url.com/profile/individual/${userId}`,
+      `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/profile/individual/${userId}`,
       {
         method: 'PUT',
         headers: {
