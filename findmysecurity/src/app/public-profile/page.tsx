@@ -129,123 +129,114 @@ const JobPosting: React.FC = () => {
   };
 
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    const token = localStorage.getItem("authToken")
-    try {
-      if (!userId) throw new Error("User ID not found");
-  
-      // Prepare FormData for file upload (documents and profile image)
-      const form = new FormData();
-      
-      // Check if profile photo is available before appending
-      if (formData.profilePhoto instanceof File) {
-        form.append('profileImage', formData.profilePhoto); // Append profile image
-      }
-      
-      // Append documents to FormData
-      formData.compulsoryDocuments.forEach((file: File) => {
-        form.append('file', file); // Append each document to FormData
-      });
-      console.log("form data", form)
-  
-      // Upload the files (documents and profile image)
-      const uploadResponse = await axios.post(
-        'https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/file/upload',
-        form, // Pass 'form' as the body of the request
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data', // Make sure the content type is set to 'multipart/form-data'
-            'Authorization': `Bearer ${token}`, // Authorization token if needed
-          }
-        }
-      );
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsSubmitting(true);
+  const token =  localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
 
-      // Log upload response data to see its structure
-      console.log('Upload Response:', uploadResponse.data);
-  
-      // Assuming the response is an object with file data
-      const uploadedFiles = uploadResponse.data.url || []; // Adjust based on actual structure
-      console.log('Uploaded Files:', uploadedFiles);
-  
-      // Check if response contains file URLs
-      const documentUrls = uploadedFiles
-        .filter((file: { type: string }) => file.type === 'document')
-        .map((file: { url: string }) => file.url);
-      const profileImageUrl = uploadedFiles
-        .find((file: { type: string }) => file.type === 'profileImage')?.url;
-  
-      // Build API data without including the large files
-      const apiData = {
-        profileData: {
-          basicInfo: {
-            screenName: formData.screenName,
-            postcode: formData.postcode,
-            profileHeadline: formData.profileHeadline,
-            gender: formData.gender,
-            profilePhoto: profileImageUrl, // Use the uploaded profile image URL
-          },
-          services: {
-            selectedServices: formData.selectedServices,
-            otherService: formData.otherService,
-          },
-          about: {
-            aboutMe: formData.aboutMe.substring(0, 1000),
-            experience: formData.experience.substring(0, 1000),
-            qualifications: formData.qualifications.substring(0, 1000),
-          },
-          availability: {
-            description: formData.availability,
-            weeklySchedule: formData.weeklySchedule,
-          },
-          fees: {
-            description: formData.availability,
-            hourlyRate: formData.hourlyRate,
-          },
-          contact: {
-            homeTelephone: formData.homeTelephone,
-            mobileTelephone: formData.mobileTelephone,
-            website: formData.website,
-          },
-          documents: documentUrls, // Add uploaded document URLs
-        },
-      };
-  
-      // Log payload size
-      const payloadSizeKB = JSON.stringify(apiData).length / 1024;
-      console.log(`Payload size: ${payloadSizeKB} KB`);
-  
-      // Submit the final form data to your backend
-      const response = await fetch(
-        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/profile/individual/${userId}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+  try {
+    if (!userId) throw new Error("User ID not found");
 
-          },
-          body: JSON.stringify(apiData),
-        }
-      );
-  
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Request failed (${response.status})`);
-      }
-  
-      const result = await response.json();
-      safeLocalStorageSet("loginData", JSON.stringify(result?.user));
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setShowModal(true);
-    } catch (error) {
-      console.error("Error:", error);
-      alert((error as Error).message || "Submission failed. Try again.");
-    } finally {
-      setIsSubmitting(false);
+    // Prepare FormData for file upload (documents and profile image)
+    const form = new FormData();
+
+    // Check if profile photo is available before appending
+    if (formData.profilePhoto instanceof File) {
+      form.append('profileImage', formData.profilePhoto); // Append profile image
     }
-  };
+
+    // Append documents to FormData
+    formData.compulsoryDocuments.forEach((file: File) => {
+      form.append('file', file); // Append each document to FormData
+    });
+
+    // Upload the files (documents and profile image)
+    const uploadResponse = await axios.post(
+      'https://your-upload-url.com/upload',
+      form,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`,
+        },
+      }
+    );
+
+    // Log upload response data to see its structure
+    const uploadedFiles = uploadResponse.data.url || [];
+
+    // Extract the URLs for the profile image and documents
+    const profileImageUrl = uploadedFiles.find((file: { type: string }) => file.type === 'profileImage')?.url;
+    const documentUrls = uploadedFiles
+      .filter((file: { type: string }) => file.type === 'document')
+      .map((file: { url: string }) => file.url);
+
+    // Prepare the API data without including the large files
+    const apiData = {
+      profileData: {
+        basicInfo: {
+          screenName: formData.screenName,
+          postcode: formData.postcode,
+          profileHeadline: formData.profileHeadline,
+          gender: formData.gender,
+          profilePhoto: profileImageUrl, // Use the uploaded profile image URL
+        },
+        services: {
+          selectedServices: formData.selectedServices,
+          otherService: formData.otherService,
+        },
+        about: {
+          aboutMe: formData.aboutMe.substring(0, 1000),
+          experience: formData.experience.substring(0, 1000),
+          qualifications: formData.qualifications.substring(0, 1000),
+        },
+        availability: {
+          description: formData.availability,
+          weeklySchedule: formData.weeklySchedule,
+        },
+        fees: {
+          description: formData.availability,
+          hourlyRate: formData.hourlyRate,
+        },
+        contact: {
+          homeTelephone: formData.homeTelephone,
+          mobileTelephone: formData.mobileTelephone,
+          website: formData.website,
+        },
+        documents: documentUrls, // Add uploaded document URLs
+      },
+    };
+
+    // Submit the final form data to your backend
+    const response = await fetch(
+      `https://your-api-url.com/profile/individual/${userId}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(apiData),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Request failed (${response.status})`);
+    }
+
+    const result = await response.json();
+    safeLocalStorageSet("loginData", JSON.stringify(result?.user));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    setShowModal(true);
+  } catch (error) {
+    console.error("Error:", error);
+    alert((error as Error).message || "Submission failed. Try again.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
   
 
   const handleInputChange = <K extends keyof FormData>(field: K, value: FormData[K]) => {
