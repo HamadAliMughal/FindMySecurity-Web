@@ -17,7 +17,7 @@ const UserProfile: React.FC = () => {
     const fetchUserData = async () => {
       const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
       const data1 = storedData1 ? JSON.parse(storedData1) : null; 
-      const currentId = data1?.id;
+      const currentId = data1?.id || data1?.user?.id;
       try {
         const response = await fetch(
           `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/auth/get-user/${currentId}`
@@ -113,8 +113,10 @@ const UserProfile: React.FC = () => {
         />
 
         <ProfileMenu roleId={roleId} />
-
+         {loginData?.individualProfessional?.profileData?.availability   && (
         <WeeklySchedule roleId={roleId} loginData={loginData} />
+         )
+         }
        
       </div>
     </div>

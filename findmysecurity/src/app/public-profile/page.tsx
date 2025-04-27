@@ -204,7 +204,7 @@ const JobPosting: React.FC = () => {
       }
   
       const result = await response.json();
-      safeLocalStorageSet("loginData", JSON.stringify(result));
+      safeLocalStorageSet("loginData", JSON.stringify(result?.user));
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setShowModal(true);
     } catch (error) {
@@ -336,7 +336,7 @@ const JobPosting: React.FC = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">Postcode*</label>
           <input
             type="text"
-            value={formData.postcode}
+            value={formData?.postcode}
             onChange={(e) => handleInputChange('postcode', e.target.value)}
             required
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
