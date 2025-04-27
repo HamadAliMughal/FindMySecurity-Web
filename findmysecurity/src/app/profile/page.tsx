@@ -14,6 +14,9 @@ const UserProfile: React.FC = () => {
   const [roleId, setRoleId] = useState(0);
   useEffect(() => {
     const token = localStorage.getItem("authToken");
+    const token2 = localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
+    console.log("token", token)
+    console.log("token 2", token2)
     const fetchUserData = async () => {
       const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
       const data1 = storedData1 ? JSON.parse(storedData1) : null; 
@@ -23,7 +26,7 @@ const UserProfile: React.FC = () => {
             `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/auth/get-user/${currentId}`,
             {
               headers: {
-                'Authorization': `Bearer ${token}`,
+                'Authorization': `Bearer ${token2}`,
               },
             }
           );
