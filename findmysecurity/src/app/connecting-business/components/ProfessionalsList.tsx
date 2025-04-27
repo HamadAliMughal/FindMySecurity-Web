@@ -8,6 +8,24 @@ interface ProfessionalsListProps {
   loading: boolean;
   error: string | null;
 }
+interface ProfileData {
+  about?: {
+    aboutMe?: string;
+    experience?: string;
+    qualifications?: string;
+  };
+  services?: {
+    selectedServices?: string[];
+  };
+  fees?: {
+    hourlyRate?: number;
+  };
+  contact?: {
+    website?: string;
+    homeTelephone?: string;
+    mobileTelephone?: string;
+  };
+}
 
 
 // Define the type for props in the ProfessionalCard component
@@ -219,18 +237,21 @@ const ProfileModal = ({
           <p className="text-gray-700"><strong>Services:</strong> <span className="text-gray-500">{professional.profileData?.services?.selectedServices?.join(", ") || "No services listed"}</span></p>
           <p className="text-gray-700"><strong>Hourly Rate:</strong> <span className="text-gray-500">£{professional.profileData?.fees?.hourlyRate || "Not specified"}/hr</span></p>
           <p className="text-gray-700"><strong>Website:</strong> 
-            <a 
-              href={professional.profileData?.contact?.website} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-blue-500 hover:underline"
-            >
-              {professional.profileData?.contact?.website || "No website provided"}
-            </a>
-          </p>
-          <p className="text-gray-700"><strong>Home Phone:</strong> <span className="text-gray-500">{professional.profileData?.contact?.homeTelephone || "No home phone provided"}</span></p>
-          <p className="text-gray-700"><strong>Mobile Phone:</strong> <span className="text-gray-500">{professional.profileData?.contact?.mobileTelephone || "No mobile phone provided"}</span></p>
-        </div>
+  <a 
+    href={professional.profileData?.contact?.website || "#"} // Fallback to "#" if no website
+    target="_blank" 
+    rel="noopener noreferrer" 
+    className="text-blue-500 hover:underline"
+  >
+    {professional.profileData?.contact?.website || "No website provided"}
+  </a>
+</p>
+<p className="text-gray-700"><strong>Home Phone:</strong> 
+  <span className="text-gray-500">{professional.profileData?.contact?.homeTelephone || "No home phone provided"}</span>
+</p>
+<p className="text-gray-700"><strong>Mobile Phone:</strong> 
+  <span className="text-gray-500">{professional.profileData?.contact?.mobileTelephone || "No mobile phone provided"}</span>
+</p> </div>
       </div>
     </div>
   );

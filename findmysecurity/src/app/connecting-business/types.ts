@@ -31,9 +31,9 @@ export interface MarkerData {
   }
   
   export interface ProfileData {
-    fees?: {
-      hourlyRate?: string;
-      description?: string;
+    basicInfo?: {
+      screenName?: string;
+      profileHeadline?: string;
     };
     about?: {
       aboutMe?: string;
@@ -42,18 +42,16 @@ export interface MarkerData {
     };
     services?: {
       selectedServices?: string[];
-      otherService?: string;
     };
-    basicInfo?: {
-      screenName?: string;
-      profileHeadline?: string;
-      postcode?: string;
+    fees?: {
+      hourlyRate?: number;
     };
-    availability?: {
-      description?: string;
+    contact?: {
+      website?: string;
+      homeTelephone?: string;
+      mobileTelephone?: string;
     };
   }
-  
   export interface Professional {
     id: number;
     userId: number;
