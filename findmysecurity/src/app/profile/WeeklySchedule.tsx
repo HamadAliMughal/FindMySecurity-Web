@@ -13,7 +13,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ roleId, loginData }) =>
   return (
     <div className="mt-6">
       <h4 className="font-semibold text-gray-800 mb-2">Weekly Schedule</h4>
-      {loginData?.individualProfessional && (
+      {loginData?.individualProfessional?.profileData?.availability && (
         <div className="overflow-x-auto text-sm">
           <table className="w-full border border-gray-200">
             <thead>
@@ -27,6 +27,7 @@ const WeeklySchedule: React.FC<WeeklyScheduleProps> = ({ roleId, loginData }) =>
               </tr>
             </thead>
             <tbody>
+
               {Object.entries(
                 loginData?.individualProfessional?.profileData?.availability
                   ?.weeklySchedule
