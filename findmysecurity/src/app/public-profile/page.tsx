@@ -148,6 +148,7 @@ const JobPosting: React.FC = () => {
       formData.compulsoryDocuments.forEach((file: File) => {
         form.append('file', file); // Append each document to FormData
       });
+      console.log("form data", form)
   
       // Upload the files (documents and profile image)
       const uploadResponse = await axios.post(
