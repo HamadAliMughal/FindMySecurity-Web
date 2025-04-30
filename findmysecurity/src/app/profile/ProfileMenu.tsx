@@ -11,6 +11,7 @@ import {
   FaUserPlus,
   FaBell,
 } from "react-icons/fa";
+import axios from "axios";
 
 interface Notification {
   id: number;
@@ -33,24 +34,32 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
   useEffect(() => {
     const storedData = localStorage.getItem("loginData");
     if (storedData) {
-      setLoginData(JSON.parse(storedData));
-    }
+      const parsedData = JSON.parse(storedData);
+      setLoginData(parsedData);
 
-    // Mock notifications
-    setNotifications([
-      {
-        id: 1,
-        profileImage: "https://randomuser.me/api/portraits/men/32.jpg",
-        text: "John Doe applied for your job.",
-        jobTitle: "Security Guard - London",
-      },
-      {
-        id: 2,
-        profileImage: "https://randomuser.me/api/portraits/women/44.jpg",
-        text: "Jane Smith requested an interview.",
-        jobTitle: "Event Security Officer",
-      },
-    ]);
+      const fetchNotifications = async () => {
+        try {
+          const token2 = localStorage.getItem("authToken")?.replace(/^"|"$/g, '')
+          const userId = parsedData.id;
+
+          const response = await axios.get(
+            `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/notifications/user/${userId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token2}`,
+              },
+            }
+          );
+
+          // Adjust this line if the data shape differs
+          setNotifications(response.data || []);
+        } catch (error) {
+          console.error("Failed to fetch notifications:", error);
+        }
+      };
+
+      fetchNotifications();
+    }
   }, []);
 
   useEffect(() => {
@@ -97,17 +106,17 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
 
   const handleAccept = (id: number) => {
     alert(`Accepted notification ${id}`);
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
   const handleReject = (id: number) => {
     alert(`Rejected notification ${id}`);
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
   const handleMenuClick = (item: any) => {
     if (item.isNotification) {
-      setShowNotifications(prev => !prev);
+      setShowNotifications((prev) => !prev);
     } else if (item.route) {
       router.push(item.route);
     }
@@ -115,7 +124,6 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
 
   return (
     <>
-      {/* Profile Menu */}
       <h3 className="text-lg font-semibold my-6 text-gray-800 text-center md:text-left">
         My Profile
       </h3>
@@ -139,7 +147,6 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
           </div>
         ))}
 
-        {/* Notification Popup */}
         {showNotifications && (
           <div
             ref={popupRef}

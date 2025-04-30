@@ -60,27 +60,67 @@ export default function JobPostingForm() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
-    localStorage.setItem('jobs', JSON.stringify([...jobs, formData]));
-    alert('Job posted successfully!');
-    setFormData({
-      title: '',
-      type: '',
-      category: '',
-      location: '',
-      region: '',
-      postcode: '',
-      payRate: '',
-      payType: '',
-      description: '',
-      experience: '',
-      certifications: '',
-      shift: '',
-      deadline: '',
-    });
+  
+    try {
+      const loginData = localStorage.getItem('loginData');
+      if (!loginData) throw new Error('User not logged in');
+  
+      const parsed = JSON.parse(loginData);
+      const userId = parsed?.id || parsed?.userId || parsed?.user?.id;
+      const token2 = localStorage.getItem("authToken")?.replace(/^"|"$/g, '')
+      if (!userId) throw new Error('User ID missing');
+  
+      const payload = {
+        userId,
+        jobTitle: formData.title,
+        jobType: formData.type,
+        industryCategory: formData.category,
+        region: formData.region,
+        postcode: formData.postcode,
+        salaryRate: parseFloat(formData.payRate),
+        salaryType: formData.payType?.toLowerCase(),
+        jobDescription: formData.description,
+        requiredExperience: formData.experience,
+        requiredLicences: formData.certifications,
+        shiftAndHours: formData.shift,
+        startDate: formData.deadline,
+        deadline: formData.deadline,
+      };
+  
+      await fetch('https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/security-jobs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token2}`,
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      alert('Job posted successfully!');
+      setFormData({
+        title: '',
+        type: '',
+        category: '',
+        location: '',
+        region: '',
+        postcode: '',
+        payRate: '',
+        payType: '',
+        description: '',
+        experience: '',
+        certifications: '',
+        shift: '',
+        deadline: '',
+      });
+  
+    } catch (error: any) {
+      console.error('Failed to post job:', error);
+      alert('Failed to post job. Please try again.');
+    }
   };
+  
 
   if (!allowed) return null;
 
