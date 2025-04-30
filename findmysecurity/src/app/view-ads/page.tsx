@@ -246,6 +246,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 import {
   FaSearch,
   FaMapMarkerAlt,
@@ -265,6 +266,7 @@ const PostAdLister: React.FC = () => {
   const [localJobs, setLocalJobs] = useState<any[]>([]);
   const [adzunaJobs, setAdzunaJobs] = useState<any[]>([]);
   const [monsterJobs, setMonsterJobs] = useState<any[]>([]);
+  const [securityJobs, setSecurityJobs] = useState<any[]>([]);
 
   const [keyword, setKeyword] = useState(DEFAULT_KEYWORD);
   const [location, setLocation] = useState(DEFAULT_LOCATION);
@@ -288,13 +290,33 @@ const PostAdLister: React.FC = () => {
     });
   };
 
+
+  const fetchSecurityJobs = async () => {
+    try {
+      const token2 = localStorage.getItem("authToken")?.replace(/^"|"$/g, '') // Replace with your actual token
+  
+      const res = await axios.get("https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/security-jobs", {
+        headers: {
+          Authorization: `Bearer ${token2}`,
+        },
+      });
+  
+      return res.data.jobs;
+    } catch (err) {
+      console.error("Security Jobs API Error:", err);
+      return [];
+    }
+  };
+  
+
   const handleSearch = async () => {
     setSearched(true);
     setLoading(true);
     try {
-      const [adzunaRes, monsterRes] = await Promise.all([
+      const [adzunaRes, monsterRes, securityJobsData] = await Promise.all([
         fetch(`/api/reed-job?keyword=${keyword}&location=${location}&minSalary=${rateFilter}`),
         fetch(`/api/monster-job?keyword=${keyword}&location=${location}&minSalary=${rateFilter}`),
+        fetchSecurityJobs(),
       ]);
 
       const [adzunaData, monsterData] = await Promise.all([
@@ -304,6 +326,8 @@ const PostAdLister: React.FC = () => {
 
       setAdzunaJobs(adzunaRes.ok ? adzunaData : []);
       setMonsterJobs(monsterRes.ok ? monsterData : []);
+      setSecurityJobs(securityJobsData || []);
+
       const filteredLocal = fetchLocalJobs(keyword, location, rateFilter);
       setLocalJobs(filteredLocal);
       setCurrentPage(1);
@@ -322,6 +346,7 @@ const PostAdLister: React.FC = () => {
     ...localJobs.map((j) => ({ ...j, source: "local" })),
     ...adzunaJobs.map((j) => ({ ...j, source: "adzuna" })),
     ...monsterJobs.map((j) => ({ ...j, source: "monster" })),
+    ...securityJobs.map((j) => ({ ...j, source: "security-api" })),
   ];
 
   const totalPages = Math.ceil(mergedJobs.length / pageSize);
@@ -405,34 +430,60 @@ const PostAdLister: React.FC = () => {
                     <FaBriefcase className="text-white text-3xl" />
                   </div>
                   <div>
-                    {post.title && <h2 className="text-2xl font-bold text-gray-900 mb-2">{post.title}</h2>}
-                    <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-gray-700">
-                      {post.type && <p><strong>Type:</strong> {post.type}</p>}
-                      {post.category && <p><strong>Category:</strong> {post.category}</p>}
-                      {post.location && <p><strong>Location:</strong> {post.location}</p>}
-                      {post.region && <p><strong>Region:</strong> {post.region}</p>}
-                      {post.postcode && <p><strong>Postcode:</strong> {post.postcode}</p>}
-                      {post.payRate && (
-                        <p><strong>Pay:</strong> ${post.payRate} {post.payType && `(${post.payType})`}</p>
-                      )}
-                      {post.experience && <p><strong>Experience:</strong> {post.experience}</p>}
-                      {post.shift && <p><strong>Shift:</strong> {post.shift}</p>}
-                      {post.certifications && <p><strong>Certifications:</strong> {post.certifications}</p>}
-                      {post.description && (
-                        <p className="col-span-2"><strong>Description:</strong> {post.description}</p>
-                      )}
-                      {post.deadline && (
-                        <p className="col-span-2 flex items-center gap-2">
-                          <FaCalendarAlt />
-                          <span><strong>Deadline:</strong> {post.deadline}</span>
-                        </p>
-                      )}
-                    </div>
-                  </div>
+  {(post.title || post.jobTitle) && (
+    <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      {post.title || post.jobTitle}
+    </h2>
+  )}
+  <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-gray-700">
+    {(post.type || post.jobType) && (
+      <p><strong>Type:</strong> {post.type || post.jobType}</p>
+    )}
+    {(post.category || post.jobCategory) && (
+      <p><strong>Category:</strong> {post.category || post.jobCategory}</p>
+    )}
+    {(post.location || post.jobLocation) && (
+      <p><strong>Location:</strong> {post.location || post.jobLocation}</p>
+    )}
+    {(post.region || post.jobRegion) && (
+      <p><strong>Region:</strong> {post.region || post.jobRegion}</p>
+    )}
+    {(post.postcode || post.JobPostcode) && (
+      <p><strong>Postcode:</strong> {post.postcode || post.jobPostcode}</p>
+    )}
+    {(post.payRate || post.salaryRate|| post.JobSalary) && (
+      <p>
+        <strong>Pay:</strong> ${post.payRate || post.salaryRate || post.JobSalary}
+        {(post.payType || post.JobPayType) && ` (${post.payType || post.JobPayType})`}
+      </p>
+    )}
+    {(post.experience || post.requiredExperience) && (
+      <p><strong>Experience:</strong> {post.experience || post.requiredExperience}</p>
+    )}
+    {(post.shift || post.shiftAndHours) && (
+      <p><strong>Shift:</strong> {post.shift || post.shiftAndHours}</p>
+    )}
+    {(post.certifications || post.requiredLicences) && (
+      <p><strong>Certifications:</strong> {post.certifications || post.requiredLicences}</p>
+    )}
+    {(post.description || post.jobDescription) && (
+      <p className="col-span-2">
+        <strong>Description:</strong> {post.description || post.jobDescription}
+      </p>
+    )}
+    {(post.deadline || post.startDeadline) && (
+      <p className="col-span-2 flex items-center gap-2">
+        <FaCalendarAlt />
+        <span><strong>Deadline:</strong> {post.deadline || post.startDeadline}</span>
+      </p>
+    )}
+  </div>
+</div>
+
                 </div>
 
                 <div className="flex flex-col items-end gap-2">
-                  {post.source === "local" ? (
+                  {post.source === "local" ||post.source === "security-api" ? (
                     <button
                       onClick={() => router.push(`/job/${idx}`)}
                       className="text-sm px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
@@ -455,7 +506,9 @@ const PostAdLister: React.FC = () => {
                       ? "FindMySecurity"
                       : post.source === "adzuna"
                       ? "Adzuna"
-                      : "Monster"}
+                      : post.source === "monster"
+                      ? "Monster"
+                      : "FindMySecurity"}
                   </span>
                 </div>
               </div>

@@ -92,7 +92,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
     { icon: <FaBell />, label: "Notifications", isNotification: true },
     ...(roleId !== 3
       ? [{ icon: <FaAd />, label: "Post Free Ad", route: "/post-ad" }]
-      : []),
+      : [{ icon: <FaAd />, label: "View JObs", route: "/view-ads" }]),
     ...(shouldShowCreateProfile
       ? [
           {
