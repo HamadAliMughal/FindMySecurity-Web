@@ -44,6 +44,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     setIsEditing(false); // Optionally disable editing mode after saving
   };
 
+  console.log("login data", loginData?.individualProfessional?.profileData?.profile)
   const handleCancel = () => {
     setFormData({ ...loginData });
     setIsEditing(false);
@@ -58,7 +59,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           style={{
             backgroundImage: `url(${
               profilePhoto ||
-              loginData?.individualProfessional?.profilePhoto ||
+              loginData?.individualProfessional?.profileData?.profile ||
               "/images/profile.png"
             })`,
             backgroundSize: "cover",

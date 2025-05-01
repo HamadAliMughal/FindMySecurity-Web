@@ -7,6 +7,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import axios from "axios";
+import { uploadToS3 } from "@/utils/s3file";
+import { API_URL } from "@/utils/path";
 interface FormData {
   screenName: string;
   postcode: string;
@@ -128,7 +130,6 @@ const JobPosting: React.FC = () => {
     handleInputChange('compulsoryDocuments', updatedDocuments);
   };
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -137,66 +138,36 @@ const JobPosting: React.FC = () => {
     try {
       if (!userId) throw new Error("User ID not found");
   
-      // Prepare FormData for file upload (documents and profile image)
-      const form = new FormData();
-  
-      // Prepare arrays for uploaded files
       const uploadedProfileImageUrls: string[] = [];
       const uploadedDocumentUrls: string[] = [];
   
-      // Handle profile photo upload
+      // Upload profile photo
       if (formData.profilePhoto instanceof File) {
-        form.append('profileImage', formData.profilePhoto); // Append profile image
-        const uploadResponse = await axios.post(
-          'https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/file/upload',
-          form,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-              'Authorization': `Bearer ${token}`,
-            },
-          }
-        );
-  
-        // Ensure the response is valid and extract the profile image URL
-        const uploadedFile = uploadResponse.data.url;
-        if (uploadedFile) {
-          uploadedProfileImageUrls.push(uploadedFile);
-        }
+        const uploadedFileUrl = await uploadToS3({
+          file: formData.profilePhoto,
+          token: token!,
+        });
+        uploadedProfileImageUrls.push(uploadedFileUrl);
       }
   
-      // Handle document uploads
+      // Upload documents
       for (const file of formData.compulsoryDocuments) {
-        const documentForm = new FormData();
-        documentForm.append('file', file);
-  
-        const uploadResponse = await axios.post(
-          'https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/file/upload',
-          documentForm,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-              'Authorization': `Bearer ${token}`,
-            },
-          }
-        );
-  
-        // Ensure the response is valid and extract the document URLs
-        const uploadedFile = uploadResponse.data.url;
-        if (uploadedFile) {
-          uploadedDocumentUrls.push(uploadedFile);
-        }
+        const uploadedDocUrl = await uploadToS3({
+          file,
+          token: token!,
+        });
+        uploadedDocumentUrls.push(uploadedDocUrl);
       }
   
-      // Prepare the API data with file URLs
       const apiData = {
         profileData: {
+          profilePhoto: uploadedProfileImageUrls[0] || null,
           basicInfo: {
             screenName: formData.screenName,
             postcode: formData.postcode,
             profileHeadline: formData.profileHeadline,
             gender: formData.gender,
-            profilePhoto: uploadedProfileImageUrls[0] || null, // Use the uploaded profile image URL
+            
           },
           services: {
             selectedServices: formData.selectedServices,
@@ -220,13 +191,12 @@ const JobPosting: React.FC = () => {
             mobileTelephone: formData.mobileTelephone,
             website: formData.website,
           },
-          documents: uploadedDocumentUrls, // Add uploaded document URLs
+          documents: uploadedDocumentUrls,
         },
       };
   
-      // Submit the final form data to your backend
       const response = await fetch(
-        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/profile/individual/${userId}`,
+        `${API_URL}/profile/individual/${userId}`,
         {
           method: 'PUT',
           headers: {
@@ -253,6 +223,7 @@ const JobPosting: React.FC = () => {
       setIsSubmitting(false);
     }
   };
+  
   
 
   

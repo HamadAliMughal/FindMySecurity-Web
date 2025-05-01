@@ -8,6 +8,7 @@ import ActionButtons from "./ActionButtons";
 import ProfileMenu from "./ProfileMenu";
 import WeeklySchedule from "./WeeklySchedule";
 import axios from "axios";
+import { API_URL } from "@/utils/path";
 const UserProfile: React.FC = () => {
   const [loginData, setLoginData] = useState<any>(null);
   const router = useRouter();
@@ -23,7 +24,7 @@ const UserProfile: React.FC = () => {
       const currentId = data1?.id || data1?.user?.id;
       try {
           const response = await axios.get(
-            `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/auth/get-user/${currentId}`,
+            `${API_URL}/auth/get-user/${currentId}`,
             {
               headers: {
                 'Authorization': `Bearer ${token2}`,
@@ -77,7 +78,7 @@ const UserProfile: React.FC = () => {
       };
   
       const response = await fetch(
-        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/users/${currentRoleId}`,
+        `${API_URL}/users/${currentRoleId}`,
         {
           method: "PUT",
           headers: {
