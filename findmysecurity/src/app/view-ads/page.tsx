@@ -291,9 +291,12 @@ const PostAdLister: React.FC = () => {
   };
 
 
+  const token2 = localStorage.getItem("authToken")?.replace(/^"|"$/g, '')
+  const storedData1 = localStorage.getItem('loginData')
+  const data1 = storedData1 ? JSON.parse(storedData1) : null; 
+  const currentId = data1?.id || data1?.user?.id; // Replace with your actual token
   const fetchSecurityJobs = async () => {
     try {
-      const token2 = localStorage.getItem("authToken")?.replace(/^"|"$/g, '') // Replace with your actual token
   
       const res = await axios.get("https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/security-jobs", {
         headers: {
@@ -308,7 +311,28 @@ const PostAdLister: React.FC = () => {
     }
   };
   
-
+  const applyForJob = async ( serviceAdId: number) => {
+    try {
+      const response = await axios.post(
+        "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev//job-applications",
+        {
+          userId: currentId,
+          serviceAdId,
+          status: "pending"
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token2}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error("Job application failed:", error.response?.data || error.message);
+      throw error;
+    }
+  };
   const handleSearch = async () => {
     setSearched(true);
     setLoading(true);
@@ -343,10 +367,10 @@ const PostAdLister: React.FC = () => {
   }, []);
 
   const mergedJobs = [
+    ...securityJobs.map((j) => ({ ...j, source: "security-api" })),
     ...localJobs.map((j) => ({ ...j, source: "local" })),
     ...adzunaJobs.map((j) => ({ ...j, source: "adzuna" })),
     ...monsterJobs.map((j) => ({ ...j, source: "monster" })),
-    ...securityJobs.map((j) => ({ ...j, source: "security-api" })),
   ];
 
   const totalPages = Math.ceil(mergedJobs.length / pageSize);
@@ -485,7 +509,7 @@ const PostAdLister: React.FC = () => {
                 <div className="flex flex-col items-end gap-2">
                   {post.source === "local" ||post.source === "security-api" ? (
                     <button
-                      onClick={() => router.push(`/job/${idx}`)}
+                      onClick={() => applyForJob( post.id)}
                       className="text-sm px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
                     >
                       Apply

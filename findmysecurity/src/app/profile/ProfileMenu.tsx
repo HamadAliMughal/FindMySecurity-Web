@@ -15,6 +15,7 @@ import axios from "axios";
 import { API_URL } from "@/utils/path";
 
 interface Notification {
+  [x: string]: ReactNode;
   id: number;
   profileImage: string;
   text: string;
@@ -52,8 +53,16 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
             }
           );
 
+
           // Adjust this line if the data shape differs
-          setNotifications(response.data || []);
+          const notificationsArray = response.data?.data;
+          console.log("response", notificationsArray);
+          if (Array.isArray(notificationsArray) && notificationsArray.length > 0) {
+            console.log("response", notificationsArray);
+            setNotifications(notificationsArray);
+          } else {
+            setNotifications([]);
+          }
         } catch (error) {
           console.error("Failed to fetch notifications:", error);
         }
@@ -154,20 +163,18 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
             className="absolute right-0 top-24 bg-white shadow-lg rounded-lg w-80 z-50 p-4 max-h-96 overflow-y-auto"
           >
             <h4 className="font-semibold mb-3 text-lg">Notifications</h4>
-            {notifications.length === 0 ? (
+            {notifications.length === 0 || notifications===null? (
               <p className="text-gray-500 text-center">No new notifications</p>
             ) : (
               notifications.map((notif) => (
+
                 <div key={notif.id} className="flex items-start gap-3 p-2 border-b">
-                  <img
-                    src={notif.profileImage}
-                    alt="Profile"
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
+               
                   <div className="flex-1">
-                    <p className="text-sm">{notif.text}</p>
-                    <p className="text-xs text-gray-500">{notif.jobTitle}</p>
-                    <div className="flex gap-2 mt-2">
+                  <p className="text-sm">{notif?.message?.split(':')[1]?.trim()}</p>
+
+                    <p className="text-xs text-gray-500">{notif?.message?.split(':')[0]?.trim()}</p>
+                   {roleId!=3 && <div className="flex gap-2 mt-2">
                       <button
                         className="text-white bg-green-600 hover:bg-green-700 text-xs px-3 py-1 rounded"
                         onClick={() => handleAccept(notif.id)}
@@ -180,7 +187,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
                       >
                         Reject
                       </button>
-                    </div>
+                    </div>}
                   </div>
                 </div>
               ))
