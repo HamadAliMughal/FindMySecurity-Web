@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState,ReactNode  } from "react";
 import { useRouter } from "next/navigation";
 import {
   FaSearch,
@@ -171,9 +171,9 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
                 <div key={notif.id} className="flex items-start gap-3 p-2 border-b">
                
                   <div className="flex-1">
-                  <p className="text-sm">{notif?.message?.split(':')[1]?.trim()}</p>
+                  <p className="text-sm">{typeof notif?.message === 'string' ? notif.message.split(':')[1]?.trim() : ''}</p>
 
-                    <p className="text-xs text-gray-500">{notif?.message?.split(':')[0]?.trim()}</p>
+                    <p className="text-xs text-gray-500">{typeof notif?.message === 'string' ? notif.message.split(':')[0]?.trim() : ''}</p>
                    {roleId!=3 && <div className="flex gap-2 mt-2">
                       <button
                         className="text-white bg-green-600 hover:bg-green-700 text-xs px-3 py-1 rounded"
