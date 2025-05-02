@@ -1,20 +1,76 @@
 "use client";
-import React, { useState } from "react";
+import React, {JSX, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   FaMobileAlt,
   FaHome,
   FaEnvelope,
   FaBriefcase,
+  FaFilePdf,
+  FaFileImage,
+  FaFileWord,
+  FaFileExcel,
+  FaFilePowerpoint,
+  FaFileArchive,
+  FaFileAlt,
+  FaFileCode,
+  FaFileAudio,
+  FaFileVideo,
+  FaDownload,
+  FaSearch,
 } from "react-icons/fa";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
+import {
+  TextField,
+  Button,
+  Chip,
+  Divider,
+  IconButton,
+  Tooltip,
+  Menu,
+  MenuItem,
+  InputAdornment,
+  Badge,
+  Avatar,
+  Typography,
+} from "@mui/material";
+import { Delete, MoreVert, FileUpload, CloudDownload } from "@mui/icons-material";
+
+interface Document {
+  url: string;
+  name: string;
+  type: string;
+  size?: string;
+  uploadedAt?: string;
+}
 
 interface ActionButtonsProps {
   loginData: any;
   roleId: number;
   updateProfile: (updatedData: any) => void;
 }
+
+const fileTypeIcons: Record<string, JSX.Element> = {
+  pdf: <FaFilePdf className="text-red-500" />,
+  jpg: <FaFileImage className="text-green-500" />,
+  jpeg: <FaFileImage className="text-green-500" />,
+  png: <FaFileImage className="text-green-500" />,
+  gif: <FaFileImage className="text-green-500" />,
+  doc: <FaFileWord className="text-blue-500" />,
+  docx: <FaFileWord className="text-blue-500" />,
+  xls: <FaFileExcel className="text-green-600" />,
+  xlsx: <FaFileExcel className="text-green-600" />,
+  ppt: <FaFilePowerpoint className="text-orange-500" />,
+  pptx: <FaFilePowerpoint className="text-orange-500" />,
+  zip: <FaFileArchive className="text-yellow-500" />,
+  rar: <FaFileArchive className="text-yellow-500" />,
+  txt: <FaFileAlt className="text-gray-500" />,
+  csv: <FaFileCode className="text-blue-300" />,
+  json: <FaFileCode className="text-yellow-300" />,
+  mp3: <FaFileAudio className="text-purple-500" />,
+  wav: <FaFileAudio className="text-purple-500" />,
+  mp4: <FaFileVideo className="text-red-400" />,
+  mov: <FaFileVideo className="text-red-400" />,
+};
 
 const ActionButtons: React.FC<ActionButtonsProps> = ({
   loginData,
@@ -25,6 +81,53 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({ ...loginData });
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, doc: Document) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedDoc(doc);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedDoc(null);
+  };
+
+  const handleDelete = () => {
+    // Implement delete functionality
+    handleMenuClose();
+  };
+
+  const handleDownload = () => {
+    if (selectedDoc) window.open(selectedDoc.url, "_blank");
+    handleMenuClose();
+  };
+
+  // Process documents
+  const rawDocuments = loginData?.individualProfessional?.profileData?.documents || [];
+  const processedDocuments: Document[] = rawDocuments.map((url: string) => ({
+    url,
+    name: decodeURIComponent(url.split('/').pop() || "Document"),
+    type: url.split('.').pop()?.toUpperCase() || 'FILE',
+    size: `${Math.floor(Math.random() * 5 + 1)} MB`, // Mock size
+    uploadedAt: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toLocaleDateString(),
+  }));
+
+  // Filter documents based on search
+  const filteredDocuments = processedDocuments.filter(doc =>
+    doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    doc.type.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Group documents by type
+  const documentGroups = filteredDocuments.reduce((groups: Record<string, Document[]>, doc) => {
+    const type = doc.type;
+    if (!groups[type]) groups[type] = [];
+    groups[type].push(doc);
+    return groups;
+  }, {});
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -40,59 +143,55 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   };
 
   const handleSubmit = () => {
-    updateProfile(formData); // Pass form data to the parent function
-    setIsEditing(false); // Optionally disable editing mode after saving
+    updateProfile(formData);
+    setIsEditing(false);
   };
 
-  console.log("login data", loginData?.individualProfessional?.profileData?.profile)
   const handleCancel = () => {
     setFormData({ ...loginData });
     setIsEditing(false);
   };
 
+  const profileData = loginData?.individualProfessional?.profileData?.profilePhoto || '';
+  const finalImage = profilePhoto || profileData || "/images/profile.png";
+
   return (
-    <div className="w-full max-w-5xl mx-auto p-4">
-      {/* Profile & Header */}
+    <div className="w-full max-w-5xl mx-auto p-4 space-y-6">
+      {/* Profile Section */}
       <div className="flex flex-col items-center md:flex-row md:items-center md:space-x-6">
-        <div
-          className="w-28 h-28 rounded-full shadow-lg shadow-gray-400 hover:scale-105 transition-transform duration-300 relative"
-          style={{
-            backgroundImage: `url(${
-              profilePhoto ||
-              loginData?.individualProfessional?.profileData?.profile ||
-              "/images/profile.png"
-            })`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
+        <div className="relative w-28 h-28 rounded-full shadow-lg shadow-gray-400 hover:scale-105 transition-transform duration-300">
+          <img
+            src={finalImage}
+            alt="Profile"
+            className="w-full h-full object-cover rounded-full"
+          />
           {isEditing && (
-             <>
-             <input
-               id="profilePhoto"
-               type="file"
-               accept="image/*"
-               onChange={handleImageChange}
-               className="hidden"
-             />
-             <label
-               htmlFor="profilePhoto"
-               className="absolute bottom-0 left-0 right-0 text-center bg-black bg-opacity-70 text-white text-xs py-1 cursor-pointer rounded-b-lg hover:bg-opacity-90 transition"
-             >
-               Upload Image
-             </label>
-           </>
+            <>
+              <input
+                id="profilePhoto"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+              <label
+                htmlFor="profilePhoto"
+                className="absolute bottom-0 left-0 right-0 text-center bg-black bg-opacity-70 text-white text-xs py-1 cursor-pointer rounded-b-lg hover:bg-opacity-90 transition"
+              >
+                Upload Image
+              </label>
+            </>
           )}
         </div>
+
+        {/* Profile Info */}
         <div className="text-center md:text-left mt-4 md:mt-0 space-y-1">
           <h2 className="text-2xl font-semibold text-gray-800">
             {formData?.firstName && formData?.lastName
               ? `${formData.firstName} ${formData.lastName}`
               : "Mr. Y"}
           </h2>
-          <h2 className="text-xl text-gray-600">
-            {formData?.screenName ?? "Mr."}
-          </h2>
+          <h2 className="text-xl text-gray-600">{formData?.screenName ?? "Mr."}</h2>
           <p className="text-gray-500">
             {loginData?.role?.name ?? loginData?.role ?? "Security Officer"}
           </p>
@@ -102,85 +201,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         </div>
       </div>
 
-      {/* 2-1-2-1 layout */}
-      <div className="flex flex-wrap mt-6 gap-4">
-        {/* Row 1: 2 fields */}
-        <div className="w-full md:w-[48%]">
-          <TextField
-            label="First Name"
-            name="firstName"
-            value={formData.firstName || ""}
-            onChange={handleInputChange}
-            disabled={!isEditing}
-            fullWidth
-            size="small"
-          />
-        </div>
-        <div className="w-full md:w-[48%]">
-          <TextField
-            label="Last Name"
-            name="lastName"
-            value={formData.lastName || ""}
-            onChange={handleInputChange}
-            disabled={!isEditing}
-            fullWidth
-            size="small"
-          />
-        </div>
-
-        {/* Row 2: 1 field */}
-        <div className="w-full">
-          <TextField
-            label="Screen Name"
-            name="screenName"
-            value={formData.screenName || ""}
-            onChange={handleInputChange}
-            disabled={!isEditing}
-            fullWidth
-            size="small"
-          />
-        </div>
-
-        {/* Row 3: 2 fields */}
-        <div className="w-full md:w-[48%]">
-          <TextField
-            label="Email"
-            name="email"
-            value={formData.email || ""}
-            onChange={handleInputChange}
-            disabled={!isEditing}
-            fullWidth
-            size="small"
-          />
-        </div>
-        <div className="w-full md:w-[48%]">
-          <TextField
-            label="Phone Number"
-            name="phoneNumber"
-            value={formData.phoneNumber || ""}
-            onChange={handleInputChange}
-            disabled={!isEditing}
-            fullWidth
-            size="small"
-          />
-        </div>
-
-        {/* Row 4: 1 field */}
-        <div className="w-full">
-          <TextField
-            label="Address"
-            name="address"
-            value={formData.address || ""}
-            onChange={handleInputChange}
-            disabled={!isEditing}
-            fullWidth
-            size="small"
-          />
-        </div>
-      </div>
-
-      {/* Buttons */}
-      <div className="mt-6 flex flex-col md:flex-row gap-3">
+      {/* Action Buttons */}
+      <div className="mt-3 flex flex-col md:flex-row">
         {isEditing ? (
           <>
             <Button
@@ -190,7 +212,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               fullWidth
               sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
             >
-              Save Profile
+              Save Profiled
             </Button>
             <Button
               variant="outlined"
@@ -213,17 +235,1725 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         )}
       </div>
 
+      {/* Upgrade Button */}
       {!isEditing && (
         <Button
           fullWidth
           variant="contained"
-          sx={{ mt: 2, bgcolor: "#f97316", ":hover": { bgcolor: "#ea580c" } }}
+          sx={{ bgcolor: "#f97316", ":hover": { bgcolor: "#ea580c" } }}
         >
           Upgrade My Membership
         </Button>
       )}
+
+      {/* Documents Section */}
+      <div className="space-y-6 mt-5">
+        <Divider className="my-4">
+          <Chip 
+            label={
+              <div className="flex items-center space-x-2">
+                <CloudDownload />
+                <span>My Documents ({processedDocuments.length})</span>
+              </div>
+            } 
+            color="primary" 
+          />
+        </Divider>
+
+        {/* Document Controls */}
+        <div className="flex flex-col md:flex-row justify-between gap-4 mt-3">
+          <TextField
+            size="small"
+            placeholder="Search documents..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <FaSearch className="text-gray-400" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ width: '100%', maxWidth: 400 }}
+          />
+
+          {isEditing && (
+            <Button
+              variant="contained"
+              startIcon={<FileUpload />}
+              sx={{ bgcolor: 'primary.main', whiteSpace: 'nowrap' }}
+            >
+              Upload New
+            </Button>
+          )}
+        </div>
+
+        {/* Document Display */}
+        {Object.entries(documentGroups).map(([type, docs]) => (
+  <div key={type} className="space-y-6">
+    {/* Document Group Header */}
+    <div className="flex justify-between items-center">
+      <Typography variant="h6" className="font-semibold text-gray-700">
+        {type} Files ({docs.length})
+      </Typography>
+      <Typography variant="body2" className="text-gray-500">
+        {docs.length} items
+      </Typography>
+    </div>
+
+    {/* Document Grid Layout */}
+    <div className="space-y-6">
+  {docs.map((doc, index) => {
+    // Extract the name part of the document (without number prefix and file extension)
+    const docName = doc.name.split('-').slice(1).join(' ').replace(/\.[^/.]+$/, '');
+
+    return (
+      <div key={index} className="flex justify-between items-center p-4 bg-white border border-gray-300 rounded-lg shadow-sm transition-all duration-200">
+        
+        {/* Document Info Section */}
+        <div className="flex items-center space-x-4">
+          <Avatar className="w-14 h-14 bg-gray-200">
+            {fileTypeIcons[doc.type.toLowerCase()] || <FaFileAlt className="text-gray-600" />}
+          </Avatar>
+
+          <div className="flex flex-col">
+            <Typography variant="subtitle1" className="font-medium text-gray-800">
+              {docName} {/* Show document name without the file prefix and extension */}
+            </Typography>
+            <Typography variant="body2" className="text-gray-500">
+              {doc.size} • {doc.uploadedAt}
+            </Typography>
+          </div>
+        </div>
+
+        {/* Action Buttons: Download, Delete */}
+        <div className="flex items-center space-x-4">
+          <Tooltip title="Download">
+            <IconButton
+              size="small"
+              onClick={() => window.open(doc.url, "_blank")}
+              sx={{
+                color: 'primary.main',
+                '&:hover': { color: 'blue.500' }
+              }}
+            >
+              <FaDownload />
+            </IconButton>
+          </Tooltip>
+
+          {isEditing && (
+            <Tooltip title="Delete">
+              <IconButton
+                size="small"
+                onClick={handleDelete}
+                sx={{
+                  color: 'red.500',
+                  '&:hover': { color: 'red.700' }
+                }}
+              >
+                <Delete />
+              </IconButton>
+            </Tooltip>
+          )}
+        </div>
+      </div>
+    );
+  })}
+</div>
+
+  </div>
+))}
+
+
+        {/* Empty State */}
+        {filteredDocuments.length === 0 && (
+          <div className="text-center py-8">
+            <FaFileAlt className="mx-auto text-4xl text-gray-300 mb-2" />
+            <Typography variant="body1" className="text-gray-500">
+              {searchQuery ? "No matching documents found" : "No documents uploaded yet"}
+            </Typography>
+          </div>
+        )}
+      </div>
+
+      {/* Document Context Menu */}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        <MenuItem onClick={handleDownload}>
+          <FaDownload className="mr-2" /> Download
+        </MenuItem>
+        <MenuItem onClick={handleDelete}>
+          <Delete className="mr-2" /> Delete
+        </MenuItem>
+      </Menu>
     </div>
   );
 };
 
 export default ActionButtons;
+
+
+
+
+
+
+// "use client";
+// import React, { useState,JSX } from "react";
+// import { useRouter } from "next/navigation";
+// import {
+//   FaFilePdf,
+//   FaFileImage,
+//   FaFileWord,
+//   FaFileExcel,
+//   FaFilePowerpoint,
+//   FaFileArchive,
+//   FaFileAlt,
+//   FaFileCode,
+//   FaFileAudio,
+//   FaFileVideo,
+//   FaDownload,
+//   FaSearch,
+// } from "react-icons/fa";
+// import {
+//   TextField,
+//   Button,
+//   Chip,
+//   Divider,
+//   IconButton,
+//   Tooltip,
+//   Menu,
+//   MenuItem,
+//   InputAdornment,
+//   Badge,
+//   Avatar,
+//   Typography,
+// } from "@mui/material";
+// import { Delete, MoreVert, FileUpload, CloudDownload } from "@mui/icons-material";
+
+// interface Document {
+//   url: string;
+//   name: string;
+//   type: string;
+//   size?: string;
+//   uploadedAt?: string;
+// }
+
+// interface ActionButtonsProps {
+//   loginData: any;
+//   roleId: number;
+//   updateProfile: (updatedData: any) => void;
+// }
+
+// const fileTypeIcons: Record<string, JSX.Element> = {
+//   pdf: <FaFilePdf className="text-red-500" />,
+//   jpg: <FaFileImage className="text-green-500" />,
+//   jpeg: <FaFileImage className="text-green-500" />,
+//   png: <FaFileImage className="text-green-500" />,
+//   gif: <FaFileImage className="text-green-500" />,
+//   doc: <FaFileWord className="text-blue-500" />,
+//   docx: <FaFileWord className="text-blue-500" />,
+//   xls: <FaFileExcel className="text-green-600" />,
+//   xlsx: <FaFileExcel className="text-green-600" />,
+//   ppt: <FaFilePowerpoint className="text-orange-500" />,
+//   pptx: <FaFilePowerpoint className="text-orange-500" />,
+//   zip: <FaFileArchive className="text-yellow-500" />,
+//   rar: <FaFileArchive className="text-yellow-500" />,
+//   txt: <FaFileAlt className="text-gray-500" />,
+//   csv: <FaFileCode className="text-blue-300" />,
+//   json: <FaFileCode className="text-yellow-300" />,
+//   mp3: <FaFileAudio className="text-purple-500" />,
+//   wav: <FaFileAudio className="text-purple-500" />,
+//   mp4: <FaFileVideo className="text-red-400" />,
+//   mov: <FaFileVideo className="text-red-400" />,
+// };
+
+// const ActionButtons: React.FC<ActionButtonsProps> = ({
+//   loginData,
+//   roleId,
+//   updateProfile,
+// }) => {
+//   const router = useRouter();
+//   const [isEditing, setIsEditing] = useState(false);
+//   const [formData, setFormData] = useState({ ...loginData });
+//   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+//   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
+
+//   // Document management functions
+//   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, doc: Document) => {
+//     setAnchorEl(event.currentTarget);
+//     setSelectedDoc(doc);
+//   };
+
+//   const handleMenuClose = () => {
+//     setAnchorEl(null);
+//     setSelectedDoc(null);
+//   };
+
+//   const handleDelete = () => {
+//     // Implement delete functionality
+//     handleMenuClose();
+//   };
+
+//   const handleDownload = () => {
+//     if (selectedDoc) window.open(selectedDoc.url, "_blank");
+//     handleMenuClose();
+//   };
+
+//   // Process documents
+//   const rawDocuments = loginData?.individualProfessional?.profileData?.documents || [];
+//   const processedDocuments: Document[] = rawDocuments.map((url: string) => ({
+//     url,
+//     name: decodeURIComponent(url.split('/').pop() || "Document"),
+//     type: url.split('.').pop()?.toUpperCase() || 'FILE',
+//     size: `${Math.floor(Math.random() * 5 + 1)} MB`, // Mock size
+//     uploadedAt: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toLocaleDateString(), // Mock date
+//   }));
+
+//   // Filter documents based on search
+//   const filteredDocuments = processedDocuments.filter(doc =>
+//     doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//     doc.type.toLowerCase().includes(searchQuery.toLowerCase())
+//   );
+
+//   // Group documents by type
+//   const documentGroups = filteredDocuments.reduce((groups: Record<string, Document[]>, doc) => {
+//     const type = doc.type;
+//     if (!groups[type]) groups[type] = [];
+//     groups[type].push(doc);
+//     return groups;
+//   }, {});
+
+//   return (
+//     <div className="w-full max-w-5xl mx-auto p-4 space-y-6">
+//       {/* Profile Section (unchanged) */}
+//       {/* ... */}
+  
+//       {/* Documents Section */}
+//       <div className="space-y-6">
+//         {/* Documents Header */}
+//         <Divider className="my-4">
+//           <Chip 
+//             label={
+//               <div className="flex items-center space-x-2">
+//                 <CloudDownload />
+//                 <span>My Documents ({processedDocuments.length})</span>
+//               </div>
+//             } 
+//             color="primary" 
+//           />
+//         </Divider>
+  
+//         {/* Document Controls */}
+//         <div className="flex flex-col md:flex-row justify-between gap-4">
+//           {/* Search Documents */}
+//           <TextField
+//             size="small"
+//             placeholder="Search documents..."
+//             value={searchQuery}
+//             onChange={(e) => setSearchQuery(e.target.value)}
+//             InputProps={{
+//               startAdornment: (
+//                 <InputAdornment position="start">
+//                   <FaSearch className="text-gray-400" />
+//                 </InputAdornment>
+//               ),
+//             }}
+//             sx={{ width: '100%', maxWidth: 400 }}
+//           />
+  
+//           {/* Upload Button */}
+//           {isEditing && (
+//             <Button
+//               variant="contained"
+//               startIcon={<FileUpload />}
+//               sx={{ bgcolor: 'primary.main', whiteSpace: 'nowrap' }}
+//             >
+//               Upload New
+//             </Button>
+//           )}
+//         </div>
+  
+//         {/* Document Groups */}
+//         {Object.entries(documentGroups).map(([type, docs]) => (
+//           <div key={type} className="space-y-3">
+//             {/* Document Type Header */}
+//             <Typography variant="subtitle1" className="font-medium text-gray-600">
+//               {type} Files ({docs.length})
+//             </Typography>
+  
+//             {/* Document Grid with Improved Styling */}
+//             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//               {docs.map((doc, index) => (
+//                 <div key={index} className="border-2 rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105 hover:shadow-xl bg-white">
+//                   {/* Document Header */}
+//                   <div className="flex items-start space-x-3">
+//                     <Badge
+//                       badgeContent={doc.type}
+//                       color="primary"
+//                       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+//                     >
+//                       <Avatar className="w-14 h-14">
+//                         {fileTypeIcons[doc.type.toLowerCase()] || <FaFileAlt />}
+//                       </Avatar>
+//                     </Badge>
+  
+//                     {/* Document Details */}
+//                     <div className="flex-1 min-w-0">
+//                       <Typography variant="subtitle2" className="font-medium truncate text-gray-800">
+//                         {doc.name}
+//                       </Typography>
+//                       <Typography variant="caption" className="text-gray-500">
+//                         {doc.size} • {doc.uploadedAt}
+//                       </Typography>
+//                     </div>
+  
+//                     {/* Document Menu */}
+//                     <div>
+//                       <IconButton onClick={(e) => handleMenuOpen(e, doc)}>
+//                         <MoreVert />
+//                       </IconButton>
+//                     </div>
+//                   </div>
+  
+//                   {/* Document Actions */}
+//                   <div className="mt-4 flex justify-end space-x-2">
+//                     <Tooltip title="Download">
+//                       <IconButton
+//                         size="small"
+//                         onClick={() => window.open(doc.url, "_blank")}
+//                         sx={{
+//                           color: 'primary.main',
+//                           '&:hover': { color: 'blue.500' }
+//                         }}
+//                       >
+//                         <FaDownload className="text-gray-500 hover:text-blue-500" />
+//                       </IconButton>
+//                     </Tooltip>
+  
+//                     {/* Delete Action */}
+//                     {isEditing && (
+//                       <Tooltip title="Delete">
+//                         <IconButton
+//                           size="small"
+//                           onClick={handleDelete}
+//                           sx={{
+//                             color: 'red.500',
+//                             '&:hover': { color: 'red.700' }
+//                           }}
+//                         >
+//                           <Delete className="text-gray-500 hover:text-red-500" />
+//                         </IconButton>
+//                       </Tooltip>
+//                     )}
+//                   </div>
+//                 </div>
+//               ))}
+//             </div>
+//           </div>
+//         ))}
+  
+//         {/* Empty State for No Documents */}
+//         {filteredDocuments.length === 0 && (
+//           <div className="text-center py-8">
+//             <FaFileAlt className="mx-auto text-4xl text-gray-300 mb-2" />
+//             <Typography variant="body1" className="text-gray-500">
+//               {searchQuery ? "No matching documents found" : "No documents uploaded yet"}
+//             </Typography>
+//           </div>
+//         )}
+//       </div>
+  
+//       {/* Document Context Menu */}
+//       <Menu
+//         anchorEl={anchorEl}
+//         open={Boolean(anchorEl)}
+//         onClose={handleMenuClose}
+//       >
+//         <MenuItem onClick={handleDownload}>
+//           <FaDownload className="mr-2" /> Download
+//         </MenuItem>
+//         <MenuItem onClick={handleDelete}>
+//           <Delete className="mr-2" /> Delete
+//         </MenuItem>
+//       </Menu>
+//     </div>
+//   );
+  
+  
+  
+// };
+
+// export default ActionButtons;
+
+
+
+
+// "use client";
+// import React, { useState,JSX  } from "react";
+// import { useRouter } from "next/navigation";
+// import {
+//   FaFilePdf,
+//   FaFileImage,
+//   FaFileWord,
+//   FaFileExcel,
+//   FaFilePowerpoint,
+//   FaFileArchive,
+//   FaFileAlt,
+//   FaFileCode,
+//   FaFileAudio,
+//   FaFileVideo,
+//   FaDownload,
+// } from "react-icons/fa";
+// import {
+//   TextField,
+//   Button,
+//   List,
+//   ListItem,
+//   ListItemIcon,
+//   ListItemText,
+//   IconButton,
+//   Tooltip,
+//   Chip,
+//   Divider,
+// } from "@mui/material";
+// import { FileCopy, Delete } from "@mui/icons-material";
+
+// interface ActionButtonsProps {
+//   loginData: any;
+//   roleId: number;
+//   updateProfile: (updatedData: any) => void;
+// }
+
+// const fileTypeIcons: Record<string, JSX.Element> = {
+//   pdf: <FaFilePdf className="text-red-500" />,
+//   jpg: <FaFileImage className="text-green-500" />,
+//   jpeg: <FaFileImage className="text-green-500" />,
+//   png: <FaFileImage className="text-green-500" />,
+//   gif: <FaFileImage className="text-green-500" />,
+//   doc: <FaFileWord className="text-blue-500" />,
+//   docx: <FaFileWord className="text-blue-500" />,
+//   xls: <FaFileExcel className="text-green-600" />,
+//   xlsx: <FaFileExcel className="text-green-600" />,
+//   ppt: <FaFilePowerpoint className="text-orange-500" />,
+//   pptx: <FaFilePowerpoint className="text-orange-500" />,
+//   zip: <FaFileArchive className="text-yellow-500" />,
+//   rar: <FaFileArchive className="text-yellow-500" />,
+//   txt: <FaFileAlt className="text-gray-500" />,
+//   csv: <FaFileCode className="text-blue-300" />,
+//   json: <FaFileCode className="text-yellow-300" />,
+//   mp3: <FaFileAudio className="text-purple-500" />,
+//   wav: <FaFileAudio className="text-purple-500" />,
+//   mp4: <FaFileVideo className="text-red-400" />,
+//   mov: <FaFileVideo className="text-red-400" />,
+// };
+
+// const ActionButtons: React.FC<ActionButtonsProps> = ({
+//   loginData,
+//   roleId,
+//   updateProfile,
+// }) => {
+//   const router = useRouter();
+//   const [isEditing, setIsEditing] = useState(false);
+//   const [formData, setFormData] = useState({ ...loginData });
+//   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+
+//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const { name, value } = e.target;
+//     setFormData((prev: any) => ({ ...prev, [name]: value }));
+//   };
+
+//   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const file = e.target.files?.[0];
+//     if (file) {
+//       const imageUrl = URL.createObjectURL(file);
+//       setProfilePhoto(imageUrl);
+//     }
+//   };
+
+//   const handleSubmit = () => {
+//     updateProfile(formData);
+//     setIsEditing(false);
+//   };
+
+//   const handleCancel = () => {
+//     setFormData({ ...loginData });
+//     setIsEditing(false);
+//   };
+
+//   // Get all documents
+//   const documents = loginData?.individualProfessional?.profileData?.documents || [];
+//   const profileData = loginData?.individualProfessional?.profileData?.profilePhoto || '';
+
+//   const finalImage = profilePhoto || profileData || "/images/profile.png";
+
+//   // Function to get file icon based on extension
+//   const getFileIcon = (url: string) => {
+//     const extension = url.split('.').pop()?.toLowerCase() || 'file';
+//     return fileTypeIcons[extension] || <FaFileAlt className="text-gray-400" />;
+//   };
+
+//   // Function to extract filename from URL
+//   const getFilename = (url: string) => {
+//     return decodeURIComponent(url.split('/').pop() || "Document");
+//   };
+
+//   // Function to get file type
+//   const getFileType = (url: string) => {
+//     const extension = url.split('.').pop()?.toUpperCase() || 'FILE';
+//     return extension;
+//   };
+
+//   // Function to format file size (mock - would need actual size data)
+//   const formatFileSize = () => {
+//     return Math.floor(Math.random() * 5 + 1) + " MB"; // Mock size
+//   };
+
+//   return (
+//     <div className="w-full max-w-5xl mx-auto p-4">
+//       {/* Profile Section (unchanged) */}
+//       {/* ... */}
+//       <div className="flex flex-col items-center md:flex-row md:items-center md:space-x-6">
+//         <div className="relative w-28 h-28 rounded-full shadow-lg shadow-gray-400 hover:scale-105 transition-transform duration-300">
+//           <img
+//             src={finalImage}
+//             alt="Profile"
+//             className="w-full h-full object-cover rounded-full"
+//           />
+//           {isEditing && (
+//             <>
+//               <input
+//                 id="profilePhoto"
+//                 type="file"
+//                 accept="image/*"
+//                 onChange={handleImageChange}
+//                 className="hidden"
+//               />
+//               <label
+//                 htmlFor="profilePhoto"
+//                 className="absolute bottom-0 left-0 right-0 text-center bg-black bg-opacity-70 text-white text-xs py-1 cursor-pointer rounded-b-lg hover:bg-opacity-90 transition"
+//               >
+//                 Upload Image
+//               </label>
+//             </>
+//           )}
+//         </div>
+
+//         {/* Profile Info */}
+//         <div className="text-center md:text-left mt-4 md:mt-0 space-y-1">
+//           <h2 className="text-2xl font-semibold text-gray-800">
+//             {formData?.firstName && formData?.lastName
+//               ? `${formData.firstName} ${formData.lastName}`
+//               : "Mr. Y"}
+//           </h2>
+//           <h2 className="text-xl text-gray-600">{formData?.screenName ?? "Mr."}</h2>
+//           <p className="text-gray-500">
+//             {loginData?.role?.name ?? loginData?.role ?? "Security Officer"}
+//           </p>
+//           <span className="text-sm text-yellow-500">
+//             ✅ Usually responds within 1 hour
+//           </span>
+//         </div>
+//       </div>
+
+//       {/* Action Buttons */}
+//       <div className="mt-6 flex flex-col md:flex-row gap-3">
+//         {isEditing ? (
+//           <>
+//             <Button
+//               variant="contained"
+//               color="primary"
+//               onClick={handleSubmit}
+//               fullWidth
+//               sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+//             >
+//               Save Profile
+//             </Button>
+//             <Button
+//               variant="outlined"
+//               onClick={handleCancel}
+//               fullWidth
+//               sx={{ color: "black", borderColor: "black" }}
+//             >
+//               Back
+//             </Button>
+//           </>
+//         ) : (
+//           <Button
+//             onClick={() => setIsEditing(true)}
+//             fullWidth
+//             variant="contained"
+//             sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+//           >
+//             Update Profile
+//           </Button>
+//         )}
+//       </div>
+
+//       {/* Upgrade Button */}
+//       {!isEditing && (
+//         <Button
+//           fullWidth
+//           variant="contained"
+//           sx={{ mt: 2, bgcolor: "#f97316", ":hover": { bgcolor: "#ea580c" } }}
+//         >
+//           Upgrade My Membership
+//         </Button>
+//       )}
+
+      
+      
+//       {/* Documents Section */}
+//       {documents.length > 0 && (
+//         <div className="mt-8">
+//           <Divider className="my-4">
+//             <Chip label="My Documents" color="primary" />
+//           </Divider>
+          
+//           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//             {documents.map((docUrl: string, index: number) => (
+//               <div 
+//                 key={index}
+//                 className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+//               >
+//                 <div className="flex items-start space-x-3">
+//                   <div className="text-3xl pt-1">
+//                     {getFileIcon(docUrl)}
+//                   </div>
+//                   <div className="flex-1 min-w-0">
+//                     <p className="font-medium truncate">{getFilename(docUrl)}</p>
+//                     <div className="flex space-x-2 text-sm text-gray-500 mt-1">
+//                       <span>{getFileType(docUrl)}</span>
+//                       <span>•</span>
+//                       <span>{formatFileSize()}</span>
+//                     </div>
+//                   </div>
+//                   <div className="flex space-x-2">
+//                     <Tooltip title="Download">
+//                       <IconButton 
+//                         size="small"
+//                         onClick={() => window.open(docUrl, "_blank")}
+//                       >
+//                         <FaDownload className="text-gray-500 hover:text-blue-500" />
+//                       </IconButton>
+//                     </Tooltip>
+//                     {isEditing && (
+//                       <Tooltip title="Delete">
+//                         <IconButton size="small">
+//                           <Delete className="text-gray-500 hover:text-red-500" />
+//                         </IconButton>
+//                       </Tooltip>
+//                     )}
+//                   </div>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default ActionButtons;
+
+
+
+
+
+
+
+
+
+// "use client";
+// import React, { useState } from "react";
+// import { useRouter } from "next/navigation";
+// import {
+//   FaMobileAlt,
+//   FaHome,
+//   FaEnvelope,
+//   FaBriefcase,
+//   FaFilePdf,
+//   FaFileImage,
+//   FaFileWord,
+//   FaFileAlt,
+// } from "react-icons/fa";
+// import TextField from "@mui/material/TextField";
+// import Button from "@mui/material/Button";
+// import List from "@mui/material/List";
+// import ListItem from "@mui/material/ListItem";
+// import ListItemIcon from "@mui/material/ListItemIcon";
+// import ListItemText from "@mui/material/ListItemText";
+// import IconButton from "@mui/material/IconButton";
+// import Tooltip from "@mui/material/Tooltip";
+
+// interface ActionButtonsProps {
+//   loginData: any;
+//   roleId: number;
+//   updateProfile: (updatedData: any) => void;
+// }
+
+// const ActionButtons: React.FC<ActionButtonsProps> = ({
+//   loginData,
+//   roleId,
+//   updateProfile,
+// }) => {
+//   const router = useRouter();
+//   const [isEditing, setIsEditing] = useState(false);
+//   const [formData, setFormData] = useState({ ...loginData });
+//   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+
+//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const { name, value } = e.target;
+//     setFormData((prev: any) => ({ ...prev, [name]: value }));
+//   };
+
+//   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const file = e.target.files?.[0];
+//     if (file) {
+//       const imageUrl = URL.createObjectURL(file);
+//       setProfilePhoto(imageUrl);
+//     }
+//   };
+
+//   const handleSubmit = () => {
+//     updateProfile(formData);
+//     setIsEditing(false);
+//   };
+
+//   const handleCancel = () => {
+//     setFormData({ ...loginData });
+//     setIsEditing(false);
+//   };
+
+//   // Get all documents
+//   const documents = loginData?.individualProfessional?.profileData?.documents || [];
+//   const profileData = loginData?.individualProfessional?.profileData?.profilePhoto || '';
+
+//   const finalImage = profilePhoto || profileData || "/images/profile.png";
+
+//   // Function to get file icon based on extension
+//   const getFileIcon = (url: string) => {
+//     if (url.endsWith(".pdf")) return <FaFilePdf className="text-red-500" />;
+//     if (url.endsWith(".doc") || url.endsWith(".docx")) return <FaFileWord className="text-blue-500" />;
+//     if (url.endsWith(".jpg") || url.endsWith(".jpeg") || url.endsWith(".png")) return <FaFileImage className="text-green-500" />;
+//     return <FaFileAlt className="text-gray-500" />;
+//   };
+
+//   // Function to extract filename from URL
+//   const getFilename = (url: string) => {
+//     return url.split('/').pop() || "Document";
+//   };
+
+//   return (
+//     <div className="w-full max-w-5xl mx-auto p-4">
+//       {/* Profile Section */}
+//       <div className="flex flex-col items-center md:flex-row md:items-center md:space-x-6">
+//         <div className="relative w-28 h-28 rounded-full shadow-lg shadow-gray-400 hover:scale-105 transition-transform duration-300">
+//           <img
+//             src={finalImage}
+//             alt="Profile"
+//             className="w-full h-full object-cover rounded-full"
+//           />
+//           {isEditing && (
+//             <>
+//               <input
+//                 id="profilePhoto"
+//                 type="file"
+//                 accept="image/*"
+//                 onChange={handleImageChange}
+//                 className="hidden"
+//               />
+//               <label
+//                 htmlFor="profilePhoto"
+//                 className="absolute bottom-0 left-0 right-0 text-center bg-black bg-opacity-70 text-white text-xs py-1 cursor-pointer rounded-b-lg hover:bg-opacity-90 transition"
+//               >
+//                 Upload Image
+//               </label>
+//             </>
+//           )}
+//         </div>
+
+//         {/* Profile Info */}
+//         <div className="text-center md:text-left mt-4 md:mt-0 space-y-1">
+//           <h2 className="text-2xl font-semibold text-gray-800">
+//             {formData?.firstName && formData?.lastName
+//               ? `${formData.firstName} ${formData.lastName}`
+//               : "Mr. Y"}
+//           </h2>
+//           <h2 className="text-xl text-gray-600">{formData?.screenName ?? "Mr."}</h2>
+//           <p className="text-gray-500">
+//             {loginData?.role?.name ?? loginData?.role ?? "Security Officer"}
+//           </p>
+//           <span className="text-sm text-yellow-500">
+//             ✅ Usually responds within 1 hour
+//           </span>
+//         </div>
+//       </div>
+
+//       {/* Action Buttons */}
+//       <div className="mt-6 flex flex-col md:flex-row gap-3">
+//         {isEditing ? (
+//           <>
+//             <Button
+//               variant="contained"
+//               color="primary"
+//               onClick={handleSubmit}
+//               fullWidth
+//               sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+//             >
+//               Save Profile
+//             </Button>
+//             <Button
+//               variant="outlined"
+//               onClick={handleCancel}
+//               fullWidth
+//               sx={{ color: "black", borderColor: "black" }}
+//             >
+//               Back
+//             </Button>
+//           </>
+//         ) : (
+//           <Button
+//             onClick={() => setIsEditing(true)}
+//             fullWidth
+//             variant="contained"
+//             sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+//           >
+//             Update Profile
+//           </Button>
+//         )}
+//       </div>
+
+//       {/* Upgrade Button */}
+//       {!isEditing && (
+//         <Button
+//           fullWidth
+//           variant="contained"
+//           sx={{ mt: 2, bgcolor: "#f97316", ":hover": { bgcolor: "#ea580c" } }}
+//         >
+//           Upgrade My Membership
+//         </Button>
+//       )}
+
+//       {/* Documents Section */}
+//       {documents.length > 0 && (
+//         <div className="mt-6">
+//           <h3 className="text-lg font-semibold mb-3">Documents</h3>
+//           <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+//             {documents.map((docUrl: string, index: number) => (
+//               <ListItem
+//                 key={index}
+//                 secondaryAction={
+//                   <Tooltip title="View Document">
+//                     <IconButton 
+//                       edge="end" 
+//                       onClick={() => window.open(docUrl, "_blank")}
+//                     >
+//                       <FaBriefcase />
+//                     </IconButton>
+//                   </Tooltip>
+//                 }
+//               >
+//                 <ListItemIcon>
+//                   {getFileIcon(docUrl)}
+//                 </ListItemIcon>
+//                 <ListItemText 
+//                   primary={getFilename(docUrl)} 
+//                   secondary={docUrl.split('/').slice(0, -1).join('/')} 
+//                 />
+//               </ListItem>
+//             ))}
+//           </List>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default ActionButtons;
+
+
+
+
+
+
+
+
+// "use client";
+// import React, { useState } from "react";
+// import { useRouter } from "next/navigation";
+// import {
+//   FaMobileAlt,
+//   FaHome,
+//   FaEnvelope,
+//   FaBriefcase,
+// } from "react-icons/fa";
+// import TextField from "@mui/material/TextField";
+// import Button from "@mui/material/Button";
+
+// interface ActionButtonsProps {
+//   loginData: any;
+//   roleId: number;
+//   updateProfile: (updatedData: any) => void;
+// }
+
+// const ActionButtons: React.FC<ActionButtonsProps> = ({
+//   loginData,
+//   roleId,
+//   updateProfile,
+// }) => {
+//   const router = useRouter();
+//   const [isEditing, setIsEditing] = useState(false);
+//   const [formData, setFormData] = useState({ ...loginData });
+//   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+
+//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const { name, value } = e.target;
+//     setFormData((prev: any) => ({ ...prev, [name]: value }));
+//   };
+
+//   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const file = e.target.files?.[0];
+//     if (file) {
+//       const imageUrl = URL.createObjectURL(file);
+//       setProfilePhoto(imageUrl);
+//     }
+//   };
+
+//   const handleSubmit = () => {
+//     updateProfile(formData);
+//     setIsEditing(false);
+//   };
+
+//   const handleCancel = () => {
+//     setFormData({ ...loginData });
+//     setIsEditing(false);
+//   };
+
+//   // Separate image and PDF URLs
+//   const documents = loginData?.individualProfessional?.profileData?.documents || [];
+//   const profileData = loginData?.individualProfessional?.profileData?.profilePhoto || '';
+
+
+//   const pdfUrl = documents.find((url: string) => url.endsWith(".pdf"));
+
+//   const finalImage =
+//     profilePhoto || profileData || "/images/profile.png";
+
+//   return (
+//     <div className="w-full max-w-5xl mx-auto p-4">
+//       {/* Profile Section */}
+//       <div className="flex flex-col items-center md:flex-row md:items-center md:space-x-6">
+//         <div className="relative w-28 h-28 rounded-full shadow-lg shadow-gray-400 hover:scale-105 transition-transform duration-300">
+//           <img
+//             src={finalImage}
+//             alt="Profile"
+//             className="w-full h-full object-cover rounded-full"
+//           />
+//           {isEditing && (
+//             <>
+//               <input
+//                 id="profilePhoto"
+//                 type="file"
+//                 accept="image/*"
+//                 onChange={handleImageChange}
+//                 className="hidden"
+//               />
+//               <label
+//                 htmlFor="profilePhoto"
+//                 className="absolute bottom-0 left-0 right-0 text-center bg-black bg-opacity-70 text-white text-xs py-1 cursor-pointer rounded-b-lg hover:bg-opacity-90 transition"
+//               >
+//                 Upload Image
+//               </label>
+//             </>
+//           )}
+//         </div>
+
+//         {/* Profile Info */}
+//         <div className="text-center md:text-left mt-4 md:mt-0 space-y-1">
+//           <h2 className="text-2xl font-semibold text-gray-800">
+//             {formData?.firstName && formData?.lastName
+//               ? `${formData.firstName} ${formData.lastName}`
+//               : "Mr. Y"}
+//           </h2>
+//           <h2 className="text-xl text-gray-600">{formData?.screenName ?? "Mr."}</h2>
+//           <p className="text-gray-500">
+//             {loginData?.role?.name ?? loginData?.role ?? "Security Officer"}
+//           </p>
+//           <span className="text-sm text-yellow-500">
+//             ✅ Usually responds within 1 hour
+//           </span>
+//         </div>
+//       </div>
+
+//       {/* Action Buttons */}
+//       <div className="mt-6 flex flex-col md:flex-row gap-3">
+//         {isEditing ? (
+//           <>
+//             <Button
+//               variant="contained"
+//               color="primary"
+//               onClick={handleSubmit}
+//               fullWidth
+//               sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+//             >
+//               Save Profile
+//             </Button>
+//             <Button
+//               variant="outlined"
+//               onClick={handleCancel}
+//               fullWidth
+//               sx={{ color: "black", borderColor: "black" }}
+//             >
+//               Back
+//             </Button>
+//           </>
+//         ) : (
+//           <Button
+//             onClick={() => setIsEditing(true)}
+//             fullWidth
+//             variant="contained"
+//             sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+//           >
+//             Update Profile
+//           </Button>
+//         )}
+//       </div>
+
+//       {/* Upgrade Button */}
+//       {!isEditing && (
+//         <Button
+//           fullWidth
+//           variant="contained"
+//           sx={{ mt: 2, bgcolor: "#f97316", ":hover": { bgcolor: "#ea580c" } }}
+//         >
+//           Upgrade My Membership
+//         </Button>
+//       )}
+
+//       {/* View PDF Button */}
+//       {pdfUrl && (
+//         <Button
+//           variant="outlined"
+//           color="primary"
+//           onClick={() => window.open(pdfUrl, "_blank")}
+//           sx={{ mt: 4 }}
+//         >
+//           View Document
+//         </Button>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default ActionButtons;
+
+
+
+
+
+
+// "use client";
+// import React, { useState } from "react";
+// import { useRouter } from "next/navigation";
+// import {
+//   FaMobileAlt,
+//   FaHome,
+//   FaEnvelope,
+//   FaBriefcase,
+// } from "react-icons/fa";
+// import TextField from "@mui/material/TextField";
+// import Button from "@mui/material/Button";
+
+// interface ActionButtonsProps {
+//   loginData: any;
+//   roleId: number;
+//   updateProfile: (updatedData: any) => void;
+// }
+
+// const ActionButtons: React.FC<ActionButtonsProps> = ({
+//   loginData,
+//   roleId,
+//   updateProfile,
+// }) => {
+//   const router = useRouter();
+//   const [isEditing, setIsEditing] = useState(false);
+//   const [formData, setFormData] = useState({ ...loginData });
+//   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+
+//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const { name, value } = e.target;
+//     setFormData((prev: any) => ({ ...prev, [name]: value }));
+//   };
+
+//   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const file = e.target.files?.[0];
+//     if (file) {
+//       const imageUrl = URL.createObjectURL(file);
+//       setProfilePhoto(imageUrl);
+//     }
+//   };
+
+//   const handleSubmit = () => {
+//     updateProfile(formData); // Pass form data to the parent function
+//     setIsEditing(false); // Optionally disable editing mode after saving
+//   };
+
+//   const handleCancel = () => {
+//     setFormData({ ...loginData });
+//     setIsEditing(false);
+//   };
+
+//   // Check for PDF or image URLs in documents
+//   const documentUrl = loginData?.individualProfessional?.profileData?.documents?.find(
+//     (url: string) => url.endsWith(".pdf") || url.match(/\.(jpeg|jpg|png)$/)
+//   );
+
+//   return (
+//     <div className="w-full max-w-5xl mx-auto p-4">
+//       {/* Profile & Header */}
+//       <div className="flex flex-col items-center md:flex-row md:items-center md:space-x-6">
+//         <div className="relative w-28 h-28 rounded-full shadow-lg shadow-gray-400 hover:scale-105 transition-transform duration-300">
+//           {/* Check if documentUrl is an image */}
+//           {documentUrl && documentUrl.match(/\.(jpeg|jpg|png)$/) ? (
+//             <img
+//               src={documentUrl}
+//               alt="Profile"
+//               className="w-full h-full object-cover rounded-full"
+//             />
+//           ) : (
+//             // Fallback image
+//             <div
+//               className="w-full h-full bg-cover bg-center rounded-full"
+//               style={{
+//                 backgroundImage: `url(${
+//                   profilePhoto ||
+//                   loginData?.individualProfessional?.profileData?.documents[1] ||
+//                   "/images/profile.png"
+//                 })`,
+//               }}
+//             />
+//           )}
+
+//           {isEditing && (
+//             <>
+//               <input
+//                 id="profilePhoto"
+//                 type="file"
+//                 accept="image/*"
+//                 onChange={handleImageChange}
+//                 className="hidden"
+//               />
+//               <label
+//                 htmlFor="profilePhoto"
+//                 className="absolute bottom-0 left-0 right-0 text-center bg-black bg-opacity-70 text-white text-xs py-1 cursor-pointer rounded-b-lg hover:bg-opacity-90 transition"
+//               >
+//                 Upload Image
+//               </label>
+//             </>
+//           )}
+//         </div>
+//         <div className="text-center md:text-left mt-4 md:mt-0 space-y-1">
+//           <h2 className="text-2xl font-semibold text-gray-800">
+//             {formData?.firstName && formData?.lastName
+//               ? `${formData.firstName} ${formData.lastName}`
+//               : "Mr. Y"}
+//           </h2>
+//           <h2 className="text-xl text-gray-600">{formData?.screenName ?? "Mr."}</h2>
+//           <p className="text-gray-500">
+//             {loginData?.role?.name ?? loginData?.role ?? "Security Officer"}
+//           </p>
+//           <span className="text-sm text-yellow-500">
+//             ✅ Usually responds within 1 hour
+//           </span>
+//         </div>
+//       </div>
+
+//       {/* Buttons */}
+//       <div className="mt-6 flex flex-col md:flex-row gap-3">
+//         {isEditing ? (
+//           <>
+//             <Button
+//               variant="contained"
+//               color="primary"
+//               onClick={handleSubmit}
+//               fullWidth
+//               sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+//             >
+//               Save Profile
+//             </Button>
+//             <Button
+//               variant="outlined"
+//               onClick={handleCancel}
+//               fullWidth
+//               sx={{ color: "black", borderColor: "black" }}
+//             >
+//               Back
+//             </Button>
+//           </>
+//         ) : (
+//           <Button
+//             onClick={() => setIsEditing(true)}
+//             fullWidth
+//             variant="contained"
+//             sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+//           >
+//             Update Profile
+//           </Button>
+//         )}
+//       </div>
+
+//       {!isEditing && (
+//         <Button
+//           fullWidth
+//           variant="contained"
+//           sx={{ mt: 2, bgcolor: "#f97316", ":hover": { bgcolor: "#ea580c" } }}
+//         >
+//           Upgrade My Membership
+//         </Button>
+//       )}
+
+//       {/* PDF Button (if document exists) */}
+//       {documentUrl && documentUrl.endsWith(".pdf") && (
+//         <Button
+//           variant="outlined"
+//           color="primary"
+//           onClick={() => window.open(documentUrl, "_blank")}
+//           sx={{ mt: 4 }}
+//         >
+//           View Document
+//         </Button>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default ActionButtons;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// "use client";
+// import React, { useState } from "react";
+// import { useRouter } from "next/navigation";
+// import {
+//   FaMobileAlt,
+//   FaHome,
+//   FaEnvelope,
+//   FaBriefcase,
+// } from "react-icons/fa";
+// import TextField from "@mui/material/TextField";
+// import Button from "@mui/material/Button";
+
+// interface ActionButtonsProps {
+//   loginData: any;
+//   roleId: number;
+//   updateProfile: (updatedData: any) => void;
+// }
+
+// const ActionButtons: React.FC<ActionButtonsProps> = ({
+//   loginData,
+//   roleId,
+//   updateProfile,
+// }) => {
+//   const router = useRouter();
+//   const [isEditing, setIsEditing] = useState(false);
+//   const [formData, setFormData] = useState({ ...loginData });
+//   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+
+//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const { name, value } = e.target;
+//     setFormData((prev: any) => ({ ...prev, [name]: value }));
+//   };
+
+//   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const file = e.target.files?.[0];
+//     if (file) {
+//       const imageUrl = URL.createObjectURL(file);
+//       setProfilePhoto(imageUrl);
+//     }
+//   };
+
+//   const handleSubmit = () => {
+//     updateProfile(formData); // Pass form data to the parent function
+//     setIsEditing(false); // Optionally disable editing mode after saving
+//   };
+
+//   const handleCancel = () => {
+//     setFormData({ ...loginData });
+//     setIsEditing(false);
+//   };
+
+//    // Check for PDF or image URLs in documents
+//    const documentUrl = loginData?.individualProfessional?.profileData?.documents?.find(
+//     (url: string) => url.endsWith(".pdf") || url.match(/\.(jpeg|jpg|png)$/)
+//   );
+
+//   return (
+//     <div className="w-full max-w-5xl mx-auto p-4">
+//       {/* Profile & Header */}
+//       <div className="flex flex-col items-center md:flex-row md:items-center md:space-x-6">
+//         <div
+//           className="w-28 h-28 rounded-full shadow-lg shadow-gray-400 hover:scale-105 transition-transform duration-300 relative"
+//           style={{
+//             backgroundImage: `url(${
+//               documentUrl
+//               // profilePhoto ||
+//               // loginData?.individualProfessional?.profileData?.documents[1] ||
+//               // "/images/profile.png"
+//             })`,
+//             backgroundSize: "cover",
+//             backgroundPosition: "center",
+//           }}
+//         >
+//           {isEditing && (
+//             <>
+//               <input
+//                 id="profilePhoto"
+//                 type="file"
+//                 accept="image/*"
+//                 onChange={handleImageChange}
+//                 className="hidden"
+//               />
+//               <label
+//                 htmlFor="profilePhoto"
+//                 className="absolute bottom-0 left-0 right-0 text-center bg-black bg-opacity-70 text-white text-xs py-1 cursor-pointer rounded-b-lg hover:bg-opacity-90 transition"
+//               >
+//                 Upload Image
+//               </label>
+//             </>
+//           )}
+//         </div>
+//         <div className="text-center md:text-left mt-4 md:mt-0 space-y-1">
+//           <h2 className="text-2xl font-semibold text-gray-800">
+//             {formData?.firstName && formData?.lastName
+//               ? `${formData.firstName} ${formData.lastName}`
+//               : "Mr. Y"}
+//           </h2>
+//           <h2 className="text-xl text-gray-600">
+//             {formData?.screenName ?? "Mr."}
+//           </h2>
+//           <p className="text-gray-500">
+//             {loginData?.role?.name ?? loginData?.role ?? "Security Officer"}
+//           </p>
+//           <span className="text-sm text-yellow-500">
+//             ✅ Usually responds within 1 hour
+//           </span>
+//         </div>
+//       </div>
+
+//       {/* Buttons */}
+//       <div className="mt-6 flex flex-col md:flex-row gap-3">
+//         {isEditing ? (
+//           <>
+//             <Button
+//               variant="contained"
+//               color="primary"
+//               onClick={handleSubmit}
+//               fullWidth
+//               sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+//             >
+//               Save Profile
+//             </Button>
+//             <Button
+//               variant="outlined"
+//               onClick={handleCancel}
+//               fullWidth
+//               sx={{ color: "black", borderColor: "black" }}
+//             >
+//               Back
+//             </Button>
+//           </>
+//         ) : (
+//           <Button
+//             onClick={() => setIsEditing(true)}
+//             fullWidth
+//             variant="contained"
+//             sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+//           >
+//             Update Profile
+//           </Button>
+//         )}
+//       </div>
+
+     
+
+//       {!isEditing && (
+//         <Button
+//           fullWidth
+//           variant="contained"
+//           sx={{ mt: 2, bgcolor: "#f97316", ":hover": { bgcolor: "#ea580c" } }}
+//         >
+//           Upgrade My Membership
+//         </Button>
+//       )}
+//        {/* PDF Button (if document exists) */}
+//        {documentUrl && (
+//         <Button
+//           variant="outlined"
+//           color="primary"
+//           onClick={() => window.open(documentUrl, "_blank")}
+//           sx={{ mt: 4 }}
+//         >
+//           View Document
+//         </Button>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default ActionButtons;
+
+
+
+
+
+
+
+
+
+// "use client";
+// import React, { useState } from "react";
+// import { useRouter } from "next/navigation";
+// import {
+//   FaMobileAlt,
+//   FaHome,
+//   FaEnvelope,
+//   FaBriefcase,
+// } from "react-icons/fa";
+// import TextField from "@mui/material/TextField";
+// import Button from "@mui/material/Button";
+
+// interface ActionButtonsProps {
+//   loginData: any;
+//   roleId: number;
+//   updateProfile: (updatedData: any) => void;
+// }
+
+// const ActionButtons: React.FC<ActionButtonsProps> = ({
+//   loginData,
+//   roleId,
+//   updateProfile,
+// }) => {
+//   const router = useRouter();
+//   const [isEditing, setIsEditing] = useState(false);
+//   const [formData, setFormData] = useState({ ...loginData });
+//   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+
+//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const { name, value } = e.target;
+//     setFormData((prev: any) => ({ ...prev, [name]: value }));
+//   };
+
+//   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const file = e.target.files?.[0];
+//     if (file) {
+//       const imageUrl = URL.createObjectURL(file);
+//       setProfilePhoto(imageUrl);
+//     }
+//   };
+
+//   const handleSubmit = () => {
+//     updateProfile(formData); // Pass form data to the parent function
+//     setIsEditing(false); // Optionally disable editing mode after saving
+//   };
+
+//   console.log("login data", loginData?.individualProfessional?.profileData?.documents)
+//   const handleCancel = () => {
+//     setFormData({ ...loginData });
+//     setIsEditing(false);
+//   };
+
+//   return (
+//     <div className="w-full max-w-5xl mx-auto p-4">
+//       {/* Profile & Header */}
+//       <div className="flex flex-col items-center md:flex-row md:items-center md:space-x-6">
+//         <div
+//           className="w-28 h-28 rounded-full shadow-lg shadow-gray-400 hover:scale-105 transition-transform duration-300 relative"
+//           style={{
+//             backgroundImage: `url(${
+//               profilePhoto ||
+//               loginData?.individualProfessional?.profileData?.documents[1] ||
+//               "/images/profile.png"
+//             })`,
+//             backgroundSize: "cover",
+//             backgroundPosition: "center",
+//           }}
+//         >
+//           {isEditing && (
+//              <>
+//              <input
+//                id="profilePhoto"
+//                type="file"
+//                accept="image/*"
+//                onChange={handleImageChange}
+//                className="hidden"
+//              />
+//              <label
+//                htmlFor="profilePhoto"
+//                className="absolute bottom-0 left-0 right-0 text-center bg-black bg-opacity-70 text-white text-xs py-1 cursor-pointer rounded-b-lg hover:bg-opacity-90 transition"
+//              >
+//                Upload Image
+//              </label>
+//            </>
+//           )}
+//         </div>
+//         <div className="text-center md:text-left mt-4 md:mt-0 space-y-1">
+//           <h2 className="text-2xl font-semibold text-gray-800">
+//             {formData?.firstName && formData?.lastName
+//               ? `${formData.firstName} ${formData.lastName}`
+//               : "Mr. Y"}
+//           </h2>
+//           <h2 className="text-xl text-gray-600">
+//             {formData?.screenName ?? "Mr."}
+//           </h2>
+//           <p className="text-gray-500">
+//             {loginData?.role?.name ?? loginData?.role ?? "Security Officer"}
+//           </p>
+//           <span className="text-sm text-yellow-500">
+//             ✅ Usually responds within 1 hour
+//           </span>
+//         </div>
+//       </div>
+
+//       {/* 2-1-2-1 layout */}
+//       <div className="flex flex-wrap mt-6 gap-4">
+//         {/* Row 1: 2 fields */}
+//         <div className="w-full md:w-[48%]">
+//           <TextField
+//             label="First Name"
+//             name="firstName"
+//             value={formData.firstName || ""}
+//             onChange={handleInputChange}
+//             disabled={!isEditing}
+//             fullWidth
+//             size="small"
+//           />
+//         </div>
+//         <div className="w-full md:w-[48%]">
+//           <TextField
+//             label="Last Name"
+//             name="lastName"
+//             value={formData.lastName || ""}
+//             onChange={handleInputChange}
+//             disabled={!isEditing}
+//             fullWidth
+//             size="small"
+//           />
+//         </div>
+
+//         {/* Row 2: 1 field */}
+//         <div className="w-full">
+//           <TextField
+//             label="Screen Name"
+//             name="screenName"
+//             value={formData.screenName || ""}
+//             onChange={handleInputChange}
+//             disabled={!isEditing}
+//             fullWidth
+//             size="small"
+//           />
+//         </div>
+
+//         {/* Row 3: 2 fields */}
+//         <div className="w-full md:w-[48%]">
+//           <TextField
+//             label="Email"
+//             name="email"
+//             value={formData.email || ""}
+//             onChange={handleInputChange}
+//             disabled={!isEditing}
+//             fullWidth
+//             size="small"
+//           />
+//         </div>
+//         <div className="w-full md:w-[48%]">
+//           <TextField
+//             label="Phone Number"
+//             name="phoneNumber"
+//             value={formData.phoneNumber || ""}
+//             onChange={handleInputChange}
+//             disabled={!isEditing}
+//             fullWidth
+//             size="small"
+//           />
+//         </div>
+
+//         {/* Row 4: 1 field */}
+//         <div className="w-full">
+//           <TextField
+//             label="Address"
+//             name="address"
+//             value={formData.address || ""}
+//             onChange={handleInputChange}
+//             disabled={!isEditing}
+//             fullWidth
+//             size="small"
+//           />
+//         </div>
+//       </div>
+
+//       {/* Buttons */}
+//       <div className="mt-6 flex flex-col md:flex-row gap-3">
+//         {isEditing ? (
+//           <>
+//             <Button
+//               variant="contained"
+//               color="primary"
+//               onClick={handleSubmit}
+//               fullWidth
+//               sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+//             >
+//               Save Profile
+//             </Button>
+//             <Button
+//               variant="outlined"
+//               onClick={handleCancel}
+//               fullWidth
+//               sx={{ color: "black", borderColor: "black" }}
+//             >
+//               Back
+//             </Button>
+//           </>
+//         ) : (
+//           <Button
+//             onClick={() => setIsEditing(true)}
+//             fullWidth
+//             variant="contained"
+//             sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+//           >
+//             Update Profile
+//           </Button>
+//         )}
+//       </div>
+
+//       {!isEditing && (
+//         <Button
+//           fullWidth
+//           variant="contained"
+//           sx={{ mt: 2, bgcolor: "#f97316", ":hover": { bgcolor: "#ea580c" } }}
+//         >
+//           Upgrade My Membership
+//         </Button>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default ActionButtons;

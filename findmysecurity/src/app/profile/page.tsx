@@ -63,7 +63,7 @@ const UserProfile: React.FC = () => {
   }, [router]);
   
   const updateProfile = async (updatedData: any) => {
-    const token = localStorage.getItem("authToken")
+    const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
 
     try {
       const storedData = localStorage.getItem("loginData") || localStorage.getItem("profileData");
