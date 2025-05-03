@@ -89,6 +89,9 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loadingDocuments, setLoadingDocuments] = useState(true);
 
+  const shouldShowDocuments = roleId === 3;
+
+
   const fetchDocumentDetails = async (url: string): Promise<Document> => {
     try {
       const response = await fetch(url, { method: 'HEAD' });
@@ -317,6 +320,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       )}
 
       {/* Documents Section */}
+      {shouldShowDocuments && 
       <div className="space-y-6 mt-5">
         <Divider className="my-4">
           <Chip 
@@ -330,7 +334,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           />
         </Divider>
 
-        {/* Document Controls */}
         <div className="flex flex-col md:flex-row justify-between gap-4 mt-3">
           <TextField
             size="small"
@@ -358,7 +361,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           )}
         </div>
 
-        {/* Loading State */}
         {loadingDocuments && (
           <div className="flex justify-center items-center py-8">
             <FaSpinner className="animate-spin text-2xl text-gray-400 mr-2" />
@@ -368,7 +370,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           </div>
         )}
 
-        {/* Document Display */}
         {!loadingDocuments && Object.entries(documentGroups).map(([type, docs]) => (
           <div key={type} className="space-y-6">
             {/* Document Group Header */}
@@ -381,16 +382,13 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               </Typography>
             </div>
 
-            {/* Document Grid Layout */}
             <div className="space-y-6">
               {docs.map((doc, index) => {
-                // Extract the name part of the document (without number prefix and file extension)
                 const docName = doc.name.split('-').slice(1).join(' ').replace(/\.[^/.]+$/, '');
 
                 return (
                   <div key={index} className="flex justify-between items-center p-4 bg-white border border-gray-300 rounded-lg shadow-sm transition-all duration-200">
                     
-                    {/* Document Info Section */}
                     <div className="flex items-center space-x-4">
                       <Avatar className="w-14 h-14 bg-gray-200">
                         {fileTypeIcons[doc.type.toLowerCase()] || <FaFileAlt className="text-gray-600" />}
@@ -413,7 +411,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                       </div>
                     </div>
 
-                    {/* Action Buttons: Download, Delete */}
                     <div className="flex items-center space-x-4">
                       <Tooltip title="Download">
                         <IconButton
@@ -450,7 +447,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           </div>
         ))}
 
-        {/* Empty State */}
         {!loadingDocuments && filteredDocuments.length === 0 && (
           <div className="text-center py-8">
             <FaFileAlt className="mx-auto text-4xl text-gray-300 mb-2" />
@@ -460,7 +456,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           </div>
         )}
       </div>
-
+}
       {/* Document Context Menu */}
       <Menu
         anchorEl={anchorEl}
@@ -474,11 +470,27 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           <Delete className="mr-2" /> Delete
         </MenuItem>
       </Menu>
+      
     </div>
   );
 };
 
 export default ActionButtons;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // "use client";
 // import React, {JSX, useState } from "react";
 // import { useRouter } from "next/navigation";
