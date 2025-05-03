@@ -89,7 +89,7 @@ export default function ProfessionalsList({ apiData, loading, error }: Professio
 const ProfessionalCard = ({ professional }: { professional: Professional }) => {
   const [showModal, setShowModal] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-
+  const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
   const handleViewProfile = () => {
     // Show modal after a 0.5s delay for a smoother effect
     setTimeout(() => {
@@ -119,10 +119,34 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
       <div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all bg-white hover:bg-gray-50 transform">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex-1">
-            <h3 className="font-bold text-xl text-gray-900">{getDisplayName(professional)}</h3>
-            {professional.profileData?.basicInfo?.profileHeadline && (
+          <div className="flex items-center gap-4">
+  {professional.profileData?.profilePhoto ? (
+    <img 
+      src={professional.profileData.profilePhoto} 
+      alt={`${getDisplayName(professional)}'s profile`}
+      className={`w-16 h-16 rounded-full object-cover border border-gray-200 transition duration-300 ${
+        token ? "" : "blur-sm"
+      }`}
+    />
+  ) : (
+    <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm border border-gray-200">
+      N/A
+    </div>
+  )}
+
+  <div>
+    <h3 className="font-bold text-xl text-gray-900">{getDisplayName(professional)}</h3>
+    {professional.profileData?.basicInfo?.profileHeadline && (
+      <p className="text-gray-600 mt-1">{professional.profileData.basicInfo.profileHeadline}</p>
+    )}
+  </div>
+</div>
+
+
+            {/* <h3 className="font-bold text-xl text-gray-900">{getDisplayName(professional)}</h3> */}
+            {/* {professional.profileData?.basicInfo?.profileHeadline && (
               <p className="text-gray-600 mt-1">{professional.profileData.basicInfo.profileHeadline}</p>
-            )}
+            )} */}
             
             <div className="mt-3 flex flex-wrap gap-2">
               {professional.profileData?.services?.selectedServices?.slice(0, 3).map((service, index) => (

@@ -51,6 +51,7 @@ export interface MarkerData {
       homeTelephone?: string;
       mobileTelephone?: string;
     };
+    profilePhoto?: string;
   }
   export interface Professional {
     id: number;
