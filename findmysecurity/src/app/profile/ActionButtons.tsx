@@ -1,5 +1,5 @@
 "use client";
-import React, {JSX, useState } from "react";
+import React, {JSX, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   FaMobileAlt,
@@ -18,6 +18,7 @@ import {
   FaFileVideo,
   FaDownload,
   FaSearch,
+  FaSpinner,
 } from "react-icons/fa";
 import {
   TextField,
@@ -39,8 +40,9 @@ interface Document {
   url: string;
   name: string;
   type: string;
-  size?: string;
-  uploadedAt?: string;
+  size: string;
+  uploadedAt: string;
+  loading?: boolean;
 }
 
 interface ActionButtonsProps {
@@ -84,6 +86,84 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [loadingDocuments, setLoadingDocuments] = useState(true);
+
+  const fetchDocumentDetails = async (url: string): Promise<Document> => {
+    try {
+      const response = await fetch(url, { method: 'HEAD' });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const contentLength = response.headers.get('content-length');
+      const lastModified = response.headers.get('last-modified');
+      
+      const fileName = decodeURIComponent(url.split('/').pop() || "Document");
+      const fileType = url.split('.').pop()?.toUpperCase() || 'FILE';
+      
+      return {
+        url,
+        name: fileName,
+        type: fileType,
+        size: contentLength ? formatFileSize(parseInt(contentLength)) : 'Unknown',
+        uploadedAt: lastModified ? new Date(lastModified).toLocaleDateString() : 'Unknown date',
+        loading: false
+      };
+    } catch (error) {
+      console.error(`Error fetching document details for ${url}:`, error);
+      return {
+        url,
+        name: decodeURIComponent(url.split('/').pop() || "Document"),
+        type: url.split('.').pop()?.toUpperCase() || 'FILE',
+        size: 'Unknown',
+        uploadedAt: 'Unknown date',
+        loading: false
+      };
+    }
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  useEffect(() => {
+    const loadDocuments = async () => {
+      const rawDocuments = loginData?.individualProfessional?.profileData?.documents || [];
+      setLoadingDocuments(true);
+      
+      // Explicitly type the url parameter as string
+      const documentPromises = rawDocuments.map(async (url: string) => {
+        return {
+          url,
+          name: decodeURIComponent(url.split('/').pop() || "Document"),
+          type: url.split('.').pop()?.toUpperCase() || 'FILE',
+          size: 'Loading...',
+          uploadedAt: 'Loading...',
+          loading: true
+        };
+      });
+  
+      const initialDocuments = await Promise.all(documentPromises);
+      setDocuments(initialDocuments);
+  
+      // Now fetch the actual details for each document
+      // Also type the url parameter here
+      const detailedDocuments = await Promise.all(
+        rawDocuments.map((url: string) => fetchDocumentDetails(url))
+      );
+      
+      setDocuments(detailedDocuments);
+      setLoadingDocuments(false);
+    };
+  
+    loadDocuments();
+  }, [loginData]);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, doc: Document) => {
     setAnchorEl(event.currentTarget);
@@ -105,18 +185,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     handleMenuClose();
   };
 
-  // Process documents
-  const rawDocuments = loginData?.individualProfessional?.profileData?.documents || [];
-  const processedDocuments: Document[] = rawDocuments.map((url: string) => ({
-    url,
-    name: decodeURIComponent(url.split('/').pop() || "Document"),
-    type: url.split('.').pop()?.toUpperCase() || 'FILE',
-    size: `${Math.floor(Math.random() * 5 + 1)} MB`, // Mock size
-    uploadedAt: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toLocaleDateString(),
-  }));
-
   // Filter documents based on search
-  const filteredDocuments = processedDocuments.filter(doc =>
+  const filteredDocuments = documents.filter(doc =>
     doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     doc.type.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -212,7 +282,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               fullWidth
               sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
             >
-              Save Profiled
+              Save Profile
             </Button>
             <Button
               variant="outlined"
@@ -253,7 +323,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             label={
               <div className="flex items-center space-x-2">
                 <CloudDownload />
-                <span>My Documents ({processedDocuments.length})</span>
+                <span>My Documents ({documents.length})</span>
               </div>
             } 
             color="primary" 
@@ -288,85 +358,100 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           )}
         </div>
 
-        {/* Document Display */}
-        {Object.entries(documentGroups).map(([type, docs]) => (
-  <div key={type} className="space-y-6">
-    {/* Document Group Header */}
-    <div className="flex justify-between items-center">
-      <Typography variant="h6" className="font-semibold text-gray-700">
-        {type} Files ({docs.length})
-      </Typography>
-      <Typography variant="body2" className="text-gray-500">
-        {docs.length} items
-      </Typography>
-    </div>
-
-    {/* Document Grid Layout */}
-    <div className="space-y-6">
-  {docs.map((doc, index) => {
-    // Extract the name part of the document (without number prefix and file extension)
-    const docName = doc.name.split('-').slice(1).join(' ').replace(/\.[^/.]+$/, '');
-
-    return (
-      <div key={index} className="flex justify-between items-center p-4 bg-white border border-gray-300 rounded-lg shadow-sm transition-all duration-200">
-        
-        {/* Document Info Section */}
-        <div className="flex items-center space-x-4">
-          <Avatar className="w-14 h-14 bg-gray-200">
-            {fileTypeIcons[doc.type.toLowerCase()] || <FaFileAlt className="text-gray-600" />}
-          </Avatar>
-
-          <div className="flex flex-col">
-            <Typography variant="subtitle1" className="font-medium text-gray-800">
-              {docName} {/* Show document name without the file prefix and extension */}
-            </Typography>
-            <Typography variant="body2" className="text-gray-500">
-              {doc.size} • {doc.uploadedAt}
+        {/* Loading State */}
+        {loadingDocuments && (
+          <div className="flex justify-center items-center py-8">
+            <FaSpinner className="animate-spin text-2xl text-gray-400 mr-2" />
+            <Typography variant="body1" className="text-gray-500">
+              Loading documents...
             </Typography>
           </div>
-        </div>
+        )}
 
-        {/* Action Buttons: Download, Delete */}
-        <div className="flex items-center space-x-4">
-          <Tooltip title="Download">
-            <IconButton
-              size="small"
-              onClick={() => window.open(doc.url, "_blank")}
-              sx={{
-                color: 'primary.main',
-                '&:hover': { color: 'blue.500' }
-              }}
-            >
-              <FaDownload />
-            </IconButton>
-          </Tooltip>
+        {/* Document Display */}
+        {!loadingDocuments && Object.entries(documentGroups).map(([type, docs]) => (
+          <div key={type} className="space-y-6">
+            {/* Document Group Header */}
+            <div className="flex justify-between items-center">
+              <Typography variant="h6" className="font-semibold text-gray-700">
+                {type} Files ({docs.length})
+              </Typography>
+              <Typography variant="body2" className="text-gray-500">
+                {docs.length} items
+              </Typography>
+            </div>
 
-          {isEditing && (
-            <Tooltip title="Delete">
-              <IconButton
-                size="small"
-                onClick={handleDelete}
-                sx={{
-                  color: 'red.500',
-                  '&:hover': { color: 'red.700' }
-                }}
-              >
-                <Delete />
-              </IconButton>
-            </Tooltip>
-          )}
-        </div>
-      </div>
-    );
-  })}
-</div>
+            {/* Document Grid Layout */}
+            <div className="space-y-6">
+              {docs.map((doc, index) => {
+                // Extract the name part of the document (without number prefix and file extension)
+                const docName = doc.name.split('-').slice(1).join(' ').replace(/\.[^/.]+$/, '');
 
-  </div>
-))}
+                return (
+                  <div key={index} className="flex justify-between items-center p-4 bg-white border border-gray-300 rounded-lg shadow-sm transition-all duration-200">
+                    
+                    {/* Document Info Section */}
+                    <div className="flex items-center space-x-4">
+                      <Avatar className="w-14 h-14 bg-gray-200">
+                        {fileTypeIcons[doc.type.toLowerCase()] || <FaFileAlt className="text-gray-600" />}
+                      </Avatar>
 
+                      <div className="flex flex-col">
+                        <Typography variant="subtitle1" className="font-medium text-gray-800">
+                          {docName}
+                        </Typography>
+                        <Typography variant="body2" className="text-gray-500">
+                          {doc.loading ? (
+                            <span className="flex items-center">
+                              <FaSpinner className="animate-spin mr-1" size={12} />
+                              Loading details...
+                            </span>
+                          ) : (
+                            `${doc.size} • ${doc.uploadedAt}`
+                          )}
+                        </Typography>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons: Download, Delete */}
+                    <div className="flex items-center space-x-4">
+                      <Tooltip title="Download">
+                        <IconButton
+                          size="small"
+                          onClick={() => window.open(doc.url, "_blank")}
+                          sx={{
+                            color: 'primary.main',
+                            '&:hover': { color: 'blue.500' }
+                          }}
+                        >
+                          <FaDownload />
+                        </IconButton>
+                      </Tooltip>
+
+                      {isEditing && (
+                        <Tooltip title="Delete">
+                          <IconButton
+                            size="small"
+                            onClick={handleDelete}
+                            sx={{
+                              color: 'red.500',
+                              '&:hover': { color: 'red.700' }
+                            }}
+                          >
+                            <Delete />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
 
         {/* Empty State */}
-        {filteredDocuments.length === 0 && (
+        {!loadingDocuments && filteredDocuments.length === 0 && (
           <div className="text-center py-8">
             <FaFileAlt className="mx-auto text-4xl text-gray-300 mb-2" />
             <Typography variant="body1" className="text-gray-500">
@@ -394,6 +479,402 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
 };
 
 export default ActionButtons;
+// "use client";
+// import React, {JSX, useState } from "react";
+// import { useRouter } from "next/navigation";
+// import {
+//   FaMobileAlt,
+//   FaHome,
+//   FaEnvelope,
+//   FaBriefcase,
+//   FaFilePdf,
+//   FaFileImage,
+//   FaFileWord,
+//   FaFileExcel,
+//   FaFilePowerpoint,
+//   FaFileArchive,
+//   FaFileAlt,
+//   FaFileCode,
+//   FaFileAudio,
+//   FaFileVideo,
+//   FaDownload,
+//   FaSearch,
+// } from "react-icons/fa";
+// import {
+//   TextField,
+//   Button,
+//   Chip,
+//   Divider,
+//   IconButton,
+//   Tooltip,
+//   Menu,
+//   MenuItem,
+//   InputAdornment,
+//   Badge,
+//   Avatar,
+//   Typography,
+// } from "@mui/material";
+// import { Delete, MoreVert, FileUpload, CloudDownload } from "@mui/icons-material";
+
+// interface Document {
+//   url: string;
+//   name: string;
+//   type: string;
+//   size?: string;
+//   uploadedAt?: string;
+// }
+
+// interface ActionButtonsProps {
+//   loginData: any;
+//   roleId: number;
+//   updateProfile: (updatedData: any) => void;
+// }
+
+// const fileTypeIcons: Record<string, JSX.Element> = {
+//   pdf: <FaFilePdf className="text-red-500" />,
+//   jpg: <FaFileImage className="text-green-500" />,
+//   jpeg: <FaFileImage className="text-green-500" />,
+//   png: <FaFileImage className="text-green-500" />,
+//   gif: <FaFileImage className="text-green-500" />,
+//   doc: <FaFileWord className="text-blue-500" />,
+//   docx: <FaFileWord className="text-blue-500" />,
+//   xls: <FaFileExcel className="text-green-600" />,
+//   xlsx: <FaFileExcel className="text-green-600" />,
+//   ppt: <FaFilePowerpoint className="text-orange-500" />,
+//   pptx: <FaFilePowerpoint className="text-orange-500" />,
+//   zip: <FaFileArchive className="text-yellow-500" />,
+//   rar: <FaFileArchive className="text-yellow-500" />,
+//   txt: <FaFileAlt className="text-gray-500" />,
+//   csv: <FaFileCode className="text-blue-300" />,
+//   json: <FaFileCode className="text-yellow-300" />,
+//   mp3: <FaFileAudio className="text-purple-500" />,
+//   wav: <FaFileAudio className="text-purple-500" />,
+//   mp4: <FaFileVideo className="text-red-400" />,
+//   mov: <FaFileVideo className="text-red-400" />,
+// };
+
+// const ActionButtons: React.FC<ActionButtonsProps> = ({
+//   loginData,
+//   roleId,
+//   updateProfile,
+// }) => {
+//   const router = useRouter();
+//   const [isEditing, setIsEditing] = useState(false);
+//   const [formData, setFormData] = useState({ ...loginData });
+//   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+//   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
+
+//   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, doc: Document) => {
+//     setAnchorEl(event.currentTarget);
+//     setSelectedDoc(doc);
+//   };
+
+//   const handleMenuClose = () => {
+//     setAnchorEl(null);
+//     setSelectedDoc(null);
+//   };
+
+//   const handleDelete = () => {
+//     // Implement delete functionality
+//     handleMenuClose();
+//   };
+
+//   const handleDownload = () => {
+//     if (selectedDoc) window.open(selectedDoc.url, "_blank");
+//     handleMenuClose();
+//   };
+
+//   // Process documents
+//   const rawDocuments = loginData?.individualProfessional?.profileData?.documents || [];
+//   const processedDocuments: Document[] = rawDocuments.map((url: string) => ({
+//     url,
+//     name: decodeURIComponent(url.split('/').pop() || "Document"),
+//     type: url.split('.').pop()?.toUpperCase() || 'FILE',
+//     size: `${Math.floor(Math.random() * 5 + 1)} MB`, // Mock size
+//     uploadedAt: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toLocaleDateString(),
+//   }));
+
+//   // Filter documents based on search
+//   const filteredDocuments = processedDocuments.filter(doc =>
+//     doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//     doc.type.toLowerCase().includes(searchQuery.toLowerCase())
+//   );
+
+//   // Group documents by type
+//   const documentGroups = filteredDocuments.reduce((groups: Record<string, Document[]>, doc) => {
+//     const type = doc.type;
+//     if (!groups[type]) groups[type] = [];
+//     groups[type].push(doc);
+//     return groups;
+//   }, {});
+
+//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const { name, value } = e.target;
+//     setFormData((prev: any) => ({ ...prev, [name]: value }));
+//   };
+
+//   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const file = e.target.files?.[0];
+//     if (file) {
+//       const imageUrl = URL.createObjectURL(file);
+//       setProfilePhoto(imageUrl);
+//     }
+//   };
+
+//   const handleSubmit = () => {
+//     updateProfile(formData);
+//     setIsEditing(false);
+//   };
+
+//   const handleCancel = () => {
+//     setFormData({ ...loginData });
+//     setIsEditing(false);
+//   };
+
+//   const profileData = loginData?.individualProfessional?.profileData?.profilePhoto || '';
+//   const finalImage = profilePhoto || profileData || "/images/profile.png";
+
+//   return (
+//     <div className="w-full max-w-5xl mx-auto p-4 space-y-6">
+//       {/* Profile Section */}
+//       <div className="flex flex-col items-center md:flex-row md:items-center md:space-x-6">
+//         <div className="relative w-28 h-28 rounded-full shadow-lg shadow-gray-400 hover:scale-105 transition-transform duration-300">
+//           <img
+//             src={finalImage}
+//             alt="Profile"
+//             className="w-full h-full object-cover rounded-full"
+//           />
+//           {isEditing && (
+//             <>
+//               <input
+//                 id="profilePhoto"
+//                 type="file"
+//                 accept="image/*"
+//                 onChange={handleImageChange}
+//                 className="hidden"
+//               />
+//               <label
+//                 htmlFor="profilePhoto"
+//                 className="absolute bottom-0 left-0 right-0 text-center bg-black bg-opacity-70 text-white text-xs py-1 cursor-pointer rounded-b-lg hover:bg-opacity-90 transition"
+//               >
+//                 Upload Image
+//               </label>
+//             </>
+//           )}
+//         </div>
+
+//         {/* Profile Info */}
+//         <div className="text-center md:text-left mt-4 md:mt-0 space-y-1">
+//           <h2 className="text-2xl font-semibold text-gray-800">
+//             {formData?.firstName && formData?.lastName
+//               ? `${formData.firstName} ${formData.lastName}`
+//               : "Mr. Y"}
+//           </h2>
+//           <h2 className="text-xl text-gray-600">{formData?.screenName ?? "Mr."}</h2>
+//           <p className="text-gray-500">
+//             {loginData?.role?.name ?? loginData?.role ?? "Security Officer"}
+//           </p>
+//           <span className="text-sm text-yellow-500">
+//             ✅ Usually responds within 1 hour
+//           </span>
+//         </div>
+//       </div>
+
+//       {/* Action Buttons */}
+//       <div className="mt-3 flex flex-col md:flex-row">
+//         {isEditing ? (
+//           <>
+//             <Button
+//               variant="contained"
+//               color="primary"
+//               onClick={handleSubmit}
+//               fullWidth
+//               sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+//             >
+//               Save Profiled
+//             </Button>
+//             <Button
+//               variant="outlined"
+//               onClick={handleCancel}
+//               fullWidth
+//               sx={{ color: "black", borderColor: "black" }}
+//             >
+//               Back
+//             </Button>
+//           </>
+//         ) : (
+//           <Button
+//             onClick={() => setIsEditing(true)}
+//             fullWidth
+//             variant="contained"
+//             sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+//           >
+//             Update Profile
+//           </Button>
+//         )}
+//       </div>
+
+//       {/* Upgrade Button */}
+//       {!isEditing && (
+//         <Button
+//           fullWidth
+//           variant="contained"
+//           sx={{ bgcolor: "#f97316", ":hover": { bgcolor: "#ea580c" } }}
+//         >
+//           Upgrade My Membership
+//         </Button>
+//       )}
+
+//       {/* Documents Section */}
+//       <div className="space-y-6 mt-5">
+//         <Divider className="my-4">
+//           <Chip 
+//             label={
+//               <div className="flex items-center space-x-2">
+//                 <CloudDownload />
+//                 <span>My Documents ({processedDocuments.length})</span>
+//               </div>
+//             } 
+//             color="primary" 
+//           />
+//         </Divider>
+
+//         {/* Document Controls */}
+//         <div className="flex flex-col md:flex-row justify-between gap-4 mt-3">
+//           <TextField
+//             size="small"
+//             placeholder="Search documents..."
+//             value={searchQuery}
+//             onChange={(e) => setSearchQuery(e.target.value)}
+//             InputProps={{
+//               startAdornment: (
+//                 <InputAdornment position="start">
+//                   <FaSearch className="text-gray-400" />
+//                 </InputAdornment>
+//               ),
+//             }}
+//             sx={{ width: '100%', maxWidth: 400 }}
+//           />
+
+//           {isEditing && (
+//             <Button
+//               variant="contained"
+//               startIcon={<FileUpload />}
+//               sx={{ bgcolor: 'primary.main', whiteSpace: 'nowrap' }}
+//             >
+//               Upload New
+//             </Button>
+//           )}
+//         </div>
+
+//         {/* Document Display */}
+//         {Object.entries(documentGroups).map(([type, docs]) => (
+//   <div key={type} className="space-y-6">
+//     {/* Document Group Header */}
+//     <div className="flex justify-between items-center">
+//       <Typography variant="h6" className="font-semibold text-gray-700">
+//         {type} Files ({docs.length})
+//       </Typography>
+//       <Typography variant="body2" className="text-gray-500">
+//         {docs.length} items
+//       </Typography>
+//     </div>
+
+//     {/* Document Grid Layout */}
+//     <div className="space-y-6">
+//   {docs.map((doc, index) => {
+//     // Extract the name part of the document (without number prefix and file extension)
+//     const docName = doc.name.split('-').slice(1).join(' ').replace(/\.[^/.]+$/, '');
+
+//     return (
+//       <div key={index} className="flex justify-between items-center p-4 bg-white border border-gray-300 rounded-lg shadow-sm transition-all duration-200">
+        
+//         {/* Document Info Section */}
+//         <div className="flex items-center space-x-4">
+//           <Avatar className="w-14 h-14 bg-gray-200">
+//             {fileTypeIcons[doc.type.toLowerCase()] || <FaFileAlt className="text-gray-600" />}
+//           </Avatar>
+
+//           <div className="flex flex-col">
+//             <Typography variant="subtitle1" className="font-medium text-gray-800">
+//               {docName} {/* Show document name without the file prefix and extension */}
+//             </Typography>
+//             <Typography variant="body2" className="text-gray-500">
+//               {doc.size} • {doc.uploadedAt}
+//             </Typography>
+//           </div>
+//         </div>
+
+//         {/* Action Buttons: Download, Delete */}
+//         <div className="flex items-center space-x-4">
+//           <Tooltip title="Download">
+//             <IconButton
+//               size="small"
+//               onClick={() => window.open(doc.url, "_blank")}
+//               sx={{
+//                 color: 'primary.main',
+//                 '&:hover': { color: 'blue.500' }
+//               }}
+//             >
+//               <FaDownload />
+//             </IconButton>
+//           </Tooltip>
+
+//           {isEditing && (
+//             <Tooltip title="Delete">
+//               <IconButton
+//                 size="small"
+//                 onClick={handleDelete}
+//                 sx={{
+//                   color: 'red.500',
+//                   '&:hover': { color: 'red.700' }
+//                 }}
+//               >
+//                 <Delete />
+//               </IconButton>
+//             </Tooltip>
+//           )}
+//         </div>
+//       </div>
+//     );
+//   })}
+// </div>
+
+//   </div>
+// ))}
+
+
+//         {/* Empty State */}
+//         {filteredDocuments.length === 0 && (
+//           <div className="text-center py-8">
+//             <FaFileAlt className="mx-auto text-4xl text-gray-300 mb-2" />
+//             <Typography variant="body1" className="text-gray-500">
+//               {searchQuery ? "No matching documents found" : "No documents uploaded yet"}
+//             </Typography>
+//           </div>
+//         )}
+//       </div>
+
+//       {/* Document Context Menu */}
+//       <Menu
+//         anchorEl={anchorEl}
+//         open={Boolean(anchorEl)}
+//         onClose={handleMenuClose}
+//       >
+//         <MenuItem onClick={handleDownload}>
+//           <FaDownload className="mr-2" /> Download
+//         </MenuItem>
+//         <MenuItem onClick={handleDelete}>
+//           <Delete className="mr-2" /> Delete
+//         </MenuItem>
+//       </Menu>
+//     </div>
+//   );
+// };
+
+// export default ActionButtons;
 
 
 
