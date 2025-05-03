@@ -227,7 +227,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
 
   const profileData = loginData?.individualProfessional?.profileData?.profilePhoto || '';
   const finalImage = profilePhoto || profileData || "/images/profile.png";
-
   return (
     <div className="w-full max-w-5xl mx-auto p-4 space-y-6">
       {/* Profile Section */}
@@ -260,7 +259,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         {/* Profile Info */}
         <div className="text-center md:text-left mt-4 md:mt-0 space-y-1">
           <h2 className="text-2xl font-semibold text-gray-800">
-            {formData?.firstName && formData?.lastName
+            {formData?.firstName || formData?.lastName
               ? `${formData.firstName} ${formData.lastName}`
               : "Mr. Y"}
           </h2>

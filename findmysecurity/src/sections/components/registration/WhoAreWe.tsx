@@ -27,6 +27,49 @@ export default function RegistrationSelector() {
   const router = useRouter();
 
   // Function to handle form submission and send data to API
+  // const handleFormSubmit = async (formData: any) => {
+  //   try {
+  //     const response: AxiosResponse<RegistrationResponse> = await axios.post(
+  //       "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/auth/register",
+  //       formData
+  //     );
+  
+  //     console.log("Response Status:", response.status);
+  //     console.log("Response Data:", response.data);
+  
+  //     alert("User registered successfully");
+  //     localStorage.setItem("loginData", JSON.stringify(response.data));
+  //     localStorage.setItem("profileData", JSON.stringify(response.data));
+  //     // router.push("/profile");  
+  //     // Check for specific error message in response.data.message
+  //     if (response.status === 400) {
+  //       if (response?.data?.message === "Email address is not verified. The following identities failed the check in region EU-NORTH-1: devilbila966@gmail.com") {
+  //         router.push("/signin");
+  //       }
+  //     }
+  //   } catch (error: any) {
+  //     console.error("Registration error:", error);
+  
+  //     if (axios.isAxiosError(error)) {
+  //       if (!error.response) {
+  //         alert("Network error. Please check your internet connection.");
+  //         return;
+  //       }
+  
+  //       const status = error.response.status;
+  //       const responseData = error.response.data;
+  
+  //       if (status === 500 && responseData?.error === 'Email already exists') {
+  //         alert("This email is already registered. Please use a different email.");
+  //       } else {
+  //         const errorMessage = responseData?.message || responseData?.error || "Registration failed. Please try again.";
+  //         alert(errorMessage);
+  //       }
+  //     } else {
+  //       alert("An unknown error occurred. Please try again.");
+  //     }
+  //   }
+  // };
   const handleFormSubmit = async (formData: any) => {
     try {
       const response: AxiosResponse<RegistrationResponse> = await axios.post(
@@ -37,40 +80,50 @@ export default function RegistrationSelector() {
       console.log("Response Status:", response.status);
       console.log("Response Data:", response.data);
   
-      alert("User registered successfully");
+      // Handle specific backend message
+      if (
+        response.status === 400 &&
+        response.data?.message?.includes("Email address is not verified")
+      ) {
+        alert("Email not verified. Redirecting to sign in...");
+        router.push("/signin");
+        return;
+      }
+  
+      // Save to localStorage
       localStorage.setItem("loginData", JSON.stringify(response.data));
       localStorage.setItem("profileData", JSON.stringify(response.data));
-      // router.push("/profile");  
-      // Check for specific error message in response.data.message
-      if (response.status === 400) {
-        if (response?.data?.message === "Email address is not verified. The following identities failed the check in region EU-NORTH-1: devilbila966@gmail.com") {
-          router.push("/signin");
-        }
-      }
-    } catch (error: any) {
+  
+      alert("User registered successfully");
+      // router.push("/profile");
+    } catch (error: unknown) {
       console.error("Registration error:", error);
   
       if (axios.isAxiosError(error)) {
+        // Network or no response
         if (!error.response) {
           alert("Network error. Please check your internet connection.");
           return;
         }
   
-        const status = error.response.status;
-        const responseData = error.response.data;
+        const { status, data } = error.response;
   
-        if (status === 500 && responseData?.error === 'Email already exists') {
-          alert("This email is already registered. Please use a different email.");
-        } else {
-          const errorMessage = responseData?.message || responseData?.error || "Registration failed. Please try again.";
-          alert(errorMessage);
+        // Handle 500 Internal Server Error
+        if (status === 500 && data?.error === "Email already exists") {
+          alert("This email is already registered. Please use a different one.");
+          return;
         }
+  
+        // Other server-side errors
+        const errorMessage =
+          data?.message || data?.error || "Registration failed. Please try again.";
+        alert(errorMessage);
       } else {
-        alert("An unknown error occurred. Please try again.");
+        // Non-Axios error
+        alert("An unexpected error occurred. Please try again later.");
       }
     }
-  };
-
+  }
   // Function to render the correct form based on selection
   const renderForm = () => {
     switch (selected) {
