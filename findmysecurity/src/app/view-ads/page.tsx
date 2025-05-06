@@ -23,6 +23,8 @@ const PostAdLister: React.FC = () => {
   const [adzunaJobs, setAdzunaJobs] = useState<any[]>([]);
   const [monsterJobs, setMonsterJobs] = useState<any[]>([]);
   const [securityJobs, setSecurityJobs] = useState<any[]>([]);
+  const [reedJobs, setReedJobs] = useState<any[]>([]);
+
 
   const [keyword, setKeyword] = useState(DEFAULT_KEYWORD);
   const [location, setLocation] = useState(DEFAULT_LOCATION);
@@ -106,19 +108,22 @@ const PostAdLister: React.FC = () => {
     setSearched(true);
     setLoading(true);
     try {
-      const [adzunaRes, monsterRes, securityRes] = await Promise.all([
+      const [adzunaRes, monsterRes,reedRes, securityRes] = await Promise.all([
         fetch(`/api/reed-job?keyword=${keyword}&location=${location}&minSalary=${rateFilter}`),
         fetch(`/api/monster-job?keyword=${keyword}&location=${location}&minSalary=${rateFilter}`),
+        fetch(`/api/reed?keyword=${keyword}&location=${location}&minSalary=${rateFilter}`),
         fetchSecurityJobs(),
       ]);
 
-      const [adzunaData, monsterData] = await Promise.all([
+      const [adzunaData, monsterData, reedData] = await Promise.all([
         adzunaRes.json(),
         monsterRes.json(),
+        reedRes.json(),
       ]);
 
       setAdzunaJobs(adzunaRes.ok ? adzunaData : []);
       setMonsterJobs(monsterRes.ok ? monsterData : []);
+      setReedJobs(reedRes.ok ? reedData?.results || [] : []);
       setSecurityJobs(securityRes.jobs || []);
 
       const filteredLocal = fetchLocalJobs(keyword, location, rateFilter);
@@ -142,7 +147,9 @@ const PostAdLister: React.FC = () => {
     ...localJobs.map((j) => ({ ...j, source: "local" })),
     ...adzunaJobs.map((j) => ({ ...j, source: "adzuna" })),
     ...monsterJobs.map((j) => ({ ...j, source: "monster" })),
+    ...reedJobs.map((j) => ({ ...j, source: "reed" })),
   ];
+  
 
   const totalPages = Math.ceil(mergedJobs.length / pageSize);
   const paginatedJobs = mergedJobs.slice(
