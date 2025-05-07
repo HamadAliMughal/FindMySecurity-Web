@@ -11,6 +11,7 @@ import { uploadToS3 } from "@/utils/s3file";
 import { API_URL } from "@/utils/path";
 import professionalsList from "@/sections/data/secuirty_professional.json";
 import Select from 'react-select';
+import toast from "react-hot-toast";
 
 interface FormData {
   screenName: string;
@@ -265,7 +266,7 @@ const JobPosting: React.FC = () => {
       setShowModal(true);
     } catch (error) {
       console.error("Error:", error);
-      alert((error as Error).message || "Submission failed. Try again.");
+      toast.error((error as Error).message || "Submission failed. Try again.");
     } finally {
       setIsSubmitting(false);
     }

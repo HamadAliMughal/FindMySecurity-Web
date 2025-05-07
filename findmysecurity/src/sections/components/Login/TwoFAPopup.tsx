@@ -1,3 +1,4 @@
+'use client';
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import axios, { AxiosError, AxiosResponse } from "axios";  // Import AxiosError

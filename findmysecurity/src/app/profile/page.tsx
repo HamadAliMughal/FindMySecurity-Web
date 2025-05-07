@@ -9,6 +9,7 @@ import ProfileMenu from "./ProfileMenu";
 import WeeklySchedule from "./WeeklySchedule";
 import axios from "axios";
 import { API_URL } from "@/utils/path";
+import toast from "react-hot-toast";
 const UserProfile: React.FC = () => {
   const [loginData, setLoginData] = useState<any>(null);
   const router = useRouter();
@@ -93,14 +94,14 @@ const UserProfile: React.FC = () => {
       if (response.ok) {
         const responseData = await response.json();
   
-        alert("Profile updated successfully!");
+        toast.success("Profile updated successfully!");
         localStorage.setItem("loginData", JSON.stringify(responseData)); // Save updated data
       } else {
         throw new Error("Failed to update profile.");
       }
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Error updating profile. Please try again.");
+      toast.error("Error updating profile. Please try again.");
     }
   };
   

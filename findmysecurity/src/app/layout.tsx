@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Navbar from "@/sections/home/Navbar";
-import "./globals.css"; // Ensure you import global styles
+import "./globals.css";
 import Footer from "@/sections/home/Footer";
+// ✅ Import the Toaster
+import ToastProvider from "@/sections/components/ToastProvider/ToastProvider";
 
 export const metadata: Metadata = {
   title: "FindMySecurity",
@@ -14,17 +16,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* Top Navigation */}
-        <Navbar />
+        {/* Global Toast Container */}
+       
 
+        {/* Top Navigation */}
+        <ToastProvider />
+        <Navbar />
         {/* Page Content */}
-        <main>
-          {children}
-        </main>
+        <main>{children}</main>
 
         {/* Footer */}
         <footer className="bg-black text-white text-center py-3">
-          <Footer/>
+          <Footer />
           © {new Date().getFullYear()} Find My Security
         </footer>
       </body>

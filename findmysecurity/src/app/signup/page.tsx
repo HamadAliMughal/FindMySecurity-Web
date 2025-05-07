@@ -1,4 +1,4 @@
-
+'use client';
 import { useState } from "react";
 import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";

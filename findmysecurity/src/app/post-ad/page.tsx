@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import toast from 'react-hot-toast';
 
 export default function JobPostingForm() {
   const router = useRouter();
@@ -98,7 +99,7 @@ export default function JobPostingForm() {
         body: JSON.stringify(payload),
       });
   
-      alert('Job posted successfully!');
+      toast.success('Job posted successfully!');
       setFormData({
         title: '',
         type: '',
@@ -117,7 +118,7 @@ export default function JobPostingForm() {
   
     } catch (error: any) {
       console.error('Failed to post job:', error);
-      alert('Failed to post job. Please try again.');
+      toast.error('Failed to post job. Please try again.');
     }
   };
   

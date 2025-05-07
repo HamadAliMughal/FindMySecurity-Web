@@ -32,7 +32,7 @@ export default function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
 
-  }, []);
+  }, [router]);
   const handleLogout = () => {
     localStorage.removeItem("loginData"); // Remove user session
     localStorage.removeItem("profileData"); // Remove user session

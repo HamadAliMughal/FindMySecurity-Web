@@ -13,6 +13,7 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 import { API_URL } from "@/utils/path";
+import toast from "react-hot-toast";
 
 interface Notification {
   [x: string]: ReactNode;
@@ -115,12 +116,12 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
   ];
 
   const handleAccept = (id: number) => {
-    alert(`Accepted notification ${id}`);
+    toast.success(`Accepted notification ${id}`);
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
   const handleReject = (id: number) => {
-    alert(`Rejected notification ${id}`);
+    toast.success(`Rejected notification ${id}`);
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 

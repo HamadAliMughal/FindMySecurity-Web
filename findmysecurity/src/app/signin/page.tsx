@@ -1,9 +1,12 @@
+'use client';
+
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import "./page-globals.css";
+import { useRouter } from 'next/navigation';
+import "@/app/globals.css";
 import axios, { AxiosError } from "axios";  // Import AxiosError
 import { ArrowLeft } from "lucide-react";
 import TwoFAPopup from "@/sections/components/Login/TwoFAPopup";
+import toast from "react-hot-toast";
 
 // Define the structure of the expected error response
 interface ErrorResponse {
@@ -30,18 +33,18 @@ const SignIn = () => {
       console.log("Login Success:", data);
   
       setSessionToken(data.code); // Used for 2FA validation
-      alert(data.code); // Show 2FA for dev testing
+      toast.success(` your 2FA code is : ${data.code}`); // Show 2FA for dev testing
   
   
       setShow2FA(true); // Show 2FA input
     } catch (error) {
       const axiosError = error as AxiosError;
   
-      console.error("Login failed:", axiosError);
+     
   
       const errorMessage =
         (axiosError.response?.data as ErrorResponse)?.message || "Login failed";
-      alert(errorMessage);
+      toast.error(errorMessage);
     }
   };
   
