@@ -8,6 +8,43 @@
   font-family: 'Open Sans', sans-serif;
 }
 
+/* styles.css or module CSS file */
+.login-prompt-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  opacity: 0;
+  animation: fadeIn 0.1s ease-out forwards;
+}
+
+.login-prompt-modal {
+  background-color: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 28rem;
+  margin: 0 1rem;
+  transform: scale(0.9);
+  opacity: 0;
+  animation: scaleIn 0.1s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 
 /* *{
   font-family:

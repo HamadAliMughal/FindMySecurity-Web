@@ -104,7 +104,6 @@ const JobPosting: React.FC = () => {
       screenName: "",
       postcode: "London",
       profileHeadline: "",
-      // selectedServices: [],
       selectedRoles: [],
       otherService: "",
       gender: "",
@@ -284,35 +283,6 @@ const JobPosting: React.FC = () => {
     handleInputChange('selectedRoles', selectedValues);
   };
 
-  // const services = [
-  //   'Corporate Security',
-  //   'Retail Security',
-  //   'Event Security',
-  //   'Door Supervisor',
-  //   'Mobile Patrol',
-  //   'Loss Prevention',
-  //   'Construction Site Security',
-  //   'Close Protection',
-  //   'Maritime Security',
-  //   'High-Value Goods Escort',
-  //   'Residential Security Team (RST)',
-  //   'K9 Security Handler',
-  //   'Armed Security Professional',
-  //   'VIP Chauffeur & Security Driver',
-  //   'CCTV Operator',
-  //   'Security Control Room Operator',
-  //   'Covert Surveillance Specialist'
-  // ] as const;
-
-  // const handleServiceToggle = (service: string) => {
-  //   setFormData(prev => ({
-  //     ...prev,
-  //     selectedServices: prev.selectedServices.includes(service)
-  //       ? prev.selectedServices.filter(s => s !== service)
-  //       : [...prev.selectedServices, service]
-  //   }));
-  // };
-
   const handleCheckboxChange = (timeSlot: string, day: string) => {
     setFormData(prev => ({
       ...prev,
@@ -431,148 +401,11 @@ const JobPosting: React.FC = () => {
 
         {/* Security Roles Multi-Select Dropdown */}
         <div className="mb-6">
-  <label className="block text-sm font-medium text-gray-700 mb-2">
-    Security Services*
-    <span className="ml-1 text-xs text-gray-500">(Select multiple if applicable)</span>
-  </label>
-  
-  <Select
-    isMulti
-    options={Object.entries(groupedOptions).map(([label, options]) => ({
-      label,
-      options
-    }))}
-    value={roleOptions.filter(option => 
-      formData.selectedRoles.includes(option.value)
-    )}
-    onChange={handleRoleSelection}
-    className="react-select-container"
-    classNamePrefix="react-select"
-    styles={{
-      control: (provided, state) => ({
-        ...provided,
-        minHeight: '44px',
-        borderRadius: '8px',
-        borderColor: state.isFocused ? '#6366f1' : '#d1d5db',
-        boxShadow: state.isFocused ? '0 0 0 1px #6366f1' : 'none',
-        '&:hover': {
-          borderColor: state.isFocused ? '#6366f1' : '#9ca3af'
-        },
-        padding: '2px 4px'
-      }),
-      option: (provided, state) => ({
-        ...provided,
-        fontSize: '14px',
-        padding: '8px 12px',
-        color: state.data.isComingSoon ? '#6b7280' : '#111827',
-        backgroundColor: state.isSelected 
-          ? '#e0e7ff' 
-          : state.isFocused 
-            ? '#f3f4f6' 
-            : 'white',
-        '&:active': {
-          backgroundColor: '#e0e7ff'
-        },
-        display: 'flex',
-        alignItems: 'center'
-      }),
-      multiValue: (provided, state) => ({
-        ...provided,
-        backgroundColor: state.data.isComingSoon ? '#f3f4f6' : '#e0e7ff',
-        borderRadius: '6px',
-        border: state.data.isComingSoon ? '1px dashed #d1d5db' : 'none'
-      }),
-      multiValueLabel: (provided, state) => ({
-        ...provided,
-        color: state.data.isComingSoon ? '#6b7280' : '#4338ca',
-        fontWeight: '500',
-        padding: '4px 6px'
-      }),
-      multiValueRemove: (provided, state) => ({
-        ...provided,
-        color: state.data.isComingSoon ? '#9ca3af' : '#818cf8',
-        ':hover': {
-          backgroundColor: state.data.isComingSoon ? '#e5e7eb' : '#c7d2fe',
-          color: state.data.isComingSoon ? '#6b7280' : '#6366f1'
-        }
-      }),
-      groupHeading: (provided) => ({
-        ...provided,
-        fontSize: '13px',
-        fontWeight: '600',
-        color: '#374151',
-        backgroundColor: '#f9fafb',
-        padding: '8px 12px',
-        borderBottom: '1px solid #e5e7eb',
-        marginBottom: '4px'
-      }),
-      menu: (provided) => ({
-        ...provided,
-        borderRadius: '8px',
-        border: '1px solid #e5e7eb',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-      }),
-      placeholder: (provided) => ({
-        ...provided,
-        color: '#9ca3af',
-        fontSize: '14px'
-      })
-    }}
-    formatGroupLabel={(group) => (
-      <div className="flex items-center justify-between">
-        <span>{group.label.replace(" (Coming Soon)", "")}</span>
-        {group.label.includes("Coming Soon") && (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-            Coming Soon
-          </span>
-        )}
-      </div>
-    )}
-    formatOptionLabel={(option) => (
-      <div className="flex items-center">
-        {option.isComingSoon && (
-          <span className="mr-2 text-gray-400">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </span>
-        )}
-        <span className={option.isComingSoon ? 'text-gray-500' : 'text-gray-900'}>
-          {option.label}
-        </span>
-      </div>
-    )}
-    closeMenuOnSelect={false}
-    hideSelectedOptions={false}
-    placeholder={
-      <div className="flex items-center text-gray-400">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        Select security services...
-      </div>
-    }
-    noOptionsMessage={() => "No roles found"}
-    components={{
-      IndicatorSeparator: () => null,
-      DropdownIndicator: () => (
-        <div className="pr-2">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-      )
-    }}
-  />
-  
-  {formData.selectedRoles.length > 0 && (
-    <p className="mt-2 text-xs text-gray-500">
-      Selected: {formData.selectedRoles.length} service(s)
-    </p>
-  )}
-</div>
-        {/* <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Security Roles*</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Security Services*
+            <span className="ml-1 text-xs text-gray-500">(Select multiple if applicable)</span>
+          </label>
+
           <Select
             isMulti
             options={Object.entries(groupedOptions).map(([label, options]) => ({
@@ -583,42 +416,131 @@ const JobPosting: React.FC = () => {
               formData.selectedRoles.includes(option.value)
             )}
             onChange={handleRoleSelection}
-            className="basic-multi-select"
-            classNamePrefix="select"
-            styles={selectStyles}
-            isOptionDisabled={(option) => false} 
-            // isOptionDisabled={(option) => option.isComingSoon}
-            getOptionLabel={(option) => 
-              option.isComingSoon ? `${option.label} (Coming Soon)` : option.label
-            }
+            className="react-select-container"
+            classNamePrefix="react-select"
+            styles={{
+              control: (provided, state) => ({
+                ...provided,
+                minHeight: '44px',
+                borderRadius: '8px',
+                borderColor: state.isFocused ? '#6366f1' : '#d1d5db',
+                boxShadow: state.isFocused ? '0 0 0 1px #6366f1' : 'none',
+                '&:hover': {
+                  borderColor: state.isFocused ? '#6366f1' : '#9ca3af'
+                },
+                padding: '2px 4px'
+              }),
+              option: (provided, state) => ({
+                ...provided,
+                fontSize: '14px',
+                padding: '8px 12px',
+                color: state.data.isComingSoon ? '#6b7280' : '#111827',
+                backgroundColor: state.isSelected 
+                  ? '#e0e7ff' 
+                  : state.isFocused 
+                    ? '#f3f4f6' 
+                    : 'white',
+                '&:active': {
+                  backgroundColor: '#e0e7ff'
+                },
+                display: 'flex',
+                alignItems: 'center'
+              }),
+              multiValue: (provided, state) => ({
+                ...provided,
+                backgroundColor: state.data.isComingSoon ? '#f3f4f6' : '#e0e7ff',
+                borderRadius: '6px',
+                border: state.data.isComingSoon ? '1px dashed #d1d5db' : 'none'
+              }),
+              multiValueLabel: (provided, state) => ({
+                ...provided,
+                color: state.data.isComingSoon ? '#6b7280' : '#4338ca',
+                fontWeight: '500',
+                padding: '4px 6px'
+              }),
+              multiValueRemove: (provided, state) => ({
+                ...provided,
+                color: state.data.isComingSoon ? '#9ca3af' : '#818cf8',
+                ':hover': {
+                  backgroundColor: state.data.isComingSoon ? '#e5e7eb' : '#c7d2fe',
+                  color: state.data.isComingSoon ? '#6b7280' : '#6366f1'
+                }
+              }),
+              groupHeading: (provided) => ({
+                ...provided,
+                fontSize: '13px',
+                fontWeight: '600',
+                color: '#374151',
+                backgroundColor: '#f9fafb',
+                padding: '8px 12px',
+                borderBottom: '1px solid #e5e7eb',
+                marginBottom: '4px'
+              }),
+              menu: (provided) => ({
+                ...provided,
+                borderRadius: '8px',
+                border: '1px solid #e5e7eb',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+              }),
+              placeholder: (provided) => ({
+                ...provided,
+                color: '#9ca3af',
+                fontSize: '14px'
+              })
+            }}
+            formatGroupLabel={(group) => (
+              <div className="flex items-center justify-between">
+                <span>{group.label.replace(" (Coming Soon)", "")}</span>
+                {group.label.includes("Coming Soon") && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    Coming Soon
+                  </span>
+                )}
+              </div>
+            )}
+            formatOptionLabel={(option) => (
+              <div className="flex items-center">
+                {option.isComingSoon && (
+                  <span className="mr-2 text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </span>
+                )}
+                <span className={option.isComingSoon ? 'text-gray-500' : 'text-gray-900'}>
+                  {option.label}
+                </span>
+              </div>
+            )}
             closeMenuOnSelect={false}
             hideSelectedOptions={false}
-            placeholder="Select security roles..."
-          />
-        </div> */}
-        {/* Services Section
-        <div className="border-t border-gray-200 pt-6">
-          <label className="block text-lg font-semibold text-gray-700 mb-2">Services Offered*</label>
-          <p className="text-sm text-gray-600 mb-4">Select all relevant security services:</p>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {services.map((service) => (
-              <div key={service} className="flex items-center bg-gray-100 p-3 rounded-md shadow-md hover:bg-gray-200 transition">
-                <input
-                  type="checkbox"
-                  id={service}
-                  checked={formData.selectedServices.includes(service)}
-                  onChange={() => handleServiceToggle(service)}
-                  className="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500"
-                />
-                <label htmlFor={service} className="ml-3 flex items-center text-gray-700 font-medium">
-                  <FaCheckCircle className={formData.selectedServices.includes(service) ? "text-blue-500 mr-2" : "text-gray-400 mr-2"} />
-                  {service}
-                </label>
+            placeholder={
+              <div className="flex items-center text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                Select security services...
               </div>
-            ))}
-          </div>
-        </div> */}
+            }
+            noOptionsMessage={() => "No roles found"}
+            components={{
+              IndicatorSeparator: () => null,
+              DropdownIndicator: () => (
+                <div className="pr-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              )
+            }}
+          />
+  
+          {formData.selectedRoles.length > 0 && (
+            <p className="mt-2 text-xs text-gray-500">
+              Selected: {formData.selectedRoles.length} service(s)
+            </p>
+          )}
+        </div>
 
         {/* Other Services */}
         <div>
