@@ -91,12 +91,12 @@ const SignIn = () => {
   };
 
   return (
-    <div className="flex h-screen justify-center items-center bg-gray-100">
+    <div className="flex h-screen justify-center items-center bg-gray-100 mt-20">
       <button
         className="absolute top-10 left-10 flex items-center text-gray-700 hover:text-black text-lg"
         onClick={() => router.push("/")}
       >
-        <ArrowLeft className="w-6 h-6 mr-2" />
+        <ArrowLeft className="w-6 h-6 mr-2 mt-40" />
       </button>
       <div className="w-96 p-6 bg-white rounded-lg shadow-lg">
         <div className="text-center">

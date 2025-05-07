@@ -273,7 +273,82 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         </div>
       </div>
 
-      {/* Action Buttons */}
+     <div className="flex flex-wrap mt-6 gap-4">
+      {/* Row 1: 2 fields */}
+         <div className="w-full md:w-[48%]">
+          <TextField
+            label="First Name"
+            name="firstName"
+            value={formData.firstName || ""}
+            onChange={handleInputChange}
+            disabled={!isEditing}
+            fullWidth
+            size="small"
+          />
+        </div>
+        <div className="w-full md:w-[48%]">
+          <TextField
+            label="Last Name"
+            name="lastName"
+            value={formData.lastName || ""}
+            onChange={handleInputChange}
+            disabled={!isEditing}
+            fullWidth
+            size="small"
+          />
+        </div>
+
+        {/* Row 2: 1 field */}
+        <div className="w-full">
+          <TextField
+            label="Screen Name"
+            name="screenName"
+            value={formData.screenName || ""}
+            onChange={handleInputChange}
+            disabled={!isEditing}
+            fullWidth
+            size="small"
+          />
+        </div>
+
+       {/* Row 3: 2 fields */}
+        <div className="w-full md:w-[48%]">
+          <TextField
+            label="Email"
+            name="email"
+            value={formData.email || ""}
+            onChange={handleInputChange}
+            disabled={!isEditing}
+            fullWidth
+            size="small"
+          />
+        </div>
+        <div className="w-full md:w-[48%]">
+          <TextField
+            label="Phone Number"
+            name="phoneNumber"
+            value={formData.phoneNumber || ""}
+            onChange={handleInputChange}
+            disabled={!isEditing}
+            fullWidth
+            size="small"
+          />
+        </div>
+
+        {/* Row 4: 1 field */}
+        <div className="w-full">
+          <TextField
+            label="Address"
+            name="address"
+            value={formData.address || ""}
+            onChange={handleInputChange}
+            disabled={!isEditing}
+            fullWidth
+            size="small"
+          />
+        </div>
+      </div>
+
       <div className="mt-3 flex flex-col md:flex-row">
         {isEditing ? (
           <>

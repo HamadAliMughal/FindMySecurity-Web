@@ -165,7 +165,7 @@ export default function RegistrationSelector() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white text-black p-6 relative">
+    <div className="min-h-screen flex flex-col items-center mt-25 justify-center bg-white text-black p-6 relative">
       {/* Back Button */}
       {step === 1 ? (
         <button
