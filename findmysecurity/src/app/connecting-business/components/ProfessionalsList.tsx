@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ApiResponse, Professional } from "../types";
 import GenericModal from "@/sections/components/modal/GenericModal";
 import { useRouter } from "next/navigation";
+import AnimateOnScrollProvider from "@/sections/components/animation/AnimateOnScrollProvider";
 
 // Update the ProfessionalsListProps to allow apiData to be null
 interface ProfessionalsListProps {
@@ -105,7 +106,8 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
 
   return (
     <>
-      <div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all bg-white hover:bg-gray-50">
+    <AnimateOnScrollProvider>
+      {/* <div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all bg-white hover:bg-gray-50" data-aos="fade-up">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-4">
@@ -203,7 +205,125 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
             </p>
           </div>
         )}
+      </div> */}
+      <div
+  className="relative rounded-2xl p-6 bg-white hover:shadow-xl transition-all border border-gray-100 hover:border-transparent hover:ring-2 hover:ring-indigo-400"
+  data-aos="fade-up"
+>
+  {/* Top Grid: Profile image and main info */}
+  <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-4">
+    {/* Profile Image */}
+    <div className="flex-shrink-0">
+      {professional.profileData?.profilePhoto ? (
+        <img
+          src={professional.profileData.profilePhoto}
+          alt={`${getDisplayName(professional)}'s profile`}
+          className={`w-20 h-20 rounded-full object-cover border-2 border-indigo-200 shadow-sm ${
+            token ? "" : "blur-sm"
+          }`}
+        />
+      ) : (
+        <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm border border-gray-200">
+          N/A
+        </div>
+      )}
+    </div>
+
+    {/* Profile Content */}
+    <div className="flex flex-col justify-between">
+      <div>
+        <h3
+          className={`text-xl font-semibold text-gray-900 ${
+            token ? "" : "blur-sm"
+          }`}
+        >
+          {getDisplayName(professional)}
+        </h3>
+        {professional.profileData?.basicInfo?.profileHeadline && (
+          <p className={`text-gray-500 mt-1 text-sm ${token ? "" : "blur-sm"}`}>
+            {professional.profileData.basicInfo.profileHeadline}
+          </p>
+        )}
       </div>
+
+      {/* Services */}
+      <div className={`mt-3 flex flex-wrap gap-2 ${token ? "" : "blur-sm"}`}>
+        {professional.profileData?.services?.selectedServices?.slice(0, 3).map(
+          (service, index) => (
+            <span
+              key={index}
+              className="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full border border-indigo-200"
+            >
+              {service}
+            </span>
+          )
+        )}
+        {(professional.profileData?.services?.selectedServices?.length ?? 0) > 3 && (
+          <span className="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full border border-indigo-200">
+            +{(professional.profileData?.services?.selectedServices?.length ?? 0)  - 3} more
+          </span>
+        )}
+      </div>
+    </div>
+  </div>
+
+  {/* Location + Rate + Experience + Button */}
+  <div className="grid md:grid-cols-[1fr_auto] gap-4 mt-6 items-start">
+  <div className="flex flex-col gap-2">
+    {professional.user.address && (
+      <p
+        className={`text-sm text-gray-400 flex items-center gap-1 ${
+          token ? "" : "blur-sm"
+        }`}
+      >
+        <LocationIcon />
+        {professional.user.address}
+      </p>
+    )}
+    <div className="flex items-center gap-4">
+      <span
+        className={`text-lg font-bold text-gray-900 ${
+          token ? "" : "blur-sm"
+        }`}
+      >
+        {getHourlyRate(professional)}
+      </span>
+      {professional.profileData?.about?.experience && (
+        <span className={`text-sm text-gray-500 ${token ? "" : "blur-sm"}`}>
+          {professional.profileData.about.experience}
+        </span>
+      )}
+    </div>
+  </div>
+
+  <button
+  onClick={() => {
+    token
+      ? router.push(`/public-profile/${professional.userId}`)
+      : setShowLoginPrompt(true);
+  }}
+  className={`w-fit self-start px-5 py-2 rounded-lg text-sm font-medium transition-all shadow ${
+    token
+      ? "bg-indigo-600 text-white hover:bg-indigo-700"
+      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+  }`}
+  title={!token ? "Please login to view the profile" : ""}
+>
+  View Profile
+</button>
+</div>
+
+  {/* About Section */}
+  {professional.profileData?.about?.aboutMe && (
+    <div className={`mt-5 pt-5 border-t border-gray-100 ${token ? "" : "blur-sm"}`}>
+      <h4 className="font-semibold text-gray-800 mb-1">About</h4>
+      <p className="text-gray-600 text-sm line-clamp-2">
+        {professional.profileData.about.aboutMe}
+      </p>
+    </div>
+  )}
+</div>
+
 
 {showLoginPrompt && (
   <GenericModal
@@ -233,7 +353,7 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
 
 )}
 
-     
+</AnimateOnScrollProvider>
     </>
   );
 };
