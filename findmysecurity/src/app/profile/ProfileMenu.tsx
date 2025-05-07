@@ -135,9 +135,6 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
 
   return (
     <>
-      <h3 className="text-lg font-semibold my-6 text-gray-800 text-center md:text-left">
-        My Profile
-      </h3>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 relative">
         {menuItems.map((item, index) => (

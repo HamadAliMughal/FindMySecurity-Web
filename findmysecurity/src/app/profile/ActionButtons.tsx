@@ -1,5 +1,7 @@
 "use client";
 import React, {JSX, useState, useEffect } from "react";
+import AnimateOnScrollProvider from "@/sections/components/animation/AnimateOnScrollProvider";
+
 import { useRouter } from "next/navigation";
 import {
   FaMobileAlt,
@@ -395,6 +397,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
 
       {/* Documents Section */}
       {shouldShowDocuments && 
+    <AnimateOnScrollProvider>
+
       <div className="space-y-6 mt-5">
         <Divider className="my-4">
           <Chip 
@@ -408,7 +412,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           />
         </Divider>
 
-        <div className="flex flex-col md:flex-row justify-between gap-4 mt-3">
+        <div className="flex flex-col md:flex-row justify-between gap-4 mt-3" >
           <TextField
             size="small"
             placeholder="Search documents..."
@@ -442,6 +446,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               Loading documents...
             </Typography>
           </div>
+          
         )}
 
         {!loadingDocuments && Object.entries(documentGroups).map(([type, docs]) => (
@@ -461,7 +466,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                 const docName = doc.name.split('-').slice(1).join(' ').replace(/\.[^/.]+$/, '');
 
                 return (
-                  <div key={index} className="flex justify-between items-center p-4 bg-white border border-gray-300 rounded-lg shadow-sm transition-all duration-200">
+        <div key={index} className="flex justify-between items-center p-4 bg-white border border-gray-300 rounded-lg shadow-sm transition-all duration-200"  data-aos="fade-up" >
                     
                     <div className="flex items-center space-x-4">
                       <Avatar className="w-14 h-14 bg-gray-200">
@@ -530,6 +535,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           </div>
         )}
       </div>
+    </AnimateOnScrollProvider>
+
 }
       {/* Document Context Menu */}
       <Menu
