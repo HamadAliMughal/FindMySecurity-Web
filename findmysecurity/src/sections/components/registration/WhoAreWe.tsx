@@ -34,7 +34,7 @@ const options = [
   },
   {
     id: 3,
-    title: "Security Professionals",
+    title: "Individuals Seeking Security",
     icon: User,
     description:
       "Register yourself as a security professional and find opportunities.",
@@ -131,7 +131,7 @@ export default function RegistrationSelector() {
         return (
           <ClientGeneralForm
             id={3}
-            title="Individual Security Professional"
+            title="Individuals Seeking Security"
             onSubmit={handleFormSubmit}
           />
         );

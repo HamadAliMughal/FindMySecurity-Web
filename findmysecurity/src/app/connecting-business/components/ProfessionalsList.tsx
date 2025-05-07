@@ -93,6 +93,7 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
 
   const handleCloseLoginPrompt = () => {
     setShowLoginPrompt(false);
+    router.push("/signin");
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {

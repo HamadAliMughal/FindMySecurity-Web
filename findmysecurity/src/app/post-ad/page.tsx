@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ArrowLeft } from "lucide-react";
 import {
   TextField,
   Button,
@@ -122,12 +123,38 @@ export default function JobPostingForm() {
     }
   };
   
-
+  const greenOutlineSx = {
+    '& .MuiOutlinedInput-root': {
+      // color: 'green', // text color
+      '& fieldset': {
+        borderColor: 'rgba(0, 0, 0, 0.23)', // default border
+      },
+      '&:hover fieldset': {
+        borderColor: 'green', // hover border
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: 'green', // focus border
+      },
+    },
+    '& .MuiInputLabel-root': {
+      color: 'gray', // default label
+    },
+    '& label.Mui-focused': {
+      color: 'green', // focused label
+    },
+  }
+  
   if (!allowed) return null;
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <div className="min-h-screen bg-white text-black p-6">
+      <div className="min-h-screen bg-white text-black p-6 mt-20">
+              <button
+                className="absolute top-4 left-4 mt-20 z-2 flex items-center text-gray-600 hover:text-black"
+                onClick={() => router.back()}
+              >
+                <ArrowLeft className="w-6 h-6 mr-2" />
+              </button>
         {/* Banner */}
         <div className="max-w-4xl mx-auto">
           <div className="bg-black text-white p-4 rounded mb-8 text-sm shadow">
@@ -161,7 +188,7 @@ export default function JobPostingForm() {
               onChange={handleChange}
               variant="outlined"
               fullWidth
-              InputProps={{ style: { borderColor: 'black' } }}
+              sx={greenOutlineSx}
             />
             <TextField
               name="type"
@@ -171,6 +198,7 @@ export default function JobPostingForm() {
               onChange={handleChange}
               variant="outlined"
               fullWidth
+              sx={greenOutlineSx}
             >
               {["Full-Time", "Part-Time", "Contract", "Temporary/Event-based"].map((option) => (
                 <MenuItem key={option} value={option}>{option}</MenuItem>
@@ -184,6 +212,7 @@ export default function JobPostingForm() {
               onChange={handleChange}
               variant="outlined"
               fullWidth
+              sx={greenOutlineSx}
             />
             <TextField
               name="location"
@@ -192,6 +221,7 @@ export default function JobPostingForm() {
               onChange={handleChange}
               variant="outlined"
               fullWidth
+              sx={greenOutlineSx}
             />
             <TextField
               name="region"
@@ -200,6 +230,7 @@ export default function JobPostingForm() {
               onChange={handleChange}
               variant="outlined"
               fullWidth
+              sx={greenOutlineSx}
             />
             <TextField
               name="postcode"
@@ -208,6 +239,7 @@ export default function JobPostingForm() {
               onChange={handleChange}
               variant="outlined"
               fullWidth
+              sx={greenOutlineSx}
             />
             <TextField
               name="payRate"
@@ -216,6 +248,7 @@ export default function JobPostingForm() {
               onChange={handleChange}
               variant="outlined"
               fullWidth
+              sx={greenOutlineSx}
             />
             <TextField
               name="payType"
@@ -225,6 +258,7 @@ export default function JobPostingForm() {
               onChange={handleChange}
               variant="outlined"
               fullWidth
+              sx={greenOutlineSx}
             >
               {["Hourly", "Daily", "Annual Salary"].map((option) => (
                 <MenuItem key={option} value={option}>{option}</MenuItem>
@@ -238,9 +272,9 @@ export default function JobPostingForm() {
               onChange={handleChange}
               variant="outlined"
               fullWidth
+              sx={greenOutlineSx}
               multiline
               rows={4}
-              sx={{ gridColumn: { md: 'span 2' } }}
             />
 
             <TextField
@@ -250,6 +284,7 @@ export default function JobPostingForm() {
               onChange={handleChange}
               variant="outlined"
               fullWidth
+              sx={greenOutlineSx}
             />
             <TextField
               name="certifications"
@@ -258,6 +293,7 @@ export default function JobPostingForm() {
               onChange={handleChange}
               variant="outlined"
               fullWidth
+              sx={greenOutlineSx}
             />
             <TextField
               name="shift"
@@ -266,6 +302,7 @@ export default function JobPostingForm() {
               onChange={handleChange}
               variant="outlined"
               fullWidth
+              sx={greenOutlineSx}
             />
             <DatePicker
               label="Start Date & Application Deadline"
@@ -275,6 +312,7 @@ export default function JobPostingForm() {
                 textField: {
                   variant: 'outlined',
                   fullWidth: true,
+                  sx: greenOutlineSx,
                 },
               }}
             />
