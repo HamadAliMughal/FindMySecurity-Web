@@ -2,12 +2,18 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import fetch from 'node-fetch'; // Optional if you're on Node 18+
 
 // Helper function to convert postcode to human-readable location
+interface PostcodeApiResponse {
+  result?: {
+    admin_district?: string;
+  };
+}
+
 const getReadableLocation = async (postcode: string) => {
   try {
     const res = await fetch(`https://api.postcodes.io/postcodes/${postcode}`);
     if (!res.ok) return postcode;
-    const data = await res.json();
-    return data?.result?.admin_district || postcode; // e.g., "City of London"
+    const data = await res.json() as PostcodeApiResponse;
+    return data.result?.admin_district || postcode; // e.g., "City of London"
   } catch {
     return postcode;
   }

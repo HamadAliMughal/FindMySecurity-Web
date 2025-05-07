@@ -4,7 +4,7 @@ import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import { FaArrowLeft } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
-import "./page-globals.css";
+import "@/app/globals.css";
 import WhoAreWe from "@/sections/components/registration/WhoAreWe";
 
 export default function SignupPage() {
