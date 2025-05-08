@@ -441,7 +441,7 @@ const UserProfileCard = ({ user }: any) => {
     
 
       {/* Availability */}
-      {profileData?.availability?.weeklySchedule && (
+      {profileData?.availability?.weeklySchedule ? (
         <div className="mt-10  bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">Availability</h3>
           <p className="text-sm text-gray-600 mb-2">
@@ -449,10 +449,21 @@ const UserProfileCard = ({ user }: any) => {
           </p>
           <AvailabilityTable schedule={profileData.availability.weeklySchedule} />
         </div>
+      ) : (
+        <div className="mt-10 bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-500 shadow-sm">
+    No professional profile available.
+  </div>
       )}
 
       {/* Documents */}
-      <DocumentsSection documents={documents} />
+      {documents && documents.length > 0 ? (
+  <DocumentsSection documents={documents} />
+) : (
+  <div className="mt-10 bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-500 shadow-sm">
+    No documents available.
+  </div>
+)}
+
 
       {/* Permissions */}
       <ProfileGroup
