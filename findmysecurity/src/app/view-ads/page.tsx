@@ -11,6 +11,7 @@ import {
   FaBriefcase,
   FaTag,
 } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const DEFAULT_KEYWORD = "Security Guard";
 const DEFAULT_LOCATION = "London";
@@ -82,9 +83,9 @@ const PostAdLister: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev//job-applications",
+        "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/job-applications",
         {
-          userId: currentId,
+          userId: currentId as number,
           serviceAdId,
           status: "pending"
         },
@@ -95,12 +96,23 @@ const PostAdLister: React.FC = () => {
           }
         }
       );
+    
+      if (response.status === 200 || response.status === 201) {
+        toast.success("Applied successfully!");
+      } else {
+        toast.error(response.data?.message || "Error during apply");
+      }
+    
       return response.data;
+    
     } catch (error: any) {
-      console.error("Job application failed:", error.response?.data || error.message);
-      throw error;
+      if (error.response && error.response.status === 400) {
+        toast.error(error.response.data?.message || "Bad request.");
+      } else {
+        toast.error(error.message || "Job application failed. Please try again.");
+      }
     }
-  };
+  }    
 
   const handleSearch = async () => {
     if (!isClient) return;

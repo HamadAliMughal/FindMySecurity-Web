@@ -14,6 +14,7 @@ import {
 import axios from "axios";
 import { API_URL } from "@/utils/path";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 interface Notification {
   [x: string]: ReactNode;
@@ -171,7 +172,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
                   <div className="flex-1">
                   <p className="text-sm">{typeof notif?.message === 'string' ? notif.message.split(':')[1]?.trim() : ''}</p>
 
-                    <p className="text-xs text-gray-500">{typeof notif?.message === 'string' ? notif.message.split(':')[0]?.trim() : ''}</p>
+                    <Link href={`public-profile/${notif?.relatedUserId}`}><p className="text-xs text-gray-500">{typeof notif?.message === 'string' ? notif.message.split(':')[0]?.trim() : ''}</p></Link>
                    {roleId!=3 && <div className="flex gap-2 mt-2">
                       <button
                         className="text-white bg-green-600 hover:bg-green-700 text-xs px-3 py-1 rounded"
