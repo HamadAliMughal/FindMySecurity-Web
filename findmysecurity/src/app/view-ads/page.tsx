@@ -11,6 +11,9 @@ import {
   FaBriefcase,
   FaTag,
 } from "react-icons/fa";
+import toast from "react-hot-toast";
+import AnimateOnScrollProvider from "@/sections/components/animation/AnimateOnScrollProvider";
+import { ArrowLeft } from "lucide-react";
 
 const DEFAULT_KEYWORD = "Security Guard";
 const DEFAULT_LOCATION = "London";
