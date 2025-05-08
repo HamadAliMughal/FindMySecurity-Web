@@ -11,7 +11,6 @@ import {
   FaBriefcase,
   FaTag,
 } from "react-icons/fa";
-import toast from "react-hot-toast";
 
 const DEFAULT_KEYWORD = "Security Guard";
 const DEFAULT_LOCATION = "London";
@@ -174,7 +173,12 @@ const PostAdLister: React.FC = () => {
       <h1 className="text-4xl font-bold text-center text-gray-900 mb-8">
         Posted <span className="text-black">Job Ads</span>
       </h1>
-
+      <button
+        className="absolute top-4 left-4 mt-20 z-2 flex items-center text-gray-600 hover:text-black"
+        onClick={() => router.back()}
+      >
+        <ArrowLeft className="w-6 h-6 mr-2" />
+      </button>
       {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-lg shadow mb-6">
         <div>
@@ -231,8 +235,9 @@ const PostAdLister: React.FC = () => {
         <p className="text-center text-gray-600">No jobs found for the current filters.</p>
       ) : (
         <>
+        <AnimateOnScrollProvider>
           {paginatedJobs.map((post, idx) => (
-            <div key={idx} className="bg-white rounded-lg shadow-md p-6 mb-6 hover:shadow-lg transition duration-300">
+            <div key={idx} className="bg-white rounded-lg shadow-md p-6 mb-6 hover:shadow-lg transition duration-300"  data-aos="fade-up">
               <div className="flex justify-between items-start gap-4">
                 <div className="flex items-start gap-4">
                   <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
@@ -275,7 +280,7 @@ const PostAdLister: React.FC = () => {
               </div>
             </div>
           ))}
-
+</AnimateOnScrollProvider>
           {/* Pagination */}
           <div className="flex justify-center items-center gap-4 mt-6">
             <button
