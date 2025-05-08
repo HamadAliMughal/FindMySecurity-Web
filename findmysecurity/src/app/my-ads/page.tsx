@@ -3,19 +3,28 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import { API_URL } from "@/utils/path";
 
-interface JobApplication {
+interface Application {
   id: number;
-  jobTitle: string;
-  applicantName: string;
+  userId: number;
+  postedBy: number;
+  serviceAdId: number;
   status: string;
   createdAt: string;
+  updatedAt: string;
 }
 
+const ITEMS_PER_PAGE = 5;
+
 const JobApplicantAdsPage = () => {
-  const [ads, setAds] = useState<JobApplication[]>([]);
+  const [ads, setAds] = useState<Application[]>([]);
+  const [filteredAds, setFilteredAds] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchAds = async () => {
@@ -40,6 +49,7 @@ const JobApplicantAdsPage = () => {
 
         if (Array.isArray(response.data?.data)) {
           setAds(response.data.data);
+          setFilteredAds(response.data.data);
         } else {
           toast.error("Unexpected response format");
         }
@@ -53,26 +63,164 @@ const JobApplicantAdsPage = () => {
     fetchAds();
   }, []);
 
+  useEffect(() => {
+    if (search.trim() === "") {
+      setFilteredAds(ads);
+    } else {
+      const searchId = parseInt(search.trim(), 10);
+      if (!isNaN(searchId)) {
+        setFilteredAds(ads.filter((app) => app.serviceAdId === searchId));
+        setCurrentPage(1);
+      }
+    }
+  }, [search, ads]);
+
+  const grouped = filteredAds.reduce((acc: Record<number, Application[]>, app) => {
+    if (!acc[app.serviceAdId]) acc[app.serviceAdId] = [];
+    acc[app.serviceAdId].push(app);
+    return acc;
+  }, {});
+
+  const paginatedEntries = Object.entries(grouped).slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const totalPages = Math.ceil(Object.keys(grouped).length / ITEMS_PER_PAGE);
+
+  const handleUpdateStatus = async (appId: number, status: string) => {
+    try {
+      const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
+      if (!token) return;
+
+      await axios.patch(
+        `${API_URL}/job-applications/${appId}`,
+        { status },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      toast.success(`Application ${status}`);
+      setAds((prev) =>
+        prev.map((app) =>
+          app.id === appId ? { ...app, status } : app
+        )
+      );
+    } catch {
+      toast.error("Failed to update application status");
+    }
+  };
+
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">My Job Applicants</h1>
+    <div className="max-w-5xl mx-auto px-4 py-6 mt-20 text-black bg-white min-h-screen">
+      <button
+        onClick={() => router.back()}
+        className="mb-4 text-sm text-gray-700 hover:underline"
+      >
+        ← Back
+      </button>
+
+      <h1 className="text-3xl font-bold mb-6 text-center">Job Applications</h1>
+
+      <div className="mb-6">
+        <input
+          type="text"
+          placeholder="Search by Service Ad ID"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full border px-4 py-2 rounded-md bg-gray-100 text-black"
+        />
+      </div>
+
       {loading ? (
-        <p>Loading...</p>
-      ) : ads.length === 0 ? (
-        <p>No job applications found.</p>
+        <p className="text-center">Loading...</p>
+      ) : paginatedEntries.length === 0 ? (
+        <p className="text-center">No job applications found.</p>
       ) : (
-        <div className="space-y-4">
-          {ads.map((ad) => (
-            <div
-              key={ad.id}
-              className="border border-gray-200 p-4 rounded shadow-sm"
-            >
-              <h2 className="text-lg font-semibold">{ad.jobTitle}</h2>
-              <p className="text-sm text-gray-600">Applicant: {ad.applicantName}</p>
-              <p className="text-sm text-gray-600">Status: {ad.status}</p>
-              <p className="text-xs text-gray-500">Applied on: {new Date(ad.createdAt).toLocaleString()}</p>
+        paginatedEntries.map(([serviceAdId, applications]) => (
+          <div key={serviceAdId} className="mb-10">
+            <h2 className="text-xl font-semibold mb-4 border-b pb-2">
+              Service Ad #{serviceAdId}
+            </h2>
+            <div className="space-y-4">
+              {applications.map((app) => (
+                <div
+                  key={app.id}
+                  className="border rounded-md p-4 shadow-sm bg-white flex justify-between items-center"
+                >
+                  <div>
+                    <p className="text-sm">
+                      <span className="font-semibold">Application ID:</span> {app.id}
+                    </p>
+                    <p className="text-sm">
+                      <span className="font-semibold">User ID:</span> {app.userId}
+                    </p>
+                    <p className="text-sm">
+                      <span className="font-semibold">Status:</span>{" "}
+                      <span
+                        className={`${
+                          app.status === "accepted"
+                            ? "text-green-600"
+                            : app.status === "rejected"
+                            ? "text-red-600"
+                            : "text-yellow-600"
+                        } font-medium`}
+                      >
+                        {app.status}
+                      </span>
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Applied on: {new Date(app.createdAt).toLocaleString()}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+                    <button
+                      onClick={() => handleUpdateStatus(app.id, "accepted")}
+                      className="bg-black text-white px-3 py-1 rounded hover:opacity-80"
+                    >
+                      Accept
+                    </button>
+                    <button
+                      onClick={() => handleUpdateStatus(app.id, "rejected")}
+                      className="bg-black text-white px-3 py-1 rounded hover:opacity-80"
+                    >
+                      Reject
+                    </button>
+                    <button
+                      onClick={() => router.push(`/public-profile/${app.userId}`)}
+                      className="bg-black text-white px-3 py-1 rounded hover:opacity-80"
+                    >
+                      Show Profile
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+        ))
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-8 gap-4">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            className="px-4 py-2 border rounded disabled:opacity-40"
+          >
+            Previous
+          </button>
+          <span className="py-2 px-4 border rounded bg-black text-white">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+            className="px-4 py-2 border rounded disabled:opacity-40"
+          >
+            Next
+          </button>
         </div>
       )}
     </div>
