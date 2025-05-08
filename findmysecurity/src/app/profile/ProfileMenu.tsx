@@ -95,26 +95,31 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
   const shouldShowCreateProfile =
     roleId === 3 && !loginData?.individualProfessional?.profileData?.availability;
 
-  const menuItems = [
-    { icon: <FaSearch />, label: "My Searches" },
-    { icon: <FaHeart />, label: "My Favourites" },
-    { icon: <FaUserShield />, label: "Visitors" },
-    { icon: <FaSearch />, label: "Advance Search" },
-    { icon: <FaCogs />, label: "Customer Support" },
-    { icon: <FaBell />, label: "Notifications", isNotification: true },
-    ...(roleId !== 3
-      ? [{ icon: <FaAd />, label: "Post Free Ad", route: "/post-ad" }]
-      : [{ icon: <FaAd />, label: "View JObs", route: "/view-ads" }]),
-    ...(shouldShowCreateProfile
-      ? [
-          {
-            icon: <FaUserPlus />,
-            label: "Create Public Profile",
-            route: "/public-profile",
-          },
-        ]
-      : []),
-  ];
+    const menuItems = [
+      { icon: <FaSearch />, label: "My Searches" },
+      { icon: <FaHeart />, label: "My Favourites" },
+      {
+        icon: <FaUserShield />,
+        label: roleId !== 3 ? "My Job Applicants" : "Visitors",
+        route: roleId !== 3 ? "/jobapplicant" : "/visitors",
+      },
+      { icon: <FaSearch />, label: "Advance Search" },
+      { icon: <FaCogs />, label: "Customer Support" },
+      { icon: <FaBell />, label: "Notifications", isNotification: true },
+      ...(roleId !== 3
+        ? [{ icon: <FaAd />, label: "Post Free Ad", route: "/post-ad" }]
+        : [{ icon: <FaAd />, label: "View JObs", route: "/view-ads" }]),
+      ...(shouldShowCreateProfile
+        ? [
+            {
+              icon: <FaUserPlus />,
+              label: "Create Public Profile",
+              route: "/public-profile",
+            },
+          ]
+        : []),
+    ];
+    
 
   const handleAccept = (id: number) => {
     toast.success(`Accepted notification ${id}`);
@@ -156,43 +161,48 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
           </div>
         ))}
 
-        {showNotifications && (
-          <div
-            ref={popupRef}
-            className="absolute right-0 top-24 bg-white shadow-lg rounded-lg w-80 z-50 p-4 max-h-96 overflow-y-auto"
-          >
-            <h4 className="font-semibold mb-3 text-lg">Notifications</h4>
-            {notifications.length === 0 || notifications===null? (
-              <p className="text-gray-500 text-center">No new notifications</p>
-            ) : (
-              notifications.map((notif) => (
+{showNotifications && (
+  <div
+    ref={popupRef}
+    className="absolute right-0 top-24 bg-white shadow-lg rounded-lg w-80 z-50 p-4 max-h-96 overflow-y-auto"
+  >
+    <div className="flex justify-between items-center mb-3">
+      <h4 className="font-semibold text-lg">Notifications</h4>
+      {notifications.length > 0 && (
+        <button
+          className="text-sm text-red-600 hover:underline"
+          onClick={() => setNotifications([])}
+        >
+          Clear All
+        </button>
+      )}
+    </div>
 
-                <div key={notif.id} className="flex items-start gap-3 p-2 border-b">
-               
-                  <div className="flex-1">
-                  <p className="text-sm">{typeof notif?.message === 'string' ? notif.message.split(':')[1]?.trim() : ''}</p>
-
-                    <Link href={`public-profile/${notif?.relatedUserId}`}><p className="text-xs text-gray-500">{typeof notif?.message === 'string' ? notif.message.split(':')[0]?.trim() : ''}</p></Link>
-                   {roleId!=3 && <div className="flex gap-2 mt-2">
-                      <button
-                        className="text-white bg-green-600 hover:bg-green-700 text-xs px-3 py-1 rounded"
-                        onClick={() => handleAccept(notif.id)}
-                      >
-                        Accept
-                      </button>
-                      <button
-                        className="text-white bg-red-500 hover:bg-red-600 text-xs px-3 py-1 rounded"
-                        onClick={() => handleReject(notif.id)}
-                      >
-                        Reject
-                      </button>
-                    </div>}
-                  </div>
-                </div>
-              ))
-            )}
+    {notifications.length === 0 || notifications === null ? (
+      <p className="text-gray-500 text-center">No new notifications</p>
+    ) : (
+      notifications.map((notif) => (
+        <div key={notif.id} className="flex items-start gap-3 p-2 border-b">
+          <div className="flex-1">
+            <p className="text-sm">
+              {typeof notif?.message === "string"
+                ? notif.message.split(":")[1]?.trim()
+                : ""}
+            </p>
+            <Link href={`public-profile/${notif?.relatedUserId}`}>
+              <p className="text-xs text-gray-500">
+                {typeof notif?.message === "string"
+                  ? notif.message.split(":")[0]?.trim()
+                  : ""}
+              </p>
+            </Link>
           </div>
-        )}
+        </div>
+      ))
+    )}
+  </div>
+)}
+
       </div>
     </>
   );
