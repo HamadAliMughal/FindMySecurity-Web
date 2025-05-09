@@ -180,3 +180,9 @@ export interface MarkerData {
     validated: boolean;
   }
   
+
+
+  // export type ApiResponseUnion =
+  // | ApiResponse             // has 'professionals'
+  // | CompaniesApiResponse    // has 'companies'
+  // | CourseProvidersApiResponse; // has 'courseProviders'

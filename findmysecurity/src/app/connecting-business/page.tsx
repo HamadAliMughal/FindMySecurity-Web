@@ -11,11 +11,11 @@ import SearchValuesDisplay from "./components/SearchValuesDisplay";
 import ProfessionalsList from "./components/ProfessionalsList";
 import MapSection from "./components/MapSection";
 import BackButton from './BackButton'
-import { ApiResponse, SearchValues, LookingForItem, CompaniesApiResponse, CourseProvidersApiResponse } from "./types";
+import { ApiResponse, SearchValues, LookingForItem, CompaniesApiResponse, CourseProvidersApiResponse} from "./types";
 import CompaniesList from "./components/CompaniesList";
 import CourseProvidersList from "./components/CourseProvidersList";
 
-type ApiResponseUnion = ApiResponse | CompaniesApiResponse | CourseProvidersApiResponse;
+// type ApiResponseUnion = ApiResponse | CompaniesApiResponse | CourseProvidersApiResponse;
 
 export default function ConnectingBusiness() {
   const router = useRouter();
@@ -28,7 +28,9 @@ export default function ConnectingBusiness() {
   const [searchMode, setSearchMode] = useState<string>("basic");
   const [hideExperience, setHideExperience] = useState(false);
   // Assuming you're using useState for apiData
-  const [apiData, setApiData] = useState<ApiResponseUnion | null>(null);
+  const [apiData1, setApiData1] = useState<ApiResponse | null>(null);
+  const [apiData2, setApiData2] = useState<CompaniesApiResponse | null>(null);
+  const [apiData3, setApiData3] = useState<CourseProvidersApiResponse | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +45,7 @@ export default function ConnectingBusiness() {
         const title = localStorage.getItem("title")?.replace(/['"]+/g, "").trim().toLowerCase() || "";
         let apiUrl = "";
         let response: Response;
-        let data: ApiResponseUnion | null = null;  // Use the new union type
+        let data: ApiResponse | CompaniesApiResponse | CourseProvidersApiResponse | null = null;  // Use the new union type
       
         if (title?.includes("compan")) {
           apiUrl = "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/users/security-companies";
@@ -72,13 +74,13 @@ export default function ConnectingBusiness() {
         if (data) {
           if ('professionals' in data) {
             // This is an ApiResponse type
-            setApiData(data as ApiResponse);
+            setApiData1(data as ApiResponse);
           } else if ('companies' in data) {
             // This is a CompaniesApiResponse type
-            setApiData(data as CompaniesApiResponse);
+            setApiData2(data as CompaniesApiResponse);
           }else if ('providers' in data) {
             // This is a CourseProvidersApiResponse type
-            setApiData(data as CourseProvidersApiResponse);
+            setApiData3(data as CourseProvidersApiResponse);
           } else {
             throw new Error("Unknown response format");
           }
@@ -212,80 +214,40 @@ export default function ConnectingBusiness() {
           onRefineSearch={handleRefineSearch}
         />
       )}
+
 {checkSearch == "professionals" && (
-  <><ProfessionalsList
-          apiData={apiData as ApiResponse} // Narrow to ApiResponse
-          loading={loading}
-          error={error} 
+  <>
+    <ProfessionalsList
+      apiData={apiData1 as ApiResponse}
+      loading={loading}
+      error={error}
     />
-    <MapSection
-  entities={(apiData as ApiResponse)?.professionals.map(pro => ({
-    id: pro.id,
-    name: `${pro.user.firstName} ${pro.user.lastName}`,
-    address: pro.user.address,
-  })) || []}
-  title="Security Professionals Locations"
-/>
-
+    <MapSection data={apiData1?.professionals || []} type="professionals" />
   </>
-)
-
-}
+)}
 
 {checkSearch == "security companies" && (
   <>
-  <CompaniesList 
-    apiData={apiData as CompaniesApiResponse}  // Narrow to CompaniesApiResponse
-    loading={loading}
-    error={error}
-  />
-  <MapSection
-  entities={(apiData as CompaniesApiResponse)?.providers.map((company: { id: any; companyName: any; address: any; }) => ({
-    id: company.id,
-    name: company.companyName,
-    address: company.address,
-  })) || []}
-  title="Security Companies Locations"
-/>
-
+    <CompaniesList
+      apiData={apiData2 as CompaniesApiResponse}
+      loading={loading}
+      error={error}
+    />
+    <MapSection data={apiData2?.companies || []} type="security companies" />
   </>
 )}
 
 {checkSearch == "training providers" && (
   <>
-  <CourseProvidersList 
-    apiData={apiData as CourseProvidersApiResponse}  // Narrow to CompaniesApiResponse
-    loading={loading}
-    error={error}
-  />
- <MapSection
-  entities={(apiData as CourseProvidersApiResponse)?.providers.map(provider => ({
-    id: provider.id,
-    name: provider.organizationName,
-    address: provider.address,
-  })) || []}
-  title="Training Providers Locations"
-/>
-
+    <CourseProvidersList
+      apiData={apiData3 as CourseProvidersApiResponse}
+      loading={loading}
+      error={error}
+    />
+    <MapSection data={apiData3?.providers || []} type="training providers" />
   </>
 )}
 
-{/* <MapSection 
-  professionals={apiData && 'professionals' in apiData ? apiData.professionals : []}  // Ensure apiData is not null and has professionals
-/> */}
-
-      {/* {checkSearch == "Professional" && <ProfessionalsList 
-        apiData={apiData}
-        loading={loading}
-        error={error}
-      />}
-      {checkSearch == "Security Companies" && <CompaniesList 
-        apiData={apiData}
-        loading={loading}
-        error={error}
-      />}
-
-      <MapSection professionals={apiData?.professionals || []} /> */}
     </section>
   );
 }
