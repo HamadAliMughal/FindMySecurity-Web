@@ -14,6 +14,15 @@ interface Application {
   status: string;
   createdAt: string;
   updatedAt: string;
+  securityProfessional: {
+    firstName: string;
+    lastName: string;
+    profileImage: string;
+  };
+  serviceAd: {
+    jobTitle: string;
+    description: string;
+  };
 }
 
 const ITEMS_PER_PAGE = 5;
@@ -26,40 +35,40 @@ const JobApplicantAdsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchAds = async () => {
-      try {
-        const stored = localStorage.getItem("loginData");
-        const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
-        if (!stored || !token) {
-          toast.error("User not authenticated");
-          return;
-        }
-
-        const { id: postedBy } = JSON.parse(stored);
-
-        const response = await axios.get(
-          `${API_URL}/job-applications/posted-by/${postedBy}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (Array.isArray(response.data?.data)) {
-          setAds(response.data.data);
-          setFilteredAds(response.data.data);
-        } else {
-          toast.error("Unexpected response format");
-        }
-      } catch (error: any) {
-        toast.error(error.message || "Failed to fetch job applications.");
-      } finally {
-        setLoading(false);
+  const fetchAds = async () => {
+    try {
+      const stored = localStorage.getItem("loginData");
+      const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
+      if (!stored || !token) {
+        toast.error("User not authenticated");
+        return;
       }
-    };
 
+      const { id: postedBy } = JSON.parse(stored);
+
+      const response = await axios.get(
+        `${API_URL}/job-applications/posted-by/${postedBy}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (Array.isArray(response.data?.data)) {
+        setAds(response.data.data);
+        setFilteredAds(response.data.data);
+      } else {
+        toast.error("Unexpected response format");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to fetch job applications.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchAds();
   }, []);
 
@@ -67,17 +76,23 @@ const JobApplicantAdsPage = () => {
     if (search.trim() === "") {
       setFilteredAds(ads);
     } else {
+      const searchTerm = search.toLowerCase();
       const searchId = parseInt(search.trim(), 10);
-      if (!isNaN(searchId)) {
-        setFilteredAds(ads.filter((app) => app.serviceAdId === searchId));
-        setCurrentPage(1);
-      }
+      const matches = ads.filter(
+        (app) =>
+          app.serviceAd.jobTitle.toLowerCase().includes(searchTerm) ||
+          (!isNaN(searchId) && app.serviceAdId === searchId)
+      );
+      setFilteredAds(matches);
+      setCurrentPage(1);
     }
   }, [search, ads]);
 
-  const grouped = filteredAds.reduce((acc: Record<number, Application[]>, app) => {
-    if (!acc[app.serviceAdId]) acc[app.serviceAdId] = [];
-    acc[app.serviceAdId].push(app);
+  // 🔸 Group by job title now
+  const grouped = filteredAds.reduce((acc: Record<string, Application[]>, app) => {
+    const title = app.serviceAd?.jobTitle || "Untitled Job";
+    if (!acc[title]) acc[title] = [];
+    acc[title].push(app);
     return acc;
   }, {});
 
@@ -88,12 +103,12 @@ const JobApplicantAdsPage = () => {
 
   const totalPages = Math.ceil(Object.keys(grouped).length / ITEMS_PER_PAGE);
 
-  const handleUpdateStatus = async (appId: number, status: string) => {
+  const handleUpdateStatus = async (appId: number, status: "approved" | "rejected") => {
     try {
       const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
       if (!token) return;
 
-      await axios.patch(
+      await axios.put(
         `${API_URL}/job-applications/${appId}`,
         { status },
         {
@@ -102,11 +117,7 @@ const JobApplicantAdsPage = () => {
       );
 
       toast.success(`Application ${status}`);
-      setAds((prev) =>
-        prev.map((app) =>
-          app.id === appId ? { ...app, status } : app
-        )
-      );
+      fetchAds(); // Refresh the data
     } catch {
       toast.error("Failed to update application status");
     }
@@ -126,7 +137,7 @@ const JobApplicantAdsPage = () => {
       <div className="mb-6">
         <input
           type="text"
-          placeholder="Search by Service Ad ID"
+          placeholder="Search by Service Ad ID or Job Title"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full border px-4 py-2 rounded-md bg-gray-100 text-black"
@@ -138,10 +149,10 @@ const JobApplicantAdsPage = () => {
       ) : paginatedEntries.length === 0 ? (
         <p className="text-center">No job applications found.</p>
       ) : (
-        paginatedEntries.map(([serviceAdId, applications]) => (
-          <div key={serviceAdId} className="mb-10">
+        paginatedEntries.map(([jobTitle, applications]) => (
+          <div key={jobTitle} className="mb-10">
             <h2 className="text-xl font-semibold mb-4 border-b pb-2">
-              Service Ad #{serviceAdId}
+              {jobTitle}
             </h2>
             <div className="space-y-4">
               {applications.map((app) => (
@@ -154,13 +165,15 @@ const JobApplicantAdsPage = () => {
                       <span className="font-semibold">Application ID:</span> {app.id}
                     </p>
                     <p className="text-sm">
-                      <span className="font-semibold">User ID:</span> {app.userId}
+                      <span className="font-semibold">Applicant Name:</span>{" "}
+                      {app?.securityProfessional?.firstName || ""}{" "}
+                      {app?.securityProfessional?.lastName || ""}
                     </p>
                     <p className="text-sm">
                       <span className="font-semibold">Status:</span>{" "}
                       <span
                         className={`${
-                          app.status === "accepted"
+                          app.status === "approved"
                             ? "text-green-600"
                             : app.status === "rejected"
                             ? "text-red-600"
@@ -176,18 +189,22 @@ const JobApplicantAdsPage = () => {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
-                    <button
-                      onClick={() => handleUpdateStatus(app.id, "accepted")}
-                      className="bg-black text-white px-3 py-1 rounded hover:opacity-80"
-                    >
-                      Accept
-                    </button>
-                    <button
-                      onClick={() => handleUpdateStatus(app.id, "rejected")}
-                      className="bg-black text-white px-3 py-1 rounded hover:opacity-80"
-                    >
-                      Reject
-                    </button>
+                    {app.status === "pending" && (
+                      <>
+                        <button
+                          onClick={() => handleUpdateStatus(app.id, "approved")}
+                          className="bg-black text-white px-3 py-1 rounded hover:opacity-80"
+                        >
+                          Accept
+                        </button>
+                        <button
+                          onClick={() => handleUpdateStatus(app.id, "rejected")}
+                          className="bg-black text-white px-3 py-1 rounded hover:opacity-80"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
                     <button
                       onClick={() => router.push(`/public-profile/${app.userId}`)}
                       className="bg-black text-white px-3 py-1 rounded hover:opacity-80"
