@@ -11,7 +11,11 @@ import SearchValuesDisplay from "./components/SearchValuesDisplay";
 import ProfessionalsList from "./components/ProfessionalsList";
 import MapSection from "./components/MapSection";
 import BackButton from './BackButton'
-import { ApiResponse, SearchValues, LookingForItem } from "./types";
+import { ApiResponse, SearchValues, LookingForItem, CompaniesApiResponse, CourseProvidersApiResponse } from "./types";
+import CompaniesList from "./components/CompaniesList";
+import CourseProvidersList from "./components/CourseProvidersList";
+
+type ApiResponseUnion = ApiResponse | CompaniesApiResponse | CourseProvidersApiResponse;
 
 export default function ConnectingBusiness() {
   const router = useRouter();
@@ -23,27 +27,66 @@ export default function ConnectingBusiness() {
   const [searchTitle, setSearchTitle] = useState<string | null>(null);
   const [searchMode, setSearchMode] = useState<string>("basic");
   const [hideExperience, setHideExperience] = useState(false);
-  const [apiData, setApiData] = useState<ApiResponse | null>(null);
+  // Assuming you're using useState for apiData
+  const [apiData, setApiData] = useState<ApiResponseUnion | null>(null);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const [checkSearch,setCheckSearch] = useState<string | null>(null);
   // Fetch professionals data
   useEffect(() => {
     const fetchProfessionals = async () => {
       try {
         setLoading(true);
         setError(null);
-        
-        const response = await fetch(
-          "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/users/professionals"
-        );
-        
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        
-        const data: ApiResponse = await response.json();
-        setApiData(data);
+      
+        const title = localStorage.getItem("title")?.replace(/['"]+/g, "").trim().toLowerCase() || "";
+        let apiUrl = "";
+        let response: Response;
+        let data: ApiResponseUnion | null = null;  // Use the new union type
+      
+        if (title?.includes("compan")) {
+          apiUrl = "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/users/security-companies";
+          response = await fetch(apiUrl);
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          
+          // Here we expect a CompaniesApiResponse
+          data = await response.json();
+        } else if (title?.includes("train")) {
+          apiUrl = "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/users/course-providers";
+          response = await fetch(apiUrl);
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          
+          // Here we expect an ApiResponse
+          data = await response.json();
+        } else {
+          apiUrl = "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/users/professionals";
+          response = await fetch(apiUrl);
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          
+          // Here we expect an ApiResponse
+          data = await response.json();
+        }
+      
+        // Type checking and setting data based on the response
+        if (data) {
+          if ('professionals' in data) {
+            // This is an ApiResponse type
+            setApiData(data as ApiResponse);
+          } else if ('companies' in data) {
+            // This is a CompaniesApiResponse type
+            setApiData(data as CompaniesApiResponse);
+          }else if ('providers' in data) {
+            // This is a CourseProvidersApiResponse type
+            setApiData(data as CourseProvidersApiResponse);
+          } else {
+            throw new Error("Unknown response format");
+          }
+        } else {
+          throw new Error("No data returned from the API");
+        }
       } catch (err) {
-        console.error("Error fetching professionals:", err);
+        console.error("Error fetching data:", err);
         setError("Failed to load professionals. Please try again later.");
       } finally {
         setLoading(false);
@@ -53,6 +96,17 @@ export default function ConnectingBusiness() {
     fetchProfessionals();
   }, []);
 
+  useEffect(() => {
+    const title = localStorage.getItem("title");
+    const title_check = title?.replace(/['"]+/g, "").trim().toLowerCase() || '';
+    setCheckSearch(title_check);
+  }, []);
+  
+  useEffect(() => {
+    if (checkSearch) {
+      console.log("Updated checkSearch:", checkSearch);
+    }
+  }, [checkSearch]); 
   // Load search settings from localStorage
   useEffect(() => {
     const storedMode = localStorage.getItem("searchMode");
@@ -64,7 +118,6 @@ export default function ConnectingBusiness() {
     
     const values = localStorage.getItem("searchValues");
     const title = localStorage.getItem("title");
-
     if (!storedMode) {
       router.push("/");
       return;
@@ -84,7 +137,6 @@ export default function ConnectingBusiness() {
       setSearchValues(parsedValues);
       const cleanedTitle = title.replace(/['"]+/g, "").trim();
       setSearchTitle(cleanedTitle);
-
       // Set appropriate data based on title
       let data: LookingForItem[] = [];
       const normalizedTitle = cleanedTitle.toLowerCase();
@@ -160,14 +212,80 @@ export default function ConnectingBusiness() {
           onRefineSearch={handleRefineSearch}
         />
       )}
+{checkSearch == "professionals" && (
+  <><ProfessionalsList
+          apiData={apiData as ApiResponse} // Narrow to ApiResponse
+          loading={loading}
+          error={error} 
+    />
+    <MapSection
+  entities={(apiData as ApiResponse)?.professionals.map(pro => ({
+    id: pro.id,
+    name: `${pro.user.firstName} ${pro.user.lastName}`,
+    address: pro.user.address,
+  })) || []}
+  title="Security Professionals Locations"
+/>
 
-      <ProfessionalsList 
+  </>
+)
+
+}
+
+{checkSearch == "security companies" && (
+  <>
+  <CompaniesList 
+    apiData={apiData as CompaniesApiResponse}  // Narrow to CompaniesApiResponse
+    loading={loading}
+    error={error}
+  />
+  <MapSection
+  entities={(apiData as CompaniesApiResponse)?.providers.map((company: { id: any; companyName: any; address: any; }) => ({
+    id: company.id,
+    name: company.companyName,
+    address: company.address,
+  })) || []}
+  title="Security Companies Locations"
+/>
+
+  </>
+)}
+
+{checkSearch == "training providers" && (
+  <>
+  <CourseProvidersList 
+    apiData={apiData as CourseProvidersApiResponse}  // Narrow to CompaniesApiResponse
+    loading={loading}
+    error={error}
+  />
+ <MapSection
+  entities={(apiData as CourseProvidersApiResponse)?.providers.map(provider => ({
+    id: provider.id,
+    name: provider.organizationName,
+    address: provider.address,
+  })) || []}
+  title="Training Providers Locations"
+/>
+
+  </>
+)}
+
+{/* <MapSection 
+  professionals={apiData && 'professionals' in apiData ? apiData.professionals : []}  // Ensure apiData is not null and has professionals
+/> */}
+
+      {/* {checkSearch == "Professional" && <ProfessionalsList 
         apiData={apiData}
         loading={loading}
         error={error}
-      />
+      />}
+      {checkSearch == "Security Companies" && <CompaniesList 
+        apiData={apiData}
+        loading={loading}
+        error={error}
+      />}
 
-      <MapSection professionals={apiData?.professionals || []} />
+      <MapSection professionals={apiData?.professionals || []} /> */}
     </section>
   );
 }
