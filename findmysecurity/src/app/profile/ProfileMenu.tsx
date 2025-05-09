@@ -124,6 +124,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
       label: roleId !== 3 ? "My Job Applicants" : "Visitors",
       route: roleId !== 3 ? "/my-job-applicants" : "/visitors",
     },
+    ...(roleId !== 3 ? [{ icon: <FaCogs />, label: "My Ads", route: "/my-ads" }]:[]),
     { icon: <FaSearch />, label: "Advance Search" },
     { icon: <FaCogs />, label: "Customer Support" },
     { icon: <FaBell />, label: "Notifications", isNotification: true },
