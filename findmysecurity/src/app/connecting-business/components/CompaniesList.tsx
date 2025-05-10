@@ -60,7 +60,7 @@ const CompanyCard = ({ company }: { company: Company }) => {
       if (!token) {
         setShowLoginPrompt(true);
       } else {
-        router.push(`/company-profile/${company.id}`);
+        router.push(`/company-profile/${company.userId}`);
       }
     };
   

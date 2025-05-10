@@ -293,46 +293,6 @@ const DocumentsSection = ({
     </div>
   );
 };
-// const DocumentsSection = ({ documents }: { documents: string[] }) => {
-//   if (!documents || documents.length === 0) return null;
-
-//   return (
-//     <div className="mt-10">
-//       <h3 className="text-lg font-semibold text-gray-800 mb-4">Documents</h3>
-//       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-//         {documents.map((docUrl, index) => {
-//           const fileName = docUrl.split("/").pop() || `Document ${index + 1}`;
-//           const docName = fileName
-//             .split("-")
-//             .slice(1)
-//             .join(" ")
-//             .replace(/\.[^/.]+$/, "");
-
-//           const icon = getFileIcon(fileName);
-//           const isImage = /\.(jpeg|jpg|png|gif|webp)$/i.test(fileName);
-
-//           return (
-//             <div
-//               key={index}
-//               className="p-4 rounded-md bg-gray-50 shadow-sm hover:shadow-md transition"
-//             >
-
-//               <a
-//                 href={docUrl}
-//                 target="_blank"
-//                 rel="noopener noreferrer"
-//                 className="block text-center text-black font-medium"
-//               >
-//                 {icon} {docName}
-//               </a>
-//             </div>
-//           );
-//         })}
-//       </div>
-//     </div>
-//   );
-// };
-
 
 const UserProfileCard = ({ user }: any) => {
   const {
@@ -475,3 +435,47 @@ const UserProfileCard = ({ user }: any) => {
 };
 
 export default UserProfileCard;
+
+
+
+
+// const DocumentsSection = ({ documents }: { documents: string[] }) => {
+//   if (!documents || documents.length === 0) return null;
+
+//   return (
+//     <div className="mt-10">
+//       <h3 className="text-lg font-semibold text-gray-800 mb-4">Documents</h3>
+//       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+//         {documents.map((docUrl, index) => {
+//           const fileName = docUrl.split("/").pop() || `Document ${index + 1}`;
+//           const docName = fileName
+//             .split("-")
+//             .slice(1)
+//             .join(" ")
+//             .replace(/\.[^/.]+$/, "");
+
+//           const icon = getFileIcon(fileName);
+//           const isImage = /\.(jpeg|jpg|png|gif|webp)$/i.test(fileName);
+
+//           return (
+//             <div
+//               key={index}
+//               className="p-4 rounded-md bg-gray-50 shadow-sm hover:shadow-md transition"
+//             >
+
+//               <a
+//                 href={docUrl}
+//                 target="_blank"
+//                 rel="noopener noreferrer"
+//                 className="block text-center text-black font-medium"
+//               >
+//                 {icon} {docName}
+//               </a>
+//             </div>
+//           );
+//         })}
+//       </div>
+//     </div>
+//   );
+// };
+

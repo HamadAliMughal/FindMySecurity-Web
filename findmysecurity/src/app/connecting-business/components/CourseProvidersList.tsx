@@ -59,7 +59,7 @@ const CourseProviderCard = ({ provider }: { provider: CourseProvider }) => {
     if (!token) {
       setShowLoginPrompt(true);
     } else {
-      router.push(`/course-provider-profile/${provider.id}`);
+      router.push(`/provider-profile/${provider.userId}`);
     }
   };
 
