@@ -14,54 +14,104 @@ const UserProfile: React.FC = () => {
   const [loginData, setLoginData] = useState<any>(null);
   const router = useRouter();
   const [roleId, setRoleId] = useState(0);
+  // ✅ Separated refresh function to be passed to children
+  const refreshUserData = async () => {
+    const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
+    const storedData = localStorage.getItem("loginData") || localStorage.getItem("profileData");
+    const parsedData = storedData ? JSON.parse(storedData) : null;
+    const currentId = parsedData?.id || parsedData?.user?.id;
+
+    try {
+      const response = await axios.get(`${API_URL}/auth/get-user/${currentId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = response.data;
+      setRoleId(data?.role?.id || data?.roleId);
+      localStorage.setItem("loginData", JSON.stringify(data));
+      setLoginData(data);
+      if (
+        data?.role?.id === 3 &&
+        !(data?.user?.individualProfessional || data?.individualProfessional)
+      ) {
+        const interval = setInterval(() => {
+          if (window.confirm("Make your public profile?")) {
+            clearInterval(interval); // Clear immediately after confirmation
+            router.push("/public-profile");
+          }
+        }, 5000);
+      }
+      // if (
+      //   data?.role?.id === 3 &&
+      //   !(data?.user?.individualProfessional || data?.individualProfessional)
+      // ) {
+      //   const interval = setInterval(() => {
+      //     if (window.confirm("Make your public profile?")) {
+      //       router.push("/public-profile");
+      //     }
+      //   }, 5000);
+
+      //   return () => clearInterval(interval);
+      // }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      router.push("/");
+    }
+  };
+
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    const token2 = localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
-    console.log("token", token)
-    console.log("token 2", token2)
-    const fetchUserData = async () => {
-      const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
-      const data1 = storedData1 ? JSON.parse(storedData1) : null; 
-      const currentId = data1?.id || data1?.user?.id;
-      try {
-          const response = await axios.get(
-            `${API_URL}/auth/get-user/${currentId}`,
-            {
-              headers: {
-                'Authorization': `Bearer ${token2}`,
-              },
-            }
-          );
+    refreshUserData();
+  }, []);
+  // useEffect(() => {
+  //   const token = localStorage.getItem("authToken");
+  //   const token2 = localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
+  //   console.log("token", token)
+  //   console.log("token 2", token2)
+  //   const fetchUserData = async () => {
+  //     const storedData1 = localStorage.getItem("loginData") || localStorage.getItem("profileData");
+  //     const data1 = storedData1 ? JSON.parse(storedData1) : null; 
+  //     const currentId = data1?.id || data1?.user?.id;
+  //     try {
+  //         const response = await axios.get(
+  //           `${API_URL}/auth/get-user/${currentId}`,
+  //           {
+  //             headers: {
+  //               'Authorization': `Bearer ${token2}`,
+  //             },
+  //           }
+  //         );
 
   
-        const data = await response.data;
-          console.log("data",data)
-        const roleId = data?.role?.id || data?.roleId;
-        setRoleId(roleId);
-        localStorage.setItem("loginData", JSON.stringify(data));
-        setLoginData(data);
+  //       const data = await response.data;
+  //         console.log("data",data)
+  //       const roleId = data?.role?.id || data?.roleId;
+  //       setRoleId(roleId);
+  //       localStorage.setItem("loginData", JSON.stringify(data));
+  //       setLoginData(data);
   
-        // Public profile check for roleId 3
-        if (
-          roleId === 3 &&
-          !(data?.user?.individualProfessional || data?.individualProfessional)
-        ) {
-          const interval = setInterval(() => {
-            if (window.confirm("Make your public profile?")) {
-              router.push("/public-profile");
-            }
-          }, 5000);
+  //       // Public profile check for roleId 3
+  //       if (
+  //         roleId === 3 &&
+  //         !(data?.user?.individualProfessional || data?.individualProfessional)
+  //       ) {
+  //         const interval = setInterval(() => {
+  //           if (window.confirm("Make your public profile?")) {
+  //             router.push("/public-profile");
+  //           }
+  //         }, 5000);
   
-          return () => clearInterval(interval);
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        router.push("/"); // Redirect if not logged in
-      }
-    };
+  //         return () => clearInterval(interval);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching user data:", error);
+  //       router.push("/"); // Redirect if not logged in
+  //     }
+  //   };
   
-    fetchUserData();
-  }, [router]);
+  //   fetchUserData();
+  // }, [router]);
   
   const updateProfile = async (updatedData: any) => {
     const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
@@ -123,6 +173,7 @@ const UserProfile: React.FC = () => {
           loginData={loginData} 
           roleId={roleId} 
           updateProfile={updateProfile} 
+          refreshUserData={refreshUserData}
         />
 
         <ProfileMenu roleId={roleId} />

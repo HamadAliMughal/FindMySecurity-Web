@@ -1,7 +1,7 @@
 "use client";
-import React, {JSX, useState, useEffect } from "react";
+import React, {JSX, useState, useEffect, useRef } from "react";
 import AnimateOnScrollProvider from "@/sections/components/animation/AnimateOnScrollProvider";
-
+import { Snackbar, Alert, Backdrop, CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
 import {
   FaMobileAlt,
@@ -21,6 +21,8 @@ import {
   FaDownload,
   FaSearch,
   FaSpinner,
+  FaPlus,
+  FaTrash,
 } from "react-icons/fa";
 import {
   TextField,
@@ -37,20 +39,24 @@ import {
   Typography,
 } from "@mui/material";
 import { Delete, MoreVert, FileUpload, CloudDownload } from "@mui/icons-material";
+import { uploadToS3 } from "@/utils/s3file";
 
 interface Document {
+  id?: string;
   url: string;
   name: string;
   type: string;
   size: string;
   uploadedAt: string;
   loading?: boolean;
+  status?: string;
 }
 
 interface ActionButtonsProps {
   loginData: any;
   roleId: number;
   updateProfile: (updatedData: any) => void;
+  refreshUserData: () => Promise<void>;
 }
 
 const fileTypeIcons: Record<string, JSX.Element> = {
@@ -80,6 +86,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   loginData,
   roleId,
   updateProfile,
+  refreshUserData
 }) => {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
@@ -90,9 +97,62 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loadingDocuments, setLoadingDocuments] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
 
   const shouldShowDocuments = roleId === 3;
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
+  const handleClick = () => {
+    inputRef.current?.click(); // open file dialog
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLoading(true);
+
+    try {
+      const uploadedUrl = await uploadToS3({ file });
+
+      if (!uploadedUrl || typeof uploadedUrl !== "string" || !uploadedUrl.startsWith("http")) {
+        throw new Error("Invalid S3 URL returned");
+      }
+
+      const dbRes = await fetch("https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/document/upload", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          url: encodeURI(uploadedUrl),
+          userId: loginData?.id || loginData?.userId || 1,
+        }),
+      });
+
+      const dbResult = await dbRes.json();
+
+      if (!dbRes.ok) {
+        throw new Error("DB Save Failed");
+      }
+
+      const newDoc = await fetchDocumentDetails(uploadedUrl);
+      setDocuments((prev) => [...prev, newDoc]);
+      await refreshUserData();
+
+      // ✅ Show success message
+      setSnackbar({ open: true, message: 'Document uploaded successfully!', severity: 'success' });
+    } catch (err) {
+      console.error("Upload Error:", err);
+      setSnackbar({ open: true, message: 'Document upload failed.', severity: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchDocumentDetails = async (url: string): Promise<Document> => {
     try {
@@ -139,35 +199,50 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
 
   useEffect(() => {
     const loadDocuments = async () => {
-      const rawDocuments = loginData?.individualProfessional?.profile?.documents || [];
+      const rawDocuments = loginData?.individualProfessional?.documents || [];
       setLoadingDocuments(true);
-      
-      // Explicitly type the url parameter as string
-      const documentPromises = rawDocuments.map(async (url: string) => {
-        return {
-          url,
-          name: decodeURIComponent(url.split('/').pop() || "Document"),
-          type: url.split('.').pop()?.toUpperCase() || 'FILE',
-          size: 'Loading...',
-          uploadedAt: 'Loading...',
-          loading: true
-        };
-      });
   
-      const initialDocuments = await Promise.all(documentPromises);
+      // Use actual structure from payload
+      const initialDocuments = rawDocuments.map((doc: any) => ({
+        id: doc.id,
+        url: doc.url,
+        name: decodeURIComponent(doc.url?.split('/').pop() || 'Document'),
+        type: doc.url?.split('.').pop()?.toUpperCase() || 'FILE',
+        size: 'Loading...',
+        uploadedAt: doc.uploadedAt,
+        status: doc.status,
+        loading: true,
+      }));
+  
       setDocuments(initialDocuments);
   
-      // Now fetch the actual details for each document
-      // Also type the url parameter here
-      const detailedDocuments = await Promise.all(
-        rawDocuments.map((url: string) => fetchDocumentDetails(url))
-      );
-      
-      setDocuments(detailedDocuments);
-      setLoadingDocuments(false);
+      try {
+        const detailedDocuments = await Promise.all(
+          rawDocuments.map((doc: any) => fetchDocumentDetails(doc.url))
+        );
+  
+        const mergedDocuments = initialDocuments.map((doc: { url: any; }) => {
+          const detail = detailedDocuments.find(d => d.url === doc.url);
+          return detail
+            ? {
+                ...doc,
+                ...detail,
+                loading: false,
+              }
+            : doc;
+        });
+  
+        setDocuments(mergedDocuments);
+      } catch (err) {
+        console.error("Error loading document details:", err);
+      } finally {
+        setLoadingDocuments(false);
+      }
     };
   
-    loadDocuments();
+    if (loginData?.individualProfessional?.documents) {
+      loadDocuments();
+    }
   }, [loginData]);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, doc: Document) => {
@@ -180,9 +255,41 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     setSelectedDoc(null);
   };
 
+  const handleDeleteDocument = async (docId?: string) => {
+    if (!docId) return;
+    
+    setDeletingId(docId);
+    const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
+    
+    try {
+      const response = await fetch(`https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/document/${docId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete document');
+      }
+
+      setDocuments(prev => prev.filter(doc => doc.id !== docId));
+      await refreshUserData();
+      setSnackbar({ open: true, message: 'Document deleted successfully!', severity: 'success' });
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      setSnackbar({ open: true, message: 'Failed to delete document', severity: 'error' });
+    } finally {
+      setDeletingId(null);
+      handleMenuClose();
+    }
+  };
+
   const handleDelete = () => {
-    // Implement delete functionality
-    handleMenuClose();
+    if (selectedDoc?.id) {
+      handleDeleteDocument(selectedDoc.id);
+    }
   };
 
   const handleDownload = () => {
@@ -229,6 +336,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
 
   const profileData = loginData?.individualProfessional?.profile?.profilePhoto || loginData.profile|| '';
   const finalImage = profilePhoto || profileData || "/images/profile.png";
+  
   return (
     <div className="w-full max-w-5xl mx-auto p-4 space-y-6">
       {/* Profile Section */}
@@ -411,22 +519,62 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             color="primary" 
           />
         </Divider>
-
         <div className="flex flex-col md:flex-row justify-between gap-4 mt-3" >
-          <TextField
-            size="small"
-            placeholder="Search documents..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <FaSearch className="text-gray-400" />
-                </InputAdornment>
-              ),
-            }}
-            sx={{ width: '100%', maxWidth: 400 }}
-          />
+          <div className="flex items-center gap-2 w-full">
+            <TextField
+              size="small"
+              placeholder="Search documents..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FaSearch className="text-gray-400" />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ flex: 1, maxWidth: 400 }}
+            />
+          <>
+      {/* 🔒 Hidden File Input */}
+      <input
+        type="file"
+        accept="*/*"
+        ref={inputRef}
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+      />
+
+      {/* 📄 Upload Button */}
+      <Button
+        variant="contained"
+        startIcon={<FaPlus />}
+        onClick={handleClick}
+        sx={{
+          bgcolor: 'primary.main',
+          whiteSpace: 'nowrap',
+          minWidth: 'fit-content',
+        }}
+      >
+        Add Documents
+      </Button>
+      <Backdrop open={loading} sx={{ zIndex: 9999, color: '#fff' }}>
+  <CircularProgress color="inherit" />
+</Backdrop>
+<Snackbar
+  open={snackbar.open}
+  autoHideDuration={4000}
+  onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+  anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+>
+  <Alert onClose={() => setSnackbar(prev => ({ ...prev, open: false }))} severity={snackbar.severity} sx={{ width: '100%' }}>
+    {snackbar.message}
+  </Alert>
+</Snackbar>
+
+    </>
+
+          </div>
 
           {isEditing && (
             <Button
@@ -466,7 +614,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                 const docName = doc.name.split('-').slice(1).join(' ').replace(/\.[^/.]+$/, '');
 
                 return (
-        <div key={index} className="flex justify-between items-center p-4 bg-white border border-gray-300 rounded-lg shadow-sm transition-all duration-200"  data-aos="fade-up" >
+                  <div key={index} className="flex justify-between items-center p-4 bg-white border border-gray-300 rounded-lg shadow-sm transition-all duration-200"  data-aos="fade-up" >
                     
                     <div className="flex items-center space-x-4">
                       <Avatar className="w-14 h-14 bg-gray-200">
@@ -504,20 +652,26 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                         </IconButton>
                       </Tooltip>
 
-                      {isEditing && (
-                        <Tooltip title="Delete">
-                          <IconButton
-                            size="small"
-                            onClick={handleDelete}
-                            sx={{
-                              color: 'red.500',
-                              '&:hover': { color: 'red.700' }
-                            }}
-                          >
-                            <Delete />
-                          </IconButton>
-                        </Tooltip>
-                      )}
+                      <Tooltip title="Delete">
+                        <IconButton
+                          size="small"
+                          onClick={() => doc.id && handleDeleteDocument(doc.id)}
+                          disabled={deletingId === doc.id}
+                          sx={{
+                            color: deletingId === doc.id ? 'gray.500' : 'red.500',
+                            '&:hover': { 
+                              color: deletingId === doc.id ? 'gray.500' : 'red.700',
+                              backgroundColor: deletingId === doc.id ? 'transparent' : 'rgba(255, 0, 0, 0.08)'
+                            }
+                          }}
+                        >
+                          {deletingId === doc.id ? (
+                            <FaSpinner className="animate-spin" />
+                          ) : (
+                            <FaTrash />
+                          )}
+                        </IconButton>
+                      </Tooltip>
                     </div>
                   </div>
                 );
@@ -536,8 +690,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         )}
       </div>
     </AnimateOnScrollProvider>
-
 }
+
       {/* Document Context Menu */}
       <Menu
         anchorEl={anchorEl}
@@ -551,12 +705,732 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           <Delete className="mr-2" /> Delete
         </MenuItem>
       </Menu>
-      
     </div>
   );
 };
 
 export default ActionButtons;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// "use client";
+// import React, {JSX, useState, useEffect, useRef } from "react";
+// import AnimateOnScrollProvider from "@/sections/components/animation/AnimateOnScrollProvider";
+// import { Snackbar, Alert, Backdrop, CircularProgress } from "@mui/material";
+// import { useRouter } from "next/navigation";
+// import {
+//   FaMobileAlt,
+//   FaHome,
+//   FaEnvelope,
+//   FaBriefcase,
+//   FaFilePdf,
+//   FaFileImage,
+//   FaFileWord,
+//   FaFileExcel,
+//   FaFilePowerpoint,
+//   FaFileArchive,
+//   FaFileAlt,
+//   FaFileCode,
+//   FaFileAudio,
+//   FaFileVideo,
+//   FaDownload,
+//   FaSearch,
+//   FaSpinner,
+//   FaPlus,
+// } from "react-icons/fa";
+// import {
+//   TextField,
+//   Button,
+//   Chip,
+//   Divider,
+//   IconButton,
+//   Tooltip,
+//   Menu,
+//   MenuItem,
+//   InputAdornment,
+//   Badge,
+//   Avatar,
+//   Typography,
+// } from "@mui/material";
+// import { Delete, MoreVert, FileUpload, CloudDownload } from "@mui/icons-material";
+// import { uploadToS3 } from "@/utils/s3file";
+
+// interface Document {
+//   url: string;
+//   name: string;
+//   type: string;
+//   size: string;
+//   uploadedAt: string;
+//   loading?: boolean;
+// }
+
+// interface ActionButtonsProps {
+//   loginData: any;
+//   roleId: number;
+//   updateProfile: (updatedData: any) => void;
+//   refreshUserData: () => Promise<void>;
+// }
+
+// const fileTypeIcons: Record<string, JSX.Element> = {
+//   pdf: <FaFilePdf className="text-red-500" />,
+//   jpg: <FaFileImage className="text-green-500" />,
+//   jpeg: <FaFileImage className="text-green-500" />,
+//   png: <FaFileImage className="text-green-500" />,
+//   gif: <FaFileImage className="text-green-500" />,
+//   doc: <FaFileWord className="text-blue-500" />,
+//   docx: <FaFileWord className="text-blue-500" />,
+//   xls: <FaFileExcel className="text-green-600" />,
+//   xlsx: <FaFileExcel className="text-green-600" />,
+//   ppt: <FaFilePowerpoint className="text-orange-500" />,
+//   pptx: <FaFilePowerpoint className="text-orange-500" />,
+//   zip: <FaFileArchive className="text-yellow-500" />,
+//   rar: <FaFileArchive className="text-yellow-500" />,
+//   txt: <FaFileAlt className="text-gray-500" />,
+//   csv: <FaFileCode className="text-blue-300" />,
+//   json: <FaFileCode className="text-yellow-300" />,
+//   mp3: <FaFileAudio className="text-purple-500" />,
+//   wav: <FaFileAudio className="text-purple-500" />,
+//   mp4: <FaFileVideo className="text-red-400" />,
+//   mov: <FaFileVideo className="text-red-400" />,
+// };
+
+// const ActionButtons: React.FC<ActionButtonsProps> = ({
+//   loginData,
+//   roleId,
+//   updateProfile,
+//   refreshUserData
+// }) => {
+//   const router = useRouter();
+//   const [isEditing, setIsEditing] = useState(false);
+//   const [formData, setFormData] = useState({ ...loginData });
+//   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+//   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
+//   const [documents, setDocuments] = useState<Document[]>([]);
+//   const [loadingDocuments, setLoadingDocuments] = useState(true);
+//   const [loading, setLoading] = useState(false);
+//   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+
+//   const shouldShowDocuments = roleId === 3;
+//   // const handleAddDocument = () => {
+//   //   // Implement your document upload logic here
+//   //   console.log("Add document clicked");
+//   // };
+//   const inputRef = useRef<HTMLInputElement | null>(null);
+
+// const handleClick = () => {
+//   inputRef.current?.click(); // open file dialog
+// };
+// const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+//   const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
+//   const file = e.target.files?.[0];
+//   if (!file) return;
+
+//   setLoading(true);
+
+//   try {
+//     const uploadedUrl = await uploadToS3({ file });
+
+//     if (!uploadedUrl || typeof uploadedUrl !== "string" || !uploadedUrl.startsWith("http")) {
+//       throw new Error("Invalid S3 URL returned");
+//     }
+
+//     const dbRes = await fetch("https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/document/upload", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//       body: JSON.stringify({
+//         url: encodeURI(uploadedUrl),
+//         userId: loginData?.id || loginData?.userId || 1,
+//       }),
+//     });
+
+//     const dbResult = await dbRes.json();
+
+//     if (!dbRes.ok) {
+//       throw new Error("DB Save Failed");
+//     }
+
+//     const newDoc = await fetchDocumentDetails(uploadedUrl);
+//     setDocuments((prev) => [...prev, newDoc]);
+//     await refreshUserData();
+
+//     // ✅ Show success message
+//     setSnackbar({ open: true, message: 'Document uploaded successfully!', severity: 'success' });
+//   } catch (err) {
+//     console.error("Upload Error:", err);
+//     setSnackbar({ open: true, message: 'Document upload failed.', severity: 'error' });
+//   } finally {
+//     setLoading(false);
+//   }
+// };
+
+
+//   const fetchDocumentDetails = async (url: string): Promise<Document> => {
+//     try {
+//       const response = await fetch(url, { method: 'HEAD' });
+      
+//       if (!response.ok) {
+//         throw new Error(`HTTP error! status: ${response.status}`);
+//       }
+      
+//       const contentLength = response.headers.get('content-length');
+//       const lastModified = response.headers.get('last-modified');
+      
+//       const fileName = decodeURIComponent(url.split('/').pop() || "Document");
+//       const fileType = url.split('.').pop()?.toUpperCase() || 'FILE';
+      
+//       return {
+//         url,
+//         name: fileName,
+//         type: fileType,
+//         size: contentLength ? formatFileSize(parseInt(contentLength)) : 'Unknown',
+//         uploadedAt: lastModified ? new Date(lastModified).toLocaleDateString() : 'Unknown date',
+//         loading: false
+//       };
+//     } catch (error) {
+//       console.error(`Error fetching document details for ${url}:`, error);
+//       return {
+//         url,
+//         name: decodeURIComponent(url.split('/').pop() || "Document"),
+//         type: url.split('.').pop()?.toUpperCase() || 'FILE',
+//         size: 'Unknown',
+//         uploadedAt: 'Unknown date',
+//         loading: false
+//       };
+//     }
+//   };
+
+//   const formatFileSize = (bytes: number): string => {
+//     if (bytes === 0) return '0 Bytes';
+//     const k = 1024;
+//     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+//     const i = Math.floor(Math.log(bytes) / Math.log(k));
+//     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+//   };
+//   useEffect(() => {
+//     const loadDocuments = async () => {
+//       const rawDocuments = loginData?.individualProfessional?.documents || [];
+//       setLoadingDocuments(true);
+  
+//       // Use actual structure from payload
+//       const initialDocuments = rawDocuments.map((doc: any) => ({
+//         id: doc.id,
+//         url: doc.url,
+//         name: decodeURIComponent(doc.url?.split('/').pop() || 'Document'),
+//         type: doc.url?.split('.').pop()?.toUpperCase() || 'FILE',
+//         size: 'Loading...',
+//         uploadedAt: doc.uploadedAt,
+//         status: doc.status,
+//         loading: true,
+//       }));
+  
+//       setDocuments(initialDocuments);
+  
+//       try {
+//         const detailedDocuments = await Promise.all(
+//           rawDocuments.map((doc: any) => fetchDocumentDetails(doc.url))
+//         );
+  
+//         const mergedDocuments = initialDocuments.map((doc: { url: any; }) => {
+//           const detail = detailedDocuments.find(d => d.url === doc.url);
+//           return detail
+//             ? {
+//                 ...doc,
+//                 ...detail,
+//                 loading: false,
+//               }
+//             : doc;
+//         });
+  
+//         setDocuments(mergedDocuments);
+//       } catch (err) {
+//         console.error("Error loading document details:", err);
+//       } finally {
+//         setLoadingDocuments(false);
+//       }
+//     };
+  
+//     if (loginData?.individualProfessional?.documents) {
+//       loadDocuments();
+//     }
+//   }, [loginData]);
+  
+//   // useEffect(() => {
+//   //   const loadDocuments = async () => {
+//   //     const rawDocuments = loginData?.individualProfessional?.documents || [];
+//   //     setLoadingDocuments(true);
+      
+//   //     // Explicitly type the url parameter as string
+//   //     const documentPromises = rawDocuments.map(async (url: string) => {
+//   //       return {
+//   //         url,
+//   //         name: decodeURIComponent(url.split('/').pop() || "Document"),
+//   //         type: url.split('.').pop()?.toUpperCase() || 'FILE',
+//   //         size: 'Loading...',
+//   //         uploadedAt: 'Loading...',
+//   //         loading: true
+//   //       };
+//   //     });
+  
+//   //     const initialDocuments = await Promise.all(documentPromises);
+//   //     setDocuments(initialDocuments);
+  
+//   //     // Now fetch the actual details for each document
+//   //     // Also type the url parameter here
+//   //     const detailedDocuments = await Promise.all(
+//   //       rawDocuments.map((url: string) => fetchDocumentDetails(url))
+//   //     );
+      
+//   //     setDocuments(detailedDocuments);
+//   //     setLoadingDocuments(false);
+//   //   };
+  
+//   //   loadDocuments();
+//   // }, [loginData]);
+
+//   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, doc: Document) => {
+//     setAnchorEl(event.currentTarget);
+//     setSelectedDoc(doc);
+//   };
+
+//   const handleMenuClose = () => {
+//     setAnchorEl(null);
+//     setSelectedDoc(null);
+//   };
+
+//   const handleDelete = () => {
+//     // Implement delete functionality
+//     handleMenuClose();
+//   };
+
+//   const handleDownload = () => {
+//     if (selectedDoc) window.open(selectedDoc.url, "_blank");
+//     handleMenuClose();
+//   };
+
+//   // Filter documents based on search
+//   const filteredDocuments = documents.filter(doc =>
+//     doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//     doc.type.toLowerCase().includes(searchQuery.toLowerCase())
+//   );
+
+//   // Group documents by type
+//   const documentGroups = filteredDocuments.reduce((groups: Record<string, Document[]>, doc) => {
+//     const type = doc.type;
+//     if (!groups[type]) groups[type] = [];
+//     groups[type].push(doc);
+//     return groups;
+//   }, {});
+
+//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const { name, value } = e.target;
+//     setFormData((prev: any) => ({ ...prev, [name]: value }));
+//   };
+
+//   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const file = e.target.files?.[0];
+//     if (file) {
+//       const imageUrl = URL.createObjectURL(file);
+//       setProfilePhoto(imageUrl);
+//     }
+//   };
+
+//   const handleSubmit = () => {
+//     updateProfile(formData);
+//     setIsEditing(false);
+//   };
+
+//   const handleCancel = () => {
+//     setFormData({ ...loginData });
+//     setIsEditing(false);
+//   };
+
+//   const profileData = loginData?.individualProfessional?.profile?.profilePhoto || loginData.profile|| '';
+//   const finalImage = profilePhoto || profileData || "/images/profile.png";
+//   return (
+//     <div className="w-full max-w-5xl mx-auto p-4 space-y-6">
+//       {/* Profile Section */}
+//       <div className="flex flex-col items-center md:flex-row md:items-center md:space-x-6">
+//         <div className="relative w-28 h-28 rounded-full shadow-lg shadow-gray-400 hover:scale-105 transition-transform duration-300">
+//           <img
+//             src={finalImage}
+//             alt="Profile"
+//             className="w-full h-full object-cover rounded-full"
+//           />
+//           {isEditing && (
+//             <>
+//               <input
+//                 id="profilePhoto"
+//                 type="file"
+//                 accept="image/*"
+//                 onChange={handleImageChange}
+//                 className="hidden"
+//               />
+//               <label
+//                 htmlFor="profilePhoto"
+//                 className="absolute bottom-0 left-0 right-0 text-center bg-black bg-opacity-70 text-white text-xs py-1 cursor-pointer rounded-b-lg hover:bg-opacity-90 transition"
+//               >
+//                 Upload Image
+//               </label>
+//             </>
+//           )}
+//         </div>
+
+//         {/* Profile Info */}
+//         <div className="text-center md:text-left mt-4 md:mt-0 space-y-1">
+//           <h2 className="text-2xl font-semibold text-gray-800">
+//             {formData?.firstName || formData?.lastName
+//               ? `${formData.firstName} ${formData.lastName}`
+//               : "Mr. Y"}
+//           </h2>
+//           <h2 className="text-xl text-gray-600">{formData?.screenName ?? "Mr."}</h2>
+//           <p className="text-gray-500">
+//             {loginData?.role?.name ?? loginData?.role ?? "Security Officer"}
+//           </p>
+//           <span className="text-sm text-yellow-500">
+//             ✅ Usually responds within 1 hour
+//           </span>
+//         </div>
+//       </div>
+
+//      <div className="flex flex-wrap mt-6 gap-4">
+//       {/* Row 1: 2 fields */}
+//          <div className="w-full md:w-[48%]">
+//           <TextField
+//             label="First Name"
+//             name="firstName"
+//             value={formData.firstName || ""}
+//             onChange={handleInputChange}
+//             disabled={!isEditing}
+//             fullWidth
+//             size="small"
+//           />
+//         </div>
+//         <div className="w-full md:w-[48%]">
+//           <TextField
+//             label="Last Name"
+//             name="lastName"
+//             value={formData.lastName || ""}
+//             onChange={handleInputChange}
+//             disabled={!isEditing}
+//             fullWidth
+//             size="small"
+//           />
+//         </div>
+
+//         {/* Row 2: 1 field */}
+//         <div className="w-full">
+//           <TextField
+//             label="Screen Name"
+//             name="screenName"
+//             value={formData.screenName || ""}
+//             onChange={handleInputChange}
+//             disabled={!isEditing}
+//             fullWidth
+//             size="small"
+//           />
+//         </div>
+
+//        {/* Row 3: 2 fields */}
+//         <div className="w-full md:w-[48%]">
+//           <TextField
+//             label="Email"
+//             name="email"
+//             value={formData.email || ""}
+//             onChange={handleInputChange}
+//             disabled={!isEditing}
+//             fullWidth
+//             size="small"
+//           />
+//         </div>
+//         <div className="w-full md:w-[48%]">
+//           <TextField
+//             label="Phone Number"
+//             name="phoneNumber"
+//             value={formData.phoneNumber || ""}
+//             onChange={handleInputChange}
+//             disabled={!isEditing}
+//             fullWidth
+//             size="small"
+//           />
+//         </div>
+
+//         {/* Row 4: 1 field */}
+//         <div className="w-full">
+//           <TextField
+//             label="Address"
+//             name="address"
+//             value={formData.address || ""}
+//             onChange={handleInputChange}
+//             disabled={!isEditing}
+//             fullWidth
+//             size="small"
+//           />
+//         </div>
+//       </div>
+
+//       <div className="mt-3 flex flex-col md:flex-row">
+//         {isEditing ? (
+//           <>
+//             <Button
+//               variant="contained"
+//               color="primary"
+//               onClick={handleSubmit}
+//               fullWidth
+//               sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+//             >
+//               Save Profile
+//             </Button>
+//             <Button
+//               variant="outlined"
+//               onClick={handleCancel}
+//               fullWidth
+//               sx={{ color: "black", borderColor: "black" }}
+//             >
+//               Back
+//             </Button>
+//           </>
+//         ) : (
+//           <Button
+//             onClick={() => setIsEditing(true)}
+//             fullWidth
+//             variant="contained"
+//             sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+//           >
+//             Update Profile
+//           </Button>
+//         )}
+//       </div>
+
+//       {/* Upgrade Button */}
+//       {!isEditing && (
+//         <Button
+//           fullWidth
+//           variant="contained"
+//           sx={{ bgcolor: "#f97316", ":hover": { bgcolor: "#ea580c" } }}
+//         >
+//           Upgrade My Membership
+//         </Button>
+//       )}
+
+//       {/* Documents Section */}
+//       {shouldShowDocuments && 
+//     <AnimateOnScrollProvider>
+
+//       <div className="space-y-6 mt-5">
+//         <Divider className="my-4">
+//           <Chip 
+//             label={
+//               <div className="flex items-center space-x-2">
+//                 <CloudDownload />
+//                 <span>My Documents ({documents.length})</span>
+//               </div>
+//             } 
+//             color="primary" 
+//           />
+//         </Divider>
+//         <div className="flex flex-col md:flex-row justify-between gap-4 mt-3" >
+//           <div className="flex items-center gap-2 w-full">
+//             <TextField
+//               size="small"
+//               placeholder="Search documents..."
+//               value={searchQuery}
+//               onChange={(e) => setSearchQuery(e.target.value)}
+//               InputProps={{
+//                 startAdornment: (
+//                   <InputAdornment position="start">
+//                     <FaSearch className="text-gray-400" />
+//                   </InputAdornment>
+//                 ),
+//               }}
+//               sx={{ flex: 1, maxWidth: 400 }}
+//             />
+//           <>
+//       {/* 🔒 Hidden File Input */}
+//       <input
+//         type="file"
+//         accept="*/*"
+//         ref={inputRef}
+//         onChange={handleFileChange}
+//         style={{ display: "none" }}
+//       />
+
+//       {/* 📄 Upload Button */}
+//       <Button
+//         variant="contained"
+//         startIcon={<FaPlus />}
+//         onClick={handleClick}
+//         sx={{
+//           bgcolor: 'primary.main',
+//           whiteSpace: 'nowrap',
+//           minWidth: 'fit-content',
+//         }}
+//       >
+//         Add Documents
+//       </Button>
+//       <Backdrop open={loading} sx={{ zIndex: 9999, color: '#fff' }}>
+//   <CircularProgress color="inherit" />
+// </Backdrop>
+// <Snackbar
+//   open={snackbar.open}
+//   autoHideDuration={4000}
+//   onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+//   anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+// >
+//   <Alert onClose={() => setSnackbar(prev => ({ ...prev, open: false }))} severity={snackbar.severity} sx={{ width: '100%' }}>
+//     {snackbar.message}
+//   </Alert>
+// </Snackbar>
+
+//     </>
+
+//           </div>
+
+//           {isEditing && (
+//             <Button
+//               variant="contained"
+//               startIcon={<FileUpload />}
+//               sx={{ bgcolor: 'primary.main', whiteSpace: 'nowrap' }}
+//             >
+//               Upload New
+//             </Button>
+//           )}
+//         </div>
+
+//         {loadingDocuments && (
+//           <div className="flex justify-center items-center py-8">
+//             <FaSpinner className="animate-spin text-2xl text-gray-400 mr-2" />
+//             <Typography variant="body1" className="text-gray-500">
+//               Loading documents...
+//             </Typography>
+//           </div>
+          
+//         )}
+
+//         {!loadingDocuments && Object.entries(documentGroups).map(([type, docs]) => (
+//           <div key={type} className="space-y-6">
+//             {/* Document Group Header */}
+//             <div className="flex justify-between items-center">
+//               <Typography variant="h6" className="font-semibold text-gray-700">
+//                 {type} Files ({docs.length})
+//               </Typography>
+//               <Typography variant="body2" className="text-gray-500">
+//                 {docs.length} items
+//               </Typography>
+//             </div>
+
+//             <div className="space-y-6">
+//               {docs.map((doc, index) => {
+//                 const docName = doc.name.split('-').slice(1).join(' ').replace(/\.[^/.]+$/, '');
+
+//                 return (
+//         <div key={index} className="flex justify-between items-center p-4 bg-white border border-gray-300 rounded-lg shadow-sm transition-all duration-200"  data-aos="fade-up" >
+                    
+//                     <div className="flex items-center space-x-4">
+//                       <Avatar className="w-14 h-14 bg-gray-200">
+//                         {fileTypeIcons[doc.type.toLowerCase()] || <FaFileAlt className="text-gray-600" />}
+//                       </Avatar>
+
+//                       <div className="flex flex-col">
+//                         <Typography variant="subtitle1" className="font-medium text-gray-800">
+//                           {docName}
+//                         </Typography>
+//                         <Typography variant="body2" className="text-gray-500">
+//                           {doc.loading ? (
+//                             <span className="flex items-center">
+//                               <FaSpinner className="animate-spin mr-1" size={12} />
+//                               Loading details...
+//                             </span>
+//                           ) : (
+//                             `${doc.size} • ${doc.uploadedAt}`
+//                           )}
+//                         </Typography>
+//                       </div>
+//                     </div>
+
+//                     <div className="flex items-center space-x-4">
+//                       <Tooltip title="Download">
+//                         <IconButton
+//                           size="small"
+//                           onClick={() => window.open(doc.url, "_blank")}
+//                           sx={{
+//                             color: 'primary.main',
+//                             '&:hover': { color: 'blue.500' }
+//                           }}
+//                         >
+//                           <FaDownload />
+//                         </IconButton>
+//                       </Tooltip>
+
+//                       {isEditing && (
+//                         <Tooltip title="Delete">
+//                           <IconButton
+//                             size="small"
+//                             onClick={handleDelete}
+//                             sx={{
+//                               color: 'red.500',
+//                               '&:hover': { color: 'red.700' }
+//                             }}
+//                           >
+//                             <Delete />
+//                           </IconButton>
+//                         </Tooltip>
+//                       )}
+//                     </div>
+//                   </div>
+//                 );
+//               })}
+//             </div>
+//           </div>
+//         ))}
+
+//         {!loadingDocuments && filteredDocuments.length === 0 && (
+//           <div className="text-center py-8">
+//             <FaFileAlt className="mx-auto text-4xl text-gray-300 mb-2" />
+//             <Typography variant="body1" className="text-gray-500">
+//               {searchQuery ? "No matching documents found" : "No documents uploaded yet"}
+//             </Typography>
+//           </div>
+//         )}
+//       </div>
+//     </AnimateOnScrollProvider>
+
+// }
+//       {/* Document Context Menu */}
+//       <Menu
+//         anchorEl={anchorEl}
+//         open={Boolean(anchorEl)}
+//         onClose={handleMenuClose}
+//       >
+//         <MenuItem onClick={handleDownload}>
+//           <FaDownload className="mr-2" /> Download
+//         </MenuItem>
+//         <MenuItem onClick={handleDelete}>
+//           <Delete className="mr-2" /> Delete
+//         </MenuItem>
+//       </Menu>
+      
+//     </div>
+//   );
+// };
+
+// export default ActionButtons;
 
 
 

@@ -2,14 +2,15 @@ import { API_URL } from "./path";
 
 export async function uploadToS3({
     file,
-    token,
     endpoint = 'file/upload', 
   }: {
     file: File;
-    token: string;
+
     endpoint?: string;
   }): Promise<string> {
     // Step 1: Get pre-signed URL
+    console.log("file",file)
+    const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
     const res = await fetch(`${API_URL}/${endpoint}`, {
       method: 'POST',
       headers: {

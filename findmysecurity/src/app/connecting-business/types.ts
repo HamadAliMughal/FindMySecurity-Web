@@ -54,6 +54,8 @@ export interface MarkerData {
     profilePhoto?: string;
   }
   export interface Professional {
+    permissions: boolean;
+    name: any;
     id: number;
     userId: number;
     user: User;
@@ -82,6 +84,7 @@ export interface MarkerData {
   }
   
   export interface Company {
+    name: any;
     id: number;
     userId: number;
     companyName: string;
@@ -138,6 +141,7 @@ export interface MarkerData {
   }
   
   export interface CourseProvider {
+    name: any;
     organizationName: any;
     id: number;
     userId: number;

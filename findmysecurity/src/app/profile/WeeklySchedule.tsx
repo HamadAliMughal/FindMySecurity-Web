@@ -1,13 +1,13 @@
 "use client";
 
 import React from "react";
-import ProfileHeader from "./ProfileHeader";
-import BasicInfo from "./BasicInfo";
-import AboutSection from "./AboutSection";
-import ServicesSection from "./ServiceSection";
-import AvailabilitySection from "./AvailabilitySection";
-import FeesSection from "./FeeSection";
-import ContactSection from "./ContactSection";
+import ProfileHeader from "./components/ProfileHeader";
+import BasicInfo from "./components/BasicInfo";
+import AboutSection from "./components/AboutSection";
+import ServicesSection from "./components/ServiceSection";
+import AvailabilitySection from "./components/AvailabilitySection";
+import FeesSection from "./components/FeeSection";
+import ContactSection from "./components/ContactSection";
 
 const WeeklySchedule = ({ roleId, loginData }: any) => {
   if (roleId !== 3) return null;
