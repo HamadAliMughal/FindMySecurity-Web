@@ -192,7 +192,6 @@ const JobPosting: React.FC = () => {
       if (formData.profilePhoto) {
         profilePhotoUrl = await uploadToS3({
           file: formData.profilePhoto,
-          token: token!,
         });
       }
   
@@ -201,7 +200,6 @@ const JobPosting: React.FC = () => {
       for (const file of formData.compulsoryDocuments) {
         const uploadedDocUrl = await uploadToS3({
           file,
-          token: token!,
         });
         uploadedDocumentUrls.push(uploadedDocUrl);
       }
