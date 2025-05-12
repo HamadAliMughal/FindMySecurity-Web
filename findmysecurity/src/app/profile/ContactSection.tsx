@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import Section from "./Section";
 import toast from "react-hot-toast";
-
-const ContactSection = ({ contact }: { contact: any }) => {
+import axios from "axios";
+const ContactSection = ({ contact , id}: { contact: any , id : any}) => {
   if (!contact) return null;
 
   const [isEditing, setIsEditing] = useState(false);
@@ -19,11 +19,43 @@ const ContactSection = ({ contact }: { contact: any }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    setUpdatedData({ ...formData });
-    toast.success("Contact information updated successfully");
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
+      if (!token) {
+        toast.error("Authorization token not found.");
+        return;
+      }
+  
+      const payload = {
+        profileData: {
+          homeTelephone: formData.homeTelephone,
+          mobileTelephone: formData.mobileTelephone,
+          website: formData.website,
+        },
+   
+      };
+  
+      await axios.put(
+        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/profile/individual/${id}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      setUpdatedData({ ...formData });
+      toast.success("Contact information updated successfully");
+      setIsEditing(false);
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Failed to update contact info.";
+      toast.error(message);
+    }
   };
+  
 
   const handleCancel = () => {
     setFormData({ ...updatedData });

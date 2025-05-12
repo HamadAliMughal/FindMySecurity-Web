@@ -11,19 +11,19 @@ import ContactSection from "./ContactSection";
 
 const WeeklySchedule = ({ roleId, loginData }: any) => {
   if (roleId !== 3) return null;
-  const profileData = loginData?.individualProfessional?.profileData;
+  const profileData = loginData?.individualProfessional?.profile;
   if (!profileData)
     return <div className="p-6 text-center text-gray-500">No profile data available</div>;
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-6 bg-gray-50 rounded-xl">
       <ProfileHeader />
-      <BasicInfo profileData={profileData} />
-      <AboutSection about={profileData.about} />
-      <ServicesSection services={profileData.services} />
-      <AvailabilitySection availability={profileData.availability} />
-      <FeesSection fees={profileData.fees} />
-      <ContactSection contact={profileData.contact} />
+      <BasicInfo profileData={profileData} id={loginData?.id} />
+      <AboutSection about={profileData} id={loginData?.id} />
+      <ServicesSection services={profileData} id={loginData?.id} />
+      <AvailabilitySection availability={profileData}  id={loginData?.id}/>
+      <FeesSection fees={profileData} id={loginData?.id}/>
+      <ContactSection contact={profileData} id={loginData?.id}/>
     </div>
   );
 };

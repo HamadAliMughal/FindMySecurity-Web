@@ -209,36 +209,35 @@ const JobPosting: React.FC = () => {
       const apiData = {
         profileData: {
           profilePhoto: profilePhotoUrl,
-          basicInfo: {
             screenName: formData.screenName,
             postcode: formData.postcode,
             profileHeadline: formData.profileHeadline,
             gender: formData.gender,
-          },
-          services: {
+          
+          
             // selectedServices: formData.selectedServices,
             selectedRoles: formData.selectedRoles,
             otherService: formData.otherService,
-          },
-          about: {
+          
+         
             aboutMe: formData.aboutMe.substring(0, 1000),
             experience: formData.experience.substring(0, 1000),
             qualifications: formData.qualifications.substring(0, 1000),
-          },
-          availability: {
+         
+        
             description: formData.availability,
             weeklySchedule: formData.weeklySchedule,
-          },
-          fees: {
-            description: formData.availability,
+        
+         
+           
             hourlyRate: formData.hourlyRate,
-          },
-          contact: {
+         
+       
             homeTelephone: formData.homeTelephone,
             mobileTelephone: formData.mobileTelephone,
             website: formData.website,
-          },
-          documents: uploadedDocumentUrls,
+       
+        
         },
       };
   

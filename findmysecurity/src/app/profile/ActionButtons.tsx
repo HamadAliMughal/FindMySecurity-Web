@@ -139,7 +139,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
 
   useEffect(() => {
     const loadDocuments = async () => {
-      const rawDocuments = loginData?.individualProfessional?.profileData?.documents || [];
+      const rawDocuments = loginData?.individualProfessional?.profile?.documents || [];
       setLoadingDocuments(true);
       
       // Explicitly type the url parameter as string
@@ -227,7 +227,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     setIsEditing(false);
   };
 
-  const profileData = loginData?.individualProfessional?.profileData?.profilePhoto || '';
+  const profileData = loginData?.individualProfessional?.profile?.profilePhoto || loginData.profile|| '';
   const finalImage = profilePhoto || profileData || "/images/profile.png";
   return (
     <div className="w-full max-w-5xl mx-auto p-4 space-y-6">

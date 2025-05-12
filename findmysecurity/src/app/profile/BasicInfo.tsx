@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import Section from "./Section";
 import toast from "react-hot-toast";
+import axios from "axios";
 
-
-const BasicInfo = ({ profileData }: { profileData: any }) => {
+const BasicInfo = ({ profileData , id }: { profileData: any , id:any }) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const [formData, setFormData] = useState({
-    profileHeadline: profileData.basicInfo?.profileHeadline || "",
-    gender: profileData.basicInfo?.gender || "",
-    postcode: profileData.basicInfo?.postcode || "",
-    hourlyRate: profileData.fees?.hourlyRate || "",
+    profileHeadline: profileData.profileHeadline || "",
+    gender: profileData?.gender || "",
+    postcode: profileData?.postcode || "",
+    hourlyRate: profileData?.hourlyRate || "",
   });
 
   const [updatedData, setUpdatedData] = useState({ ...formData });
@@ -20,11 +20,45 @@ const BasicInfo = ({ profileData }: { profileData: any }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    setUpdatedData({ ...formData });
-    toast.success("Profile updated successfully");
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
+  
+      if (!token) {
+        toast.error("Authorization token not found.");
+        return;
+      }
+  
+      const payload = {
+        profileData:{
+        profileHeadline: formData.profileHeadline,
+        gender: formData.gender,
+        postcode: formData.postcode,
+        hourlyRate: formData.hourlyRate,
+        },
+      };
+  
+      await axios.put(
+        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/profile/individual/${id}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      setUpdatedData({ ...formData });
+      setIsEditing(false);
+      toast.success("Profile updated successfully");
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message || "An error occurred while saving.";
+      toast.error(message);
+    }
   };
+  
 
   const handleCancel = () => {
     setFormData({ ...updatedData });
@@ -34,7 +68,7 @@ const BasicInfo = ({ profileData }: { profileData: any }) => {
   const profilePhoto = profileData.profilePhoto;
 
   return (
-    (profileData.basicInfo || profilePhoto) && (
+    (profileData || profilePhoto) && (
       <Section
         title={
           <div className="flex items-center justify-between">

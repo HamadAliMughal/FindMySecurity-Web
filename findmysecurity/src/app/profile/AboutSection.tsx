@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import Section from "./Section";
 import toast from "react-hot-toast";
+import axios from "axios";
 
-const AboutSection = ({ about }: { about: any }) => {
+const AboutSection = ({ about, id }: { about: any; id: any }) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -13,15 +14,47 @@ const AboutSection = ({ about }: { about: any }) => {
 
   const [updatedData, setUpdatedData] = useState({ ...formData });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    setUpdatedData({ ...formData });
-    toast.success("About section updated successfully");
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
+      if (!token) {
+        toast.error("Authorization token not found.");
+        return;
+      }
+
+      const payload = {
+        profileData:{
+        ...updatedData,
+        ...formData,
+        },
+      };
+
+      await axios.put(
+        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/profile/individual/${id}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      setUpdatedData({ ...formData });
+      setIsEditing(false);
+      toast.success("About section updated successfully");
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message || "Failed to update about section.";
+      toast.error(message);
+    }
   };
 
   const handleCancel = () => {

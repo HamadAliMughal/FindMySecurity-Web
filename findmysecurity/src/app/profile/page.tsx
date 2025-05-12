@@ -126,8 +126,11 @@ const UserProfile: React.FC = () => {
         />
 
         <ProfileMenu roleId={roleId} />
-         {loginData?.individualProfessional?.profileData?.availability   && (
+         {loginData?.individualProfessional?.profile?.weeklySchedule   && (
+          <>
+        
         <WeeklySchedule roleId={roleId} loginData={loginData} />
+        </>
          )
          }
        

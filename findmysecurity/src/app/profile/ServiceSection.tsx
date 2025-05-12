@@ -1,7 +1,7 @@
 import React from "react";
 import Section from "./Section";
 
-const ServicesSection = ({ services }: { services: any }) => {
+const ServicesSection = ({ services , id}: { services: any , id :any}) => {
   if (!services) return null;
 
   return (

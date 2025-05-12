@@ -3,14 +3,15 @@ import Section from "./Section";
 import { CheckCircle, Cancel } from "@mui/icons-material";
 import toast from "react-hot-toast";
 
-const AvailabilitySection = ({ availability }: { availability: any }) => {
+import axios from "axios";
+const AvailabilitySection = ({ availability , id }: { availability: any , id : any }) => {
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
   const [isEditing, setIsEditing] = useState(false);
-  const [description, setDescription] = useState(availability?.description || "");
+  const [description, setDescription] = useState(availability?.availabilityDescription || "");
   const [weeklySchedule, setWeeklySchedule] = useState(availability?.weeklySchedule || {});
   const [updatedSchedule, setUpdatedSchedule] = useState(availability?.weeklySchedule || {});
-  const [updatedDescription, setUpdatedDescription] = useState(availability?.description || "");
+  const [updatedDescription, setUpdatedDescription] = useState(availability?.availabilityDescription || "");
 
   if (!availability) return null;
 
@@ -24,12 +25,45 @@ const AvailabilitySection = ({ availability }: { availability: any }) => {
     }));
   };
 
-  const handleSave = () => {
-    setUpdatedSchedule({ ...weeklySchedule });
-    setUpdatedDescription(description);
-    toast.success("Availability updated successfully");
-    setIsEditing(false);
+
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
+      if (!token) {
+        toast.error("Authorization token not found.");
+        return;
+      }
+  
+      const payload = {
+        profileData: {
+          weeklySchedule: weeklySchedule,
+          availabilityDescription: description,
+        },
+
+      };
+  
+      await axios.put(
+        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/profile/individual/${id}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      setUpdatedSchedule({ ...weeklySchedule });
+      setUpdatedDescription(description);
+      toast.success("Availability updated successfully");
+      setIsEditing(false);
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message || "Failed to update availability.";
+      toast.error(message);
+    }
   };
+  
 
   const handleCancel = () => {
     setWeeklySchedule({ ...updatedSchedule });
