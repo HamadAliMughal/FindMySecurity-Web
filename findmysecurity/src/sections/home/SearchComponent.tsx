@@ -251,16 +251,50 @@ export default function SearchComponent({
               validBasic &&
               searchValues.distance &&
               (hideExperienceField || searchValues.experience);
-
+          
             if ((showAdvanced && !validAdvanced) || (!showAdvanced && !validBasic)) {
               return;
-            } else {
-              localStorage.setItem("searchValues", JSON.stringify(searchValues));
-              localStorage.setItem("searchMode", showAdvanced ? "advanced" : "basic");
-              localStorage.setItem("title", JSON.stringify(title));
-              window.location.href = "/connecting-business";
             }
+          
+            const params = new URLSearchParams();
+            if (title === "Professionals") {
+              params.set("role", searchValues.lookingFor);
+              // Allow multiple subCategory values
+              searchValues.subCategory.split(",").forEach((sub) => {
+                if (sub.trim()) params.append("subcategory", sub.trim());
+              });
+              params.set("pc", searchValues.postcode);
+              
+              params.set("page", "1");
+              params.set("pageSize", "10");
+            } else {
+              params.set("sr", searchValues.lookingFor);
+              params.set("so", searchValues.subCategory);
+              params.set("pc", searchValues.postcode);
+              if (searchValues.distance) params.set("ds", searchValues.distance);
+              if (searchValues.experience && !hideExperienceField)
+                params.set("ex", searchValues.experience);
+              params.set("page", "1");
+            }
+            
+          
+            let targetPath = "/connecting-business";
+            if (title === "Security Companies") {
+              alert(title);
+              targetPath = "/security-companies";
+            } else if (title === "Professionals") {
+              targetPath = "/professionals";
+            } else if (title === "Course Providers") {
+              targetPath = "/course-providers";
+            }
+          
+            localStorage.setItem("searchValues", JSON.stringify(searchValues));
+            localStorage.setItem("searchMode", showAdvanced ? "advanced" : "basic");
+            localStorage.setItem("title", JSON.stringify(title));
+          
+            window.location.href = `${targetPath}?${params.toString()}`;
           }}
+          
         >
           <FaSearch className="mr-2" />
           Go
