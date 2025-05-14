@@ -13,12 +13,23 @@ import professionalsList from "@/sections/data/secuirty_professional.json";
 import Select from 'react-select';
 import toast from "react-hot-toast";
 
+
+interface RoleOption {
+  label: string;
+  value: string;
+  group: string;
+  isComingSoon: boolean;
+}
+interface RoleSelection {
+  title: string;
+  role: string;
+}
 interface FormData {
   screenName: string;
   postcode: string;
   profileHeadline: string;
   // selectedServices: string[];
-  selectedRoles: string[];
+  selectedRoles: RoleSelection[];
   otherService: string;
   gender: string;
   aboutMe: string;
@@ -38,6 +49,8 @@ interface FormData {
   };
 }
 
+
+
 const JobPosting: React.FC = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,7 +63,14 @@ const JobPosting: React.FC = () => {
     'Evening',
     'Overnight'
   ];
-
+  
+  const handleRoleSelection = (selectedOptions: any) => {
+    const selectedItems = selectedOptions.map((option: any) => ({
+      title: option.group,  // Store the group title
+      role: option.value    // Store the role value
+    }));
+    handleInputChange('selectedRoles', selectedItems);
+  };
   // Transform professional data for select component
   const roleOptions = professionalsList.flatMap(category => 
     category.roles.map(role => ({
@@ -89,6 +109,7 @@ const JobPosting: React.FC = () => {
       backgroundColor: state.data.isComingSoon ? '#F3F4F6' : '#E5E7EB'
     })
   };
+
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -162,19 +183,7 @@ const JobPosting: React.FC = () => {
     }
   };
 
-  const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const newDocuments = Array.from(e.target.files);
-      handleInputChange('compulsoryDocuments', [...formData.compulsoryDocuments, ...newDocuments]);
-    }
-  };
-
-  const removeDocument = (index: number) => {
-    const updatedDocuments = [...formData.compulsoryDocuments];
-    updatedDocuments.splice(index, 1);
-    handleInputChange('compulsoryDocuments', updatedDocuments);
-  };
-
+ 
   const removeProfilePhoto = () => {
     handleInputChange('profilePhoto', null);
   };
@@ -184,6 +193,7 @@ const JobPosting: React.FC = () => {
     setIsSubmitting(true);
     const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
   
+    
     try {
       if (!userId) throw new Error("User ID not found");
   
@@ -194,7 +204,16 @@ const JobPosting: React.FC = () => {
           file: formData.profilePhoto,
         });
       }
-  
+     // Get unique titles from selected roles
+     const serviceRequirements = Array.from(
+      new Set(formData.selectedRoles.map(item => item.title))
+    );
+
+    // Get all roles and include other services if provided
+    const securityServicesOfferings = [
+      ...formData.selectedRoles.map(item => item.role),
+      ...(formData.otherService ? [formData.otherService.trim()] : [])
+    ];
       // Upload documents
       const uploadedDocumentUrls = [];
       for (const file of formData.compulsoryDocuments) {
@@ -211,31 +230,18 @@ const JobPosting: React.FC = () => {
             postcode: formData.postcode,
             profileHeadline: formData.profileHeadline,
             gender: formData.gender,
-          
-          
             // selectedServices: formData.selectedServices,
-            selectedRoles: formData.selectedRoles,
-            otherService: formData.otherService,
-          
-         
+            serviceRequirements, // Now contains only unique titles
+            securityServicesOfferings, // Contains all roles + other services
             aboutMe: formData.aboutMe.substring(0, 1000),
             experience: formData.experience.substring(0, 1000),
-            qualifications: formData.qualifications.substring(0, 1000),
-         
-        
+            qualifications: formData.qualifications.substring(0, 1000),    
             description: formData.availability,
-            weeklySchedule: formData.weeklySchedule,
-        
-         
-           
-            hourlyRate: formData.hourlyRate,
-         
-       
+            weeklySchedule: formData.weeklySchedule,           
+            hourlyRate: formData.hourlyRate,                
             homeTelephone: formData.homeTelephone,
             mobileTelephone: formData.mobileTelephone,
-            website: formData.website,
-       
-        
+            website: formData.website,               
         },
       };
   
@@ -275,10 +281,10 @@ const JobPosting: React.FC = () => {
     }));
   };
 
-  const handleRoleSelection = (selectedOptions: any) => {
-    const selectedValues = selectedOptions.map((option: any) => option.value);
-    handleInputChange('selectedRoles', selectedValues);
-  };
+  // const handleRoleSelection = (selectedOptions: any) => {
+  //   const selectedValues = selectedOptions.map((option: any) => option.value);
+  //   handleInputChange('selectedRoles', selectedValues);
+  // };
 
   const handleCheckboxChange = (timeSlot: string, day: string) => {
     setFormData(prev => ({
@@ -399,10 +405,9 @@ const JobPosting: React.FC = () => {
         {/* Security Roles Multi-Select Dropdown */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Security Services*
-            <span className="ml-1 text-xs text-gray-500">(Select multiple if applicable)</span>
+            Security Services* <span className="ml-1 text-xs text-gray-500">(Select multiple if applicable)</span>
           </label>
-
+        
           <Select
             isMulti
             options={Object.entries(groupedOptions).map(([label, options]) => ({
@@ -410,7 +415,7 @@ const JobPosting: React.FC = () => {
               options
             }))}
             value={roleOptions.filter(option => 
-              formData.selectedRoles.includes(option.value)
+              formData.selectedRoles.some(item => item.role === option.value)
             )}
             onChange={handleRoleSelection}
             className="react-select-container"
@@ -531,14 +536,14 @@ const JobPosting: React.FC = () => {
               )
             }}
           />
-  
+        
           {formData.selectedRoles.length > 0 && (
             <p className="mt-2 text-xs text-gray-500">
               Selected: {formData.selectedRoles.length} service(s)
             </p>
           )}
         </div>
-
+          
         {/* Other Services */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Other Services:</label>
@@ -651,7 +656,7 @@ const JobPosting: React.FC = () => {
         </div>
 
         {/* Compulsory Documents Section */}
-        <div className="border-t border-gray-200 pt-6">
+        {/* <div className="border-t border-gray-200 pt-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Add Compulsary Documents</h2>
           <div className="space-y-4">
             <div>
@@ -686,7 +691,7 @@ const JobPosting: React.FC = () => {
   ))}        
 
           </div>
-        </div>
+        </div> */}
 
         {/* Fees Section */}
         <div className="border-t border-gray-200 pt-6">
@@ -716,29 +721,7 @@ const JobPosting: React.FC = () => {
           </div>
         </div>
 
-        {/* Profile Photo Section */}
-        {/* <div className="border-t border-gray-200 pt-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Profile Photo</h2>
-        <p className="text-sm text-gray-600 mb-4">
-          Your photo must be of yourself or your setting only. No children or logos.
-        </p>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Upload a new Profile Photo*</label>
-          <input
-                type="file"
-                onChange={handleProfilePhotoUpload}
-                multiple
-                accept=".jpg,.jpeg,.png"
-                className="block w-full text-sm text-gray-500
-                  file:mr-4 file:py-2 file:px-4
-                  file:rounded-md file:border-0
-                  file:text-sm file:font-semibold
-                  file:bg-blue-50 file:text-blue-700
-                  hover:file:bg-blue-100"
-              />
-        </div>
-        
-      </div> */}
+  
        {/* Profile Photo Section - Updated */}
        <div className="border-t border-gray-200 pt-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Profile Photo</h2>
@@ -870,6 +853,69 @@ export default JobPosting;
 
 
 
+
+
+
+  //   option: (provided: any, state: any) => ({
+  //     ...provided,
+  //     color: state.data.isComingSoon ? '#9CA3AF' : provided.color,
+  //     cursor: state.data.isComingSoon ? 'not-allowed' : provided.cursor,
+  //     backgroundColor: state.isSelected ? '#E5E7EB' : provided.backgroundColor,
+  //     '&:hover': {
+  //       backgroundColor: state.data.isComingSoon ? provided.backgroundColor : '#F3F4F6'
+  //     }
+  //   }),
+  //   multiValueLabel: (provided: any, state: any) => ({
+  //     ...provided,
+  //     textDecoration: 'none',
+  //     color: state.data.isComingSoon ? '#9CA3AF' : provided.color
+  //   }),
+  //   multiValue: (provided: any, state: any) => ({
+  //     ...provided,
+  //     backgroundColor: state.data.isComingSoon ? '#F3F4F6' : '#E5E7EB'
+  //   })
+  // };
+
+
+
+      {/* Profile Photo Section */}
+        {/* <div className="border-t border-gray-200 pt-6">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Profile Photo</h2>
+        <p className="text-sm text-gray-600 mb-4">
+          Your photo must be of yourself or your setting only. No children or logos.
+        </p>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Upload a new Profile Photo*</label>
+          <input
+                type="file"
+                onChange={handleProfilePhotoUpload}
+                multiple
+                accept=".jpg,.jpeg,.png"
+                className="block w-full text-sm text-gray-500
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-md file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-blue-50 file:text-blue-700
+                  hover:file:bg-blue-100"
+              />
+        </div>
+        
+      </div> */}
+ // const handleDocumentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (e.target.files) {
+  //     const newDocuments = Array.from(e.target.files);
+  //     handleInputChange('compulsoryDocuments', [...formData.compulsoryDocuments, ...newDocuments]);
+  //   }
+  // };
+
+  // const removeDocument = (index: number) => {
+  //   const updatedDocuments = [...formData.compulsoryDocuments];
+  //   updatedDocuments.splice(index, 1);
+  //   handleInputChange('compulsoryDocuments', updatedDocuments);
+  // };
+
+
+  // const selectStyles = {
 
 // "use client";
 
