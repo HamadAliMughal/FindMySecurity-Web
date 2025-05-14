@@ -16,6 +16,7 @@ const UserProfile: React.FC = () => {
   const [roleId, setRoleId] = useState(0);
   // ✅ Separated refresh function to be passed to children
   const refreshUserData = async () => {
+    alert("refreshUserData");
     const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
     const storedData = localStorage.getItem("loginData") || localStorage.getItem("profileData");
     const parsedData = storedData ? JSON.parse(storedData) : null;

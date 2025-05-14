@@ -40,6 +40,7 @@ import {
 } from "@mui/material";
 import { Delete, MoreVert, FileUpload, CloudDownload } from "@mui/icons-material";
 import { uploadToS3 } from "@/utils/s3file";
+import SubscriptionPopup from "@/sections/components/Subscription-plan-popup/SubscriptionPopup";
 
 interface Document {
   id?: string;
@@ -90,6 +91,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
 }) => {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
+  const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({ ...loginData });
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -493,16 +495,26 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       </div>
 
       {/* Upgrade Button */}
-      {!isEditing && (
+      {!isEditing && !loginData.isSubscriber && (
         <Button
           fullWidth
+           onClick={() => setOpen(true)}
           variant="contained"
           sx={{ bgcolor: "#f97316", ":hover": { bgcolor: "#ea580c" } }}
         >
           Upgrade My Membership
         </Button>
       )}
-
+        {loginData.isSubscriber && (
+              <div className="bg-green-100 border border-green-400 text-green-800 px-6 py-4 rounded-lg mb-6">
+      <h2 className="text-lg font-semibold">You are a valued subscriber! 🎉</h2>
+      {loginData?.subscriptionTier && (
+        <p className="mt-1">
+          <span className="font-medium">Subscription Tier:</span> {loginData?.subscriptionTier}
+        </p>
+      )}
+    </div>
+          )}
       {/* Documents Section */}
       {shouldShowDocuments && 
     <AnimateOnScrollProvider>
@@ -705,6 +717,9 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           <Delete className="mr-2" /> Delete
         </MenuItem>
       </Menu>
+       {open && (
+        <SubscriptionPopup roleId={roleId} onClose={() => setOpen(false)} />
+      )}
     </div>
   );
 };
