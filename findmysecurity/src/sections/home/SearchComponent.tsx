@@ -285,7 +285,7 @@ export default function SearchComponent({
             } else if (title === "Professionals") {
               targetPath = "/professionals";
             } else if (title === "Course Providers") {
-              targetPath = "/course-providers";
+              targetPath = "/course-provider";
             }
           
             localStorage.setItem("searchValues", JSON.stringify(searchValues));
