@@ -16,6 +16,9 @@ import { API_URL } from "@/utils/path";
 import toast from "react-hot-toast";
 import Link from "next/link";
 
+
+
+
 interface Notification {
   [x: string]: ReactNode;
   id: number;
@@ -116,31 +119,42 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
   const shouldShowCreateProfile =
     roleId === 3 && !loginData?.individualProfessional?.profileData?.availability;
 
-  const menuItems = [
-    { icon: <FaSearch />, label: "My Searches" },
-    { icon: <FaHeart />, label: "My Favourites" },
-    {
-      icon: <FaUserShield />,
-      label: roleId !== 3 ? "My Job Applicants" : "Visitors",
-      route: roleId !== 3 ? "/my-job-applicants" : "/visitors",
-    },
-    ...(roleId !== 3 ? [{ icon: <FaCogs />, label: "My Ads", route: "/my-ads" }]:[]),
-    { icon: <FaSearch />, label: "Advance Search" },
-    { icon: <FaCogs />, label: "Customer Support" },
-    { icon: <FaBell />, label: "Notifications", isNotification: true },
-    ...(roleId !== 3
+const isSubscriber = loginData?.isSubscriber;
+const subscriptionTier = loginData?.subscriptionTier;
+
+const menuItems = [
+  { icon: <FaSearch />, label: "My Searches" },
+  { icon: <FaHeart />, label: "My Favourites" },
+  {
+    icon: <FaUserShield />,
+    label: roleId !== 3 ? "My Job Applicants" : "Visitors",
+    route: roleId !== 3 ? "/my-job-applicants" : "/visitors",
+  },
+  ...(roleId !== 3 && isSubscriber && subscriptionTier !== "basic"
+    ? [{ icon: <FaCogs />, label: "My Ads", route: "/my-ads" }]
+    : []),
+  { icon: <FaSearch />, label: "Advance Search" },
+  { icon: <FaCogs />, label: "Customer Support" },
+  ...(isSubscriber && subscriptionTier !== "basic"
+    ? [{ icon: <FaBell />, label: "Notifications", isNotification: true }]
+    : []),
+  ...(roleId !== 3
+    ? isSubscriber && subscriptionTier !== "basic"
       ? [{ icon: <FaAd />, label: "Post Free Ad", route: "/post-ad" }]
-      : [{ icon: <FaAd />, label: "View JObs", route: "/view-ads" }]),
-    ...(shouldShowCreateProfile
-      ? [
-          {
-            icon: <FaUserPlus />,
-            label: "Create Public Profile",
-            route: "/public-profile",
-          },
-        ]
-      : []),
-  ];
+      : []
+    : [{ icon: <FaAd />, label: "View JObs", route: "/view-ads" }]),
+  ...(shouldShowCreateProfile
+    ? [
+        {
+          icon: <FaUserPlus />,
+          label: "Create Public Profile",
+          route: "/public-profile",
+        },
+      ]
+    : []),
+];
+
+
 
   const handleMenuClick = (item: any) => {
     if (item.isNotification) {
