@@ -130,16 +130,16 @@ const menuItems = [
     label: roleId !== 3 ? "My Job Applicants" : "Visitors",
     route: roleId !== 3 ? "/my-job-applicants" : "/visitors",
   },
-  ...(roleId !== 3 && isSubscriber && subscriptionTier !== "basic"
+  ...(roleId !== 3 && isSubscriber && subscriptionTier !== "Basic"
     ? [{ icon: <FaCogs />, label: "My Ads", route: "/my-ads" }]
     : []),
   { icon: <FaSearch />, label: "Advance Search" },
   { icon: <FaCogs />, label: "Customer Support" },
-  ...(isSubscriber && subscriptionTier !== "basic"
+  ...(isSubscriber && subscriptionTier !== "Basic"
     ? [{ icon: <FaBell />, label: "Notifications", isNotification: true }]
     : []),
   ...(roleId !== 3
-    ? isSubscriber && subscriptionTier !== "basic"
+    ? isSubscriber && subscriptionTier !== "Basic"
       ? [{ icon: <FaAd />, label: "Post Free Ad", route: "/post-ad" }]
       : []
     : [{ icon: <FaAd />, label: "View JObs", route: "/view-ads" }]),
