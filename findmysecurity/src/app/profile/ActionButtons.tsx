@@ -351,7 +351,7 @@ const tier = loginData?.subscriptionTier;
 
 let ringClass = '';
 if (isSubscriber && tier !== 'basic') {
-  if (tier === 'standard') ringClass = 'ring-6 ring-gray-400'; // silver
+  if (tier === 'Standard') ringClass = 'ring-6 ring-gray-400'; // silver
   else if (tier === 'Premium') ringClass = 'ring-6 ring-yellow-500'; // gold
 }
 
