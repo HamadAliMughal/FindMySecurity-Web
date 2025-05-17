@@ -255,7 +255,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
       companyData: {
         companyName: formData.companyName,
         registrationNumber: formData.registrationNumber,
-        businessAddress: formData.address,
+        address: formData.address,
         postCode: formData.postcode,
         contactPerson: formData.contactPerson,
         jobTitle: formData.jobTitle,
