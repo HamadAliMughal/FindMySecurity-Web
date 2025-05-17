@@ -180,7 +180,10 @@ const BasicInfo = ({ profileData , id }: { profileData: any , id:any }) => {
                     </p>
                   )}
                 </div>
-                {!isEditing && (
+                
+              </>
+            )}
+            {!isEditing && (
             <button
               onClick={() => setIsEditing(true)}
               className="text-sm px-5 py-2 mt-5 bg-black text-white rounded hover:bg-gray-800 transition"
@@ -188,8 +191,6 @@ const BasicInfo = ({ profileData , id }: { profileData: any , id:any }) => {
               Edit
             </button>
           )}
-              </>
-            )}
           </div>
         </div>
       </Section>
