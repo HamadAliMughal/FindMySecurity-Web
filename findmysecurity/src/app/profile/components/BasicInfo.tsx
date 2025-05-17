@@ -85,7 +85,7 @@ const BasicInfo = ({ profileData , id }: { profileData: any , id:any }) => {
               className="w-24 h-24 rounded-full object-cover border shadow-sm"
             />
           )}
-
+          
           <div className="flex-1 space-y-4">
             {isEditing ? (
               <>
@@ -183,7 +183,10 @@ const BasicInfo = ({ profileData , id }: { profileData: any , id:any }) => {
                 
               </>
             )}
-            {!isEditing && (
+            
+          </div>
+        </div>
+        {!isEditing && (
             <button
               onClick={() => setIsEditing(true)}
               className="text-sm px-5 py-2 mt-5 bg-black text-white rounded hover:bg-gray-800 transition"
@@ -191,8 +194,6 @@ const BasicInfo = ({ profileData , id }: { profileData: any , id:any }) => {
               Edit
             </button>
           )}
-          </div>
-        </div>
       </Section>
     )
   );
