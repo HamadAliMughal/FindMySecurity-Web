@@ -73,14 +73,7 @@ const BasicInfo = ({ profileData , id }: { profileData: any , id:any }) => {
         title={
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Basic Information</h2>
-            {!isEditing && (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="text-sm px-3 py-1 ml-100 bg-black text-white rounded hover:bg-gray-800"
-              >
-                Edit
-              </button>
-            )}
+
           </div>
         }
       >
@@ -187,6 +180,14 @@ const BasicInfo = ({ profileData , id }: { profileData: any , id:any }) => {
                     </p>
                   )}
                 </div>
+                {!isEditing && (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="text-sm px-5 py-2 mt-5 bg-black text-white rounded hover:bg-gray-800 transition"
+            >
+              Edit
+            </button>
+          )}
               </>
             )}
           </div>

@@ -50,126 +50,286 @@ export default function CompaniesList({ apiData, loading, error }: CompaniesList
     </div>
   );
 }
-
+// ✅ Updated CompanyCard to show securityServicesOfferings clearly
 const CompanyCard = ({ company }: { company: Company }) => {
-    const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-    const token = typeof window !== "undefined" ? localStorage.getItem("authToken")?.replace(/^"|"$/g, "") : null;
-    const router = useRouter();
-  
-    const handleViewProfile = () => {
-      if (!token) {
-        setShowLoginPrompt(true);
-      } else {
-        router.push(`/company-profile/${company.userId}`);
-      }
-    };
-  
-    const handleCloseLoginPrompt = () => {
-      setShowLoginPrompt(false);
-      router.push("/signin");
-    };
-  
-    return (
-      <AnimateOnScrollProvider>
-        <div
-          className="relative rounded-2xl p-6 bg-white hover:shadow-xl transition-all border border-gray-100 hover:border-transparent hover:ring-2 hover:ring-indigo-400"
-          data-aos="fade-up"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-4">
-            {/* Logo Placeholder */}
-            <div className="flex-shrink-0">
-              <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm border border-gray-200">
-                N/A
-              </div>
-            </div>
-  
-            {/* Company Info */}
-            <div className="flex flex-col justify-between">
-              <div>
-                <h3 className={`text-xl font-semibold text-gray-900 ${token ? "" : "blur-sm"}`}>
-                  {company.companyName}
-                </h3>
-                {company.contactPerson && (
-                  <p className={`text-gray-500 mt-1 text-sm ${token ? "" : "blur-sm"}`}>
-                    Contact: {company.contactPerson}
-                  </p>
-                )}
-              </div>
-  
-              {/* Services Requirements */}
-              <div className={`mt-3 flex flex-wrap gap-2 ${token ? "" : "blur-sm"}`}>
-                {company.servicesRequirements.slice(0, 3).map((service, index) => (
-                  <span
-                    key={index}
-                    className="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full border border-indigo-200"
-                  >
-                    {service}
-                  </span>
-                ))}
-                {company.servicesRequirements.length > 3 && (
-                  <span className="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full border border-indigo-200">
-                    +{company.servicesRequirements.length - 3} more
-                  </span>
-                )}
-              </div>
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const token =
+    typeof window !== "undefined"
+      ? localStorage.getItem("authToken")?.replace(/^"|"$/g, "")
+      : null;
+  const router = useRouter();
+
+  const handleViewProfile = () => {
+    if (!token) {
+      setShowLoginPrompt(true);
+    } else {
+      router.push(`/company-profile/${company.userId}`);
+    }
+  };
+
+  const handleCloseLoginPrompt = () => {
+    setShowLoginPrompt(false);
+    router.push("/signin");
+  };
+
+  return (
+    <AnimateOnScrollProvider>
+      <div
+        className="relative rounded-2xl p-6 bg-white hover:shadow-xl transition-all border border-gray-100 hover:border-transparent hover:ring-2 hover:ring-indigo-400"
+        data-aos="fade-up"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-4">
+          {/* Logo Placeholder */}
+          <div className="flex-shrink-0">
+            <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm border border-gray-200">
+              N/A
             </div>
           </div>
-  
-          {/* Address and Action */}
-          <div className="grid md:grid-cols-[1fr_auto] gap-4 mt-6 items-start">
-            <div className="flex flex-col gap-2">
-              {company.address && (
-                <p className={`text-sm text-gray-400 flex items-center gap-1 ${token ? "" : "blur-sm"}`}>
-                  <LocationIcon />
-                  {company.address}
+
+          {/* Company Info */}
+          <div className="flex flex-col justify-between">
+            <div>
+              <h3 className={`text-xl font-semibold text-gray-900 ${token ? "" : "blur-sm"}`}>
+                {company.companyName}
+              </h3>
+              {company.contactPerson && (
+                <p className={`text-gray-500 mt-1 text-sm ${token ? "" : "blur-sm"}`}>
+                  Contact: {company.contactPerson}
                 </p>
               )}
             </div>
-  
-            <button
-              onClick={handleViewProfile}
-              className={`w-fit self-start px-5 py-2 rounded-lg text-sm font-medium transition-all shadow ${
-                token
-                  ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
-              title={!token ? "Please login to view the profile" : ""}
-            >
-              View Profile
-            </button>
+
+            {/* Services Requirements */}
+            <div className={`mt-3 flex flex-wrap gap-2 ${token ? "" : "blur-sm"}`}>
+              {company.servicesRequirements.slice(0, 3).map((service, index) => (
+                <span
+                  key={index}
+                  className="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full border border-indigo-200"
+                >
+                  {service}
+                </span>
+              ))}
+              {company.servicesRequirements.length > 3 && (
+                <span className="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full border border-indigo-200">
+                  +{company.servicesRequirements.length - 3} more
+                </span>
+              )}
+            </div>
+
+            {/* Security Services Offerings */}
+            {company.securityServicesOfferings.length > 0 && (
+              <div className={`mt-3 ${token ? "" : "blur-sm"}`}>
+                <p className="text-sm text-gray-500 mb-1">Security Services:</p>
+                <div className="flex flex-wrap gap-2">
+                  {company.securityServicesOfferings.slice(0, 3).map((service, index) => (
+                    <span
+                      key={index}
+                      className="bg-blue-50 text-blue-700 text-xs px-3 py-1 rounded-full border border-blue-200"
+                    >
+                      {service}
+                    </span>
+                  ))}
+                  {company.securityServicesOfferings.length > 3 && (
+                    <span className="bg-blue-50 text-blue-700 text-xs px-3 py-1 rounded-full border border-blue-200">
+                      +{company.securityServicesOfferings.length - 3} more
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Address and Action */}
+        <div className="grid md:grid-cols-[1fr_auto] gap-4 mt-6 items-start">
+          <div className="flex flex-col gap-2">
+            {company.address && (
+              <p className={`text-sm text-gray-400 flex items-center gap-1 ${token ? "" : "blur-sm"}`}>
+                <LocationIcon />
+                {company.address}
+              </p>
+            )}
+          </div>
+
+          <button
+            onClick={handleViewProfile}
+            className={`w-fit self-start px-5 py-2 rounded-lg text-sm font-medium transition-all shadow ${
+              token
+                ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
+            title={!token ? "Please login to view the profile" : ""}
+          >
+            View Profile
+          </button>
+        </div>
+      </div>
+
+      {/* Login Prompt Modal */}
+      {showLoginPrompt && (
+        <GenericModal
+          show={showLoginPrompt}
+          onClose={handleCloseLoginPrompt}
+          icon={
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
+              <svg
+                className="h-6 w-6 text-blue-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+            </div>
+          }
+          title="Please Login First"
+          message="You need to be logged in to view company profiles."
+          buttonText="Got it!"
+        />
+      )}
+    </AnimateOnScrollProvider>
+  );
+};
+
+// const CompanyCard = ({ company }: { company: Company }) => {
+//     const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+//     const token = typeof window !== "undefined" ? localStorage.getItem("authToken")?.replace(/^"|"$/g, "") : null;
+//     const router = useRouter();
   
-        {/* Login Prompt Modal */}
-        {showLoginPrompt && (
-          <GenericModal
-            show={showLoginPrompt}
-            onClose={handleCloseLoginPrompt}
-            icon={
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
-                <svg
-                  className="h-6 w-6 text-blue-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                  />
-                </svg>
-              </div>
-            }
-            title="Please Login First"
-            message="You need to be logged in to view company profiles."
-            buttonText="Got it!"
-          />
-        )}
-      </AnimateOnScrollProvider>
-    );
-  };
+//     const handleViewProfile = () => {
+//       if (!token) {
+//         setShowLoginPrompt(true);
+//       } else {
+//         router.push(`/company-profile/${company.userId}`);
+//       }
+//     };
+  
+//     const handleCloseLoginPrompt = () => {
+//       setShowLoginPrompt(false);
+//       router.push("/signin");
+//     };
+  
+//     return (
+//       <AnimateOnScrollProvider>
+//         <div
+//           className="relative rounded-2xl p-6 bg-white hover:shadow-xl transition-all border border-gray-100 hover:border-transparent hover:ring-2 hover:ring-indigo-400"
+//           data-aos="fade-up"
+//         >
+//           <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-4">
+//             {/* Logo Placeholder */}
+//             <div className="flex-shrink-0">
+//               <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm border border-gray-200">
+//                 N/A
+//               </div>
+//             </div>
+  
+//             {/* Company Info */}
+//             <div className="flex flex-col justify-between">
+//               <div>
+//                 <h3 className={`text-xl font-semibold text-gray-900 ${token ? "" : "blur-sm"}`}>
+//                   {company.companyName}
+//                 </h3>
+//                 {company.contactPerson && (
+//                   <p className={`text-gray-500 mt-1 text-sm ${token ? "" : "blur-sm"}`}>
+//                     Contact: {company.contactPerson}
+//                   </p>
+//                 )}
+//               </div>
+  
+//               {/* Services Requirements */}
+//               <div className={`mt-3 flex flex-wrap gap-2 ${token ? "" : "blur-sm"}`}>
+//                 {company.servicesRequirements.slice(0, 3).map((service, index) => (
+//                   <span
+//                     key={index}
+//                     className="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full border border-indigo-200"
+//                   >
+//                     {service}
+//                   </span>
+//                 ))}
+//                 {company.servicesRequirements.length > 3 && (
+//                   <span className="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full border border-indigo-200">
+//                     +{company.servicesRequirements.length - 3} more
+//                   </span>
+//                 )}
+//               </div>
+//               <div className={`mt-3 flex flex-wrap gap-2 ${token ? "" : "blur-sm"}`}>
+//                 {company.securityServicesOfferings.slice(0, 3).map((service, index) => (
+//                   <span
+//                     key={index}
+//                     className="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full border border-indigo-200"
+//                   >
+//                     {service}
+//                   </span>
+//                 ))}
+//                 {company.securityServicesOfferings.length > 3 && (
+//                   <span className="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full border border-indigo-200">
+//                     +{company.securityServicesOfferings.length - 3} more
+//                   </span>
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+  
+//           {/* Address and Action */}
+//           <div className="grid md:grid-cols-[1fr_auto] gap-4 mt-6 items-start">
+//             <div className="flex flex-col gap-2">
+//               {company.address && (
+//                 <p className={`text-sm text-gray-400 flex items-center gap-1 ${token ? "" : "blur-sm"}`}>
+//                   <LocationIcon />
+//                   {company.address}
+//                 </p>
+//               )}
+//             </div>
+  
+//             <button
+//               onClick={handleViewProfile}
+//               className={`w-fit self-start px-5 py-2 rounded-lg text-sm font-medium transition-all shadow ${
+//                 token
+//                   ? "bg-indigo-600 text-white hover:bg-indigo-700"
+//                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
+//               }`}
+//               title={!token ? "Please login to view the profile" : ""}
+//             >
+//               View Profile
+//             </button>
+//           </div>
+//         </div>
+  
+//         {/* Login Prompt Modal */}
+//         {showLoginPrompt && (
+//           <GenericModal
+//             show={showLoginPrompt}
+//             onClose={handleCloseLoginPrompt}
+//             icon={
+//               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
+//                 <svg
+//                   className="h-6 w-6 text-blue-600"
+//                   fill="none"
+//                   viewBox="0 0 24 24"
+//                   stroke="currentColor"
+//                 >
+//                   <path
+//                     strokeLinecap="round"
+//                     strokeLinejoin="round"
+//                     strokeWidth={2}
+//                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+//                   />
+//                 </svg>
+//               </div>
+//             }
+//             title="Please Login First"
+//             message="You need to be logged in to view company profiles."
+//             buttonText="Got it!"
+//           />
+//         )}
+//       </AnimateOnScrollProvider>
+//     );
+//   };
   
 
 // LocationIcon SVG component

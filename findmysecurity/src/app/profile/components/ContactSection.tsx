@@ -67,14 +67,6 @@ const ContactSection = ({ contact , id}: { contact: any , id : any}) => {
       title={
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Contact</h2>
-          {!isEditing && (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="text-sm px-3 py-1 bg-black text-white rounded hover:bg-gray-800 ml-123"
-            >
-              Edit
-            </button>
-          )}
         </div>
       }
     >
@@ -148,6 +140,14 @@ const ContactSection = ({ contact , id}: { contact: any , id : any}) => {
                 {updatedData.website}
               </a>
             </div>
+          )}
+           {!isEditing && (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="text-sm px-5 py-2 mt-5 bg-black text-white rounded hover:bg-gray-800 transition"
+            >
+              Edit
+            </button>
           )}
         </>
       )}

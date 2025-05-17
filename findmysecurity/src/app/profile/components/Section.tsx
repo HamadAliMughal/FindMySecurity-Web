@@ -16,6 +16,7 @@ const Section: React.FC<SectionProps> = ({ title, children }) => {
         <div className="flex justify-between items-center mb-4 border-b pb-2">
           <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
         </div>
+        
         {children}
       </div>
     </AnimateOnScrollProvider>

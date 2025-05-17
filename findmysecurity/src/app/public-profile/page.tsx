@@ -72,7 +72,7 @@ const JobPosting: React.FC = () => {
     handleInputChange('selectedRoles', selectedItems);
   };
   // Transform professional data for select component
-  const roleOptions = professionalsList.flatMap(category => 
+  const roleOptions:RoleOption[] = professionalsList.flatMap(category => 
     category.roles.map(role => ({
       label: role,
       value: role,
