@@ -40,6 +40,8 @@ import {
 } from "@mui/material";
 import { Delete, MoreVert, FileUpload, CloudDownload } from "@mui/icons-material";
 import { uploadToS3 } from "@/utils/s3file";
+import SubscriptionPopup from "@/sections/components/Subscription-plan-popup/SubscriptionPopup";
+ // adjust path as needed
 
 interface Document {
   id?: string;
@@ -90,6 +92,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
 }) => {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
+  const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({ ...loginData });
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -308,18 +311,47 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     return groups;
   }, {});
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev: any) => ({ ...prev, [name]: value }));
-  };
+const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const { name, value } = e.target;
+  setFormData((prev: any) => ({
+    ...prev,
+    [name]: value,
+  }));
+};
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProfilePhoto(imageUrl);
-    }
-  };
+
+const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  // Show preview immediately
+  const imageUrl = URL.createObjectURL(file);
+  setProfilePhoto(imageUrl);
+
+  try {
+    // Upload to S3
+    const uploadedUrl = await uploadToS3({ file });
+
+    // Store uploaded file URL in formData
+    setFormData((prev: any) => ({
+      ...prev,
+      profile: uploadedUrl, // store S3 URL, not the file itself
+    }));
+  } catch (err) {
+    console.error('Image upload failed:', err);
+    alert('Failed to upload image. Please try again.');
+  }
+  console.log(formData);
+};
+const isSubscriber = loginData?.isSubscriber;
+const tier = loginData?.subscriptionTier;
+
+let ringClass = '';
+if (isSubscriber && tier !== 'Basic') {
+  if (tier === 'Standard') ringClass = 'ring-6 ring-gray-400'; // silver
+  else if (tier === 'Premium') ringClass = 'ring-6 ring-yellow-500'; // gold
+}
+
 
   const handleSubmit = () => {
     updateProfile(formData);
@@ -338,17 +370,19 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     <div className="w-full max-w-5xl mx-auto p-4 space-y-6">
       <div className="flex flex-col items-center md:flex-row md:items-center md:space-x-6">
         <div className="relative w-28 h-28 rounded-full shadow-lg shadow-gray-400 hover:scale-105 transition-transform duration-300">
-          <img
-            src={finalImage}
-            alt="Profile"
-            className="w-full h-full object-cover rounded-full"
-          />
+         <img
+  src={finalImage}
+  alt="Profile"
+  className={`w-full h-full object-cover rounded-full ${ringClass}`}
+/>
+
           {isEditing && (
             <>
               <input
                 id="profilePhoto"
                 type="file"
                 accept="image/*"
+                name="profile"
                 onChange={handleImageChange}
                 className="hidden"
               />
@@ -483,9 +517,11 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         )}
       </div>
 
+      {/* Upgrade Button */}
       {!isEditing && (
         <Button
           fullWidth
+           onClick={() => setOpen(true)}
           variant="contained"
           sx={{ bgcolor: "#f97316", ":hover": { bgcolor: "#ea580c" } }}
         >
@@ -493,6 +529,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         </Button>
       )}
 
+      {/* Documents Section */}
       {shouldShowDocuments && 
         <AnimateOnScrollProvider>
           <div className="space-y-6 mt-5">
@@ -694,6 +731,9 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           <Delete className="mr-2" /> Delete
         </MenuItem>
       </Menu>
+       {open && (
+        <SubscriptionPopup roleId={roleId} onClose={() => setOpen(false)} />
+      )}
     </div>
   );
 };

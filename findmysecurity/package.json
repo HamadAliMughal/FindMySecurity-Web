@@ -22,6 +22,8 @@
     "@prisma/client": "^6.5.0",
     "@react-google-maps/api": "^2.20.6",
     "@shadcn/ui": "^0.0.4",
+    "@stripe/react-stripe-js": "^3.7.0",
+    "@stripe/stripe-js": "^7.3.0",
     "aos": "^2.3.4",
     "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
