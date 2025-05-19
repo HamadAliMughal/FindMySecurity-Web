@@ -12,7 +12,7 @@ interface CourseProvidersListProps {
 
 export default function CourseProvidersList({ apiData, loading, error }: CourseProvidersListProps) {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-4xl mx-auto mb-10">
+    <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-5xl mx-auto my-20">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg md:text-xl font-semibold">
           Available Course Providers {apiData && `(${apiData.totalCount} found)`}

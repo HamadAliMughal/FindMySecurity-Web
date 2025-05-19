@@ -24,7 +24,7 @@ const getHourlyRate = (professional: Professional) => {
 
 export default function ProfessionalsList({ apiData, loading, error }: ProfessionalsListProps) {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-4xl mx-auto mb-10">
+    <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-5xl mx-auto my-20">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg md:text-xl font-semibold">
           Available Professionals {apiData && `(${apiData.totalCount} found)`}
@@ -108,105 +108,6 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
   return (
     <>
     <AnimateOnScrollProvider>
-      {/* <div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all bg-white hover:bg-gray-50" data-aos="fade-up">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-4">
-              {professional.profileData?.profilePhoto ? (
-                <img 
-                  src={professional.profileData.profilePhoto} 
-                  alt={`${getDisplayName(professional)}'s profile`}
-                  className={`w-16 h-16 rounded-full object-cover border border-gray-200 ${
-                            token ? "" : "blur-sm"
-                          }`}
-                />
-              ) : (
-                <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm border border-gray-200">
-                  N/A
-                </div>
-              )}
-
-              <div>
-                <h3 className={`font-bold text-xl text-gray-900 ${
-        token ? "" : "blur-sm"
-      }`}>{getDisplayName(professional)}</h3>
-                {professional.profileData?.basicInfo?.profileHeadline && (
-                  <p className={`text-gray-600 mt-1 ${
-                    token ? "" : "blur-sm"
-                  }`}>{professional.profileData.basicInfo.profileHeadline}</p>
-                )}
-              </div>
-            </div>
-
-            <div className={`mt-3 flex flex-wrap gap-2 ${
-        token ? "" : "blur-sm"
-      }`}>
-              {professional.profileData?.services?.selectedServices?.slice(0, 3).map((service, index) => (
-                <span key={index} className="bg-gray-100 text-gray-800 text-xs px-3 py-1 rounded-full border border-gray-200">
-                  {service}
-                </span>
-              ))}
-              {((professional.profileData?.services?.selectedServices?.length ?? 0) > 3) && (
-                <span className="bg-gray-100 text-gray-800 text-xs px-3 py-1 rounded-full border border-gray-200">
-                  +{professional.profileData!.services!.selectedServices!.length - 3} more
-                </span>
-              )}
-            </div>
-
-            {professional.user.address && (
-              <p className={`text-sm text-gray-500 mt-3 flex items-center ${
-                token ? "" : "blur-sm"
-              }`}>
-                <LocationIcon />
-                {professional.user.address}
-              </p>
-            )}
-          </div>
-
-          <div className="flex flex-col items-end">
-            <span className={`text-lg font-semibold text-gray-900 ${
-        token ? "" : "blur-sm"
-      }`}>
-              {getHourlyRate(professional)}
-            </span>
-            {professional.profileData?.about?.experience && (
-              <span className={`text-sm text-gray-500 mt-1 ${
-                token ? "" : "blur-sm"
-              }`}>
-                {professional.profileData.about.experience} experience
-              </span>
-            )}
-            <button 
-                onClick={() => {
-                  if (token) {
-                    router.push(`/public-profile/${professional.userId}`);
-                  } else {
-                    setShowLoginPrompt(true);
-                  }
-                }}
-              className={`mt-3 px-4 py-2 rounded-md transition-colors shadow-sm ${
-                token 
-                  ? "bg-black text-white hover:bg-gray-800 cursor-pointer" 
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
-              title={!token ? "Please login to view the profile" : ""}
-            >
-              View Profile
-            </button>
-          </div>
-        </div>
-
-        {professional.profileData?.about?.aboutMe && (
-          <div className={`mt-4 pt-4 border-t border-gray-100 ${
-            token ? "" : "blur-sm"
-          }`}>
-            <h4 className="font-medium text-gray-900">About</h4>
-            <p className="text-gray-600 mt-1 line-clamp-2">
-              {professional.profileData.about.aboutMe}
-            </p>
-          </div>
-        )}
-      </div> */}
       <div
   className="relative rounded-2xl p-6 bg-white hover:shadow-xl transition-all border border-gray-100 hover:border-transparent hover:ring-2 hover:ring-indigo-400"
   data-aos="fade-up"
@@ -391,6 +292,107 @@ const LocationIcon = () => (
 
 
 
+
+
+      {/* <div className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all bg-white hover:bg-gray-50" data-aos="fade-up">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-4">
+              {professional.profileData?.profilePhoto ? (
+                <img 
+                  src={professional.profileData.profilePhoto} 
+                  alt={`${getDisplayName(professional)}'s profile`}
+                  className={`w-16 h-16 rounded-full object-cover border border-gray-200 ${
+                            token ? "" : "blur-sm"
+                          }`}
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm border border-gray-200">
+                  N/A
+                </div>
+              )}
+
+              <div>
+                <h3 className={`font-bold text-xl text-gray-900 ${
+        token ? "" : "blur-sm"
+      }`}>{getDisplayName(professional)}</h3>
+                {professional.profileData?.basicInfo?.profileHeadline && (
+                  <p className={`text-gray-600 mt-1 ${
+                    token ? "" : "blur-sm"
+                  }`}>{professional.profileData.basicInfo.profileHeadline}</p>
+                )}
+              </div>
+            </div>
+
+            <div className={`mt-3 flex flex-wrap gap-2 ${
+        token ? "" : "blur-sm"
+      }`}>
+              {professional.profileData?.services?.selectedServices?.slice(0, 3).map((service, index) => (
+                <span key={index} className="bg-gray-100 text-gray-800 text-xs px-3 py-1 rounded-full border border-gray-200">
+                  {service}
+                </span>
+              ))}
+              {((professional.profileData?.services?.selectedServices?.length ?? 0) > 3) && (
+                <span className="bg-gray-100 text-gray-800 text-xs px-3 py-1 rounded-full border border-gray-200">
+                  +{professional.profileData!.services!.selectedServices!.length - 3} more
+                </span>
+              )}
+            </div>
+
+            {professional.user.address && (
+              <p className={`text-sm text-gray-500 mt-3 flex items-center ${
+                token ? "" : "blur-sm"
+              }`}>
+                <LocationIcon />
+                {professional.user.address}
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-col items-end">
+            <span className={`text-lg font-semibold text-gray-900 ${
+        token ? "" : "blur-sm"
+      }`}>
+              {getHourlyRate(professional)}
+            </span>
+            {professional.profileData?.about?.experience && (
+              <span className={`text-sm text-gray-500 mt-1 ${
+                token ? "" : "blur-sm"
+              }`}>
+                {professional.profileData.about.experience} experience
+              </span>
+            )}
+            <button 
+                onClick={() => {
+                  if (token) {
+                    router.push(`/public-profile/${professional.userId}`);
+                  } else {
+                    setShowLoginPrompt(true);
+                  }
+                }}
+              className={`mt-3 px-4 py-2 rounded-md transition-colors shadow-sm ${
+                token 
+                  ? "bg-black text-white hover:bg-gray-800 cursor-pointer" 
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+              title={!token ? "Please login to view the profile" : ""}
+            >
+              View Profile
+            </button>
+          </div>
+        </div>
+
+        {professional.profileData?.about?.aboutMe && (
+          <div className={`mt-4 pt-4 border-t border-gray-100 ${
+            token ? "" : "blur-sm"
+          }`}>
+            <h4 className="font-medium text-gray-900">About</h4>
+            <p className="text-gray-600 mt-1 line-clamp-2">
+              {professional.profileData.about.aboutMe}
+            </p>
+          </div>
+        )}
+      </div> */}
 // const ProfessionalCard = ({ professional }: { professional: Professional }) => {
 //   const [showModal, setShowModal] = useState(false);
 //   const [showLoginPrompt, setShowLoginPrompt] = useState(false);

@@ -39,7 +39,7 @@ export default function MapSection({ data, type }: MapSectionProps) {
     });
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-4xl mx-auto mb-10">
+    <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-5xl mx-auto mb-10">
       <h2 className="text-lg md:text-xl font-semibold mb-4 capitalize">{type} Map View</h2>
       <div className="h-80 sm:h-96 w-full rounded-md overflow-hidden border">
         <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAP_API || ""}>

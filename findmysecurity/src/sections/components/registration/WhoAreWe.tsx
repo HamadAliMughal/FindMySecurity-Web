@@ -131,7 +131,7 @@ export default function RegistrationSelector() {
         return (
           <ClientGeneralForm
             id={3}
-            title="Individuals Seeking Security"
+            title="Security Professionals"
             onSubmit={handleFormSubmit}
           />
         );
