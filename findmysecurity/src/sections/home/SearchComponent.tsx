@@ -280,11 +280,11 @@ export default function SearchComponent({
           
             let targetPath = "/connecting-business";
             if (title === "Security Companies") {
-              alert(title);
+              // alert(title);
               targetPath = "/security-companies";
             } else if (title === "Professionals") {
               targetPath = "/professionals";
-            } else if (title === "Course Providers") {
+            } else if (title === "Training Providers") {
               targetPath = "/course-provider";
             }
           

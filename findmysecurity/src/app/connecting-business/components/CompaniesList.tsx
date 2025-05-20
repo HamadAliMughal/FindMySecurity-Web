@@ -13,6 +13,7 @@ interface CompaniesListProps {
 }
 
 export default function CompaniesList({ apiData, loading, error }: CompaniesListProps) {
+  console.log("apiData",apiData);
   return (
     <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-5xl mx-auto my-20">
       <div className="flex justify-between items-center mb-4">
@@ -171,15 +172,15 @@ const CompanyCard = ({ company }: { company: Company }) => {
               title={token ? (isFavorited ? "Remove from Favorites" : "Add to Favorites") : "Please login to favorite"}
             >
               {isFavorited ? (
-                <FaHeart className="text-red-500 text-lg" />
+                <FaHeart className="text-red-500 text-lg cursor-pointer" />
               ) : (
-                <FaRegHeart className="text-gray-400 hover:text-red-500 text-lg" />
+                <FaRegHeart className="text-gray-400 hover:text-red-500 text-lg cursor-pointer" />
               )}
               Favorite
             </button>
             <button
               onClick={handleViewProfile}
-              className={`w-full px-5 py-2 rounded-lg text-sm font-medium transition-all shadow ${
+              className={`w-full px-5 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer shadow ${
                 token
                   ? "bg-indigo-600 text-white hover:bg-indigo-700"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"

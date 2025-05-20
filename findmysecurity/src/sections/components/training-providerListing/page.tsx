@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-
+import CourseProvidersList from "@/app/connecting-business/components/CourseProvidersList";
 import MapSection from "@/app/connecting-business/components/MapSection";
 import filtersData from "@/sections/data/secuirty_services.json";
  import {CourseProvidersApiResponse} from "@/app/connecting-business/types"; // Use shared types
-import CourseProvidersList from "@/app/connecting-business/components/CourseProvidersList";
 
 
-export default function CourseProviderList() {
+export default function SecurityCompaniesPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -103,10 +102,10 @@ export default function CourseProviderList() {
 
   return (
     <div className="mt-20 px-4">
-      <h1 className="text-3xl font-bold mb-8 text-center text-black">Security Companies</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center text-black">Course Providers</h1>
 
       <div className="bg-white  p-6 w-full max-w-5xl mx-auto">
-        <h2 className="text-2xl font-semibold text-black mb-4">Filter Security Companies</h2>
+        <h2 className="text-2xl font-semibold text-black mb-4">Filter Course Providers</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <input
             type="text"
@@ -197,12 +196,8 @@ export default function CourseProviderList() {
         </div>
       )}
 
-      <CourseProvidersList
-        apiData={apiData as CourseProvidersApiResponse}
-        loading={loading}
-        error={error}
-      />
-      <MapSection data={apiData?.providers || []} type="security companies" />
+      <CourseProvidersList apiData={apiData as CourseProvidersApiResponse} loading={loading} error={error} />
+      <MapSection data={apiData?.providers || []} type="training providers" />
 
       {apiData?.totalCount && apiData?.pageSize && (
         <div className="flex justify-center mt-6">

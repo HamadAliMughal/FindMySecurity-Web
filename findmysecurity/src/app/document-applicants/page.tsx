@@ -43,7 +43,7 @@ const DocumentApplicantsPage = () => {
       const { id: documentOwnerId } = JSON.parse(stored);
 
       const response = await axios.get(
-        `${API_URL}/document-access-requests/posted-by/${documentOwnerId}`,
+        `${API_URL}/document/user/${documentOwnerId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -105,7 +105,8 @@ const DocumentApplicantsPage = () => {
       if (!token) return;
 
       await axios.put(
-        `${API_URL}/document-access-requests/${requestId}`,
+        // https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/document/user/38
+        `${API_URL}/document/user/${requestId}`,
         { status },
         {
           headers: { Authorization: `Bearer ${token}` },
