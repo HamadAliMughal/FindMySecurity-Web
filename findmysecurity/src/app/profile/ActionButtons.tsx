@@ -40,9 +40,36 @@ import {
 } from "@mui/material";
 import { Delete, MoreVert, FileUpload, CloudDownload } from "@mui/icons-material";
 import { uploadToS3 } from "@/utils/s3file";
+import axios from 'axios';
 import SubscriptionPopup from "@/sections/components/Subscription-plan-popup/SubscriptionPopup";
+import SubscriptionBox from "./components/SubscriptionBox";
  // adjust path as needed
 
+ 
+interface SubscriptionDetails {
+  status: string;
+  startDate: string;
+  endDate: string;
+  nextInvoiceAmount: string;
+  stripeProductName: string;
+  tierName: string;
+}
+
+interface PaymentMethod {
+  card: {
+    brand: string;
+    last4: string;
+    exp_month: number;
+    exp_year: number;
+  };
+  billing_details: {
+    name: string;
+    email: string;
+    address: {
+      country: string | null;
+    };
+  };
+}
 interface Document {
   id?: string;
   url: string;
@@ -91,6 +118,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   refreshUserData
 }) => {
   const router = useRouter();
+
   const [isEditing, setIsEditing] = useState(false);
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({ ...loginData });
@@ -103,14 +131,47 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+  const [subscriptionDetails, setSubscriptionDetails] = useState<SubscriptionDetails | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
 
+  const [error, setError] = useState<string | null>(null);
   const shouldShowDocuments = roleId === 3;
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const handleClick = () => {
     inputRef.current?.click(); // open file dialog
   };
+ useEffect(() => {
+    const fetchSubscriptionDetails = async () => {
+      try {
+        const token = localStorage.getItem('authToken')?.replace(/^"|"$/g, '');
 
+        const response = await axios.get(
+          `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/stripe/get-subscription-details?userId=${loginData?.id || loginData?.userId || 1}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const { success, result, message } = response.data;
+
+        if (success) {
+          setSubscriptionDetails(result.subscriptionDetails);
+          setPaymentMethod(result.paymentMethod);
+        } else {
+          throw new Error(message || 'Failed to fetch subscription');
+        }
+      } catch (err: any) {
+        setError(err.message || 'Something went wrong');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubscriptionDetails();
+  }, []);
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
     const file = e.target.files?.[0];
@@ -529,14 +590,37 @@ if (isSubscriber && tier !== 'Basic') {
         </Button>
       )}
              {loginData.isSubscriber && (
-              <div className="bg-green-100 border border-green-400 text-green-800 px-6 py-4 rounded-lg mb-6">
-      <h2 className="text-lg font-semibold">You are a valued subscriber! 🎉</h2>
-      {loginData?.subscriptionTier && (
-        <p className="mt-1">
-          <span className="font-medium">Subscription Tier:</span> {loginData?.subscriptionTier}
-        </p>
-      )}
-    </div>
+    
+      <SubscriptionBox
+        subscriptionDetails={
+          subscriptionDetails ?? {
+            status: "",
+            startDate: "",
+            endDate: "",
+            nextInvoiceAmount: "",
+            stripeProductName: "",
+            tierName: ""
+          }
+        }
+        paymentMethod={
+          paymentMethod ?? {
+            card: {
+              brand: "",
+              last4: "",
+              exp_month: 0,
+              exp_year: 0,
+            },
+            billing_details: {
+              name: "",
+              email: "",
+              address: {
+                country: null,
+              },
+            },
+          }
+        }
+      />
+ 
           )}
 
       {/* Documents Section */}
