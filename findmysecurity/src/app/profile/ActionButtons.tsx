@@ -518,7 +518,7 @@ if (isSubscriber && tier !== 'Basic') {
       </div>
 
       {/* Upgrade Button */}
-      {!isEditing && (
+      {!isEditing &&  !loginData.isSubscriber &&(
         <Button
           fullWidth
            onClick={() => setOpen(true)}
@@ -528,6 +528,16 @@ if (isSubscriber && tier !== 'Basic') {
           Upgrade My Membership
         </Button>
       )}
+             {loginData.isSubscriber && (
+              <div className="bg-green-100 border border-green-400 text-green-800 px-6 py-4 rounded-lg mb-6">
+      <h2 className="text-lg font-semibold">You are a valued subscriber! 🎉</h2>
+      {loginData?.subscriptionTier && (
+        <p className="mt-1">
+          <span className="font-medium">Subscription Tier:</span> {loginData?.subscriptionTier}
+        </p>
+      )}
+    </div>
+          )}
 
       {/* Documents Section */}
       {shouldShowDocuments && 
