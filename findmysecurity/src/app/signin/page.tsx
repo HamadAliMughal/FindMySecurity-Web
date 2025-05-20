@@ -146,7 +146,7 @@ const SignIn = () => {
             <button
               type="button"
               className="text-blue-600 hover:underline"
-              onClick={() => router.push("/forgot-password")}
+              onClick={() => router.push("/reset-password")}
             >
               Forgot Password?
             </button>
