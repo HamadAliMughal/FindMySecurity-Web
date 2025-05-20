@@ -157,7 +157,7 @@ const PostAdLister: React.FC = () => {
   }, []);
 
   const mergedJobs = [
-    ...securityJobs.map((j) => ({ ...j, source: "security-api" })),
+    ...securityJobs.map((j) => ({ ...j, source: "Find My Security" })),
     ...localJobs.map((j) => ({ ...j, source: "local" })),
     ...adzunaJobs.map((j) => ({ ...j, source: "adzuna" })),
     ...monsterJobs.map((j) => ({ ...j, source: "monster" })),

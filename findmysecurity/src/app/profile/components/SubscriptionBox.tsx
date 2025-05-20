@@ -50,13 +50,13 @@ const SubscriptionBox: React.FC<SubscriptionProps> = ({ subscriptionDetails, pay
 
   // Theme classes based on tier
   const getThemeClasses = () => {
-    if (tierName.toLowerCase() === 'standard') {
+    if (tierName.toLowerCase() === 'standardp') {
       return {
         bg: 'bg-gradient-to-br from-zinc-100 to-zinc-300',
         text: 'text-black',
         border: 'border-zinc-400'
       };
-    } else if (tierName.toLowerCase() === 'premium') {
+    } else if (tierName.toLowerCase() === 'standard') {
       return {
         bg: 'bg-gradient-to-br from-yellow-100 to-yellow-400',
         text: 'text-yellow-900',

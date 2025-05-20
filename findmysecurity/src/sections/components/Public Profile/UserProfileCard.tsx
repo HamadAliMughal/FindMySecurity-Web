@@ -423,10 +423,37 @@ const UserProfileCard = ({ user }: UserProfileCardProps) => {
   } = user;
 
   const profileData =
-    user?.individualProfessional?.profileData ||
+    user?.individualProfessional?.profile ||
     user?.additionalData?.profileData ||
     user?.profile ||
     {};
+    const basicInfo = {
+      profileHeadline : profileData?.profileHeadline,
+      gender : profileData?.gender,
+      hourlyRate : profileData?.hourlyRate,
+      location : profileData?.postcode,
+    }
+    const aboutMe ={
+      aboutMe : profileData?.aboutMe,
+      experience : profileData?.experience,
+      qualifications : profileData?.qualifications,
+    }
+    const fee={
+      hourlyRate : profileData?.hourlyRate,
+      feesDescription : profileData?.feesDescription,
+    }
+    const contactInfo = {
+      homeTelephone : profileData?.homeTelephone,
+  mobilePhone : profileData?.mobileTelephone,
+    website : profileData?.website,
+    }
+  const services = {
+    
+securityServicesOfferings: profileData?.securityServicesOfferings,
+serviceRequirements : profileData?.serviceRequirements,
+
+
+    }
   const profilePhoto = user?.individualProfessional?.profile?.profilePhoto;
   const documents = user?.individualProfessional?.documents || [];
   const currentUser = localStorage.getItem("loginData");
@@ -493,19 +520,19 @@ const UserProfileCard = ({ user }: UserProfileCardProps) => {
         <Section label="Last Updated" value={new Date(updatedAt).toLocaleString()} />
       </div>
 
-      <ProfileGroup title="Basic Info" data={profileData?.basicInfo} />
-      <ProfileGroup title="About" data={profileData?.about} />
-      <ProfileGroup title="Fees" data={profileData?.fees} />
-      <ProfileGroup title="Contact Info" data={profileData?.contact} />
-      <ProfileGroup title="Services" data={profileData?.services} />
+      <ProfileGroup title="Basic Info" data={basicInfo} />
+      <ProfileGroup title="About" data={aboutMe} />
+      <ProfileGroup title="Fees" data={fee} />
+      <ProfileGroup title="Contact Info" data={contactInfo} />
+      <ProfileGroup title="Services" data={services} />
 
-      {profileData?.availability?.weeklySchedule ? (
+      {profileData?.weeklySchedule ? (
         <div className="mt-10 bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">Availability</h3>
           <p className="text-sm text-gray-600 mb-2">
-            {profileData.availability.description || "Weekly schedule:"}
+            {profileData.availabilityDescription || "Weekly schedule:"}
           </p>
-          <AvailabilityTable schedule={profileData.availability.weeklySchedule} />
+          <AvailabilityTable schedule={profileData.weeklySchedule} />
         </div>
       ) : (
         <div className="mt-10 bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-500 shadow-sm">
