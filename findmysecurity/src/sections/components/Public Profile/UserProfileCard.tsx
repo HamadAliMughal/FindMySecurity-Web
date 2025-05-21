@@ -90,19 +90,29 @@ const Section = ({
 };
 
 const ProfileGroup = ({ title, data }: { title: string; data: any }) => {
-  if (!data || Object.keys(data).length === 0) return null;
+  // Filter out null or undefined values
+  const validEntries = Object.entries(data || {}).filter(
+    ([, val]) =>
+      val !== null &&
+      val !== undefined &&
+      (typeof val !== "object" || (Array.isArray(val) ? val.length > 0 : Object.keys(val).length > 0))
+  );
+
+  // Don't render if there are no valid entries
+  if (validEntries.length === 0) return null;
+
   return (
     <div className="mt-8 bg-gray-50 rounded-xl border p-6 shadow-sm">
       <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{title}</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {Object.entries(data).map(([key, val]) =>
-          typeof val === "object" && !Array.isArray(val) ? (
+        {validEntries.map(([key, val]) =>
+          typeof val === "object" && !Array.isArray(val) && val !== null ? (
             <ProfileGroup key={key} title={formatKey(key)} data={val} />
           ) : (
             <Section
               key={key}
               label={formatKey(key)}
-              value={Array.isArray(val) ? val : val?.toString()}
+              value={Array.isArray(val) ? val.join(", ") : val?.toString()}
             />
           )
         )}
@@ -110,6 +120,7 @@ const ProfileGroup = ({ title, data }: { title: string; data: any }) => {
     </div>
   );
 };
+
 
 const formatKey = (key: string) =>
   key
