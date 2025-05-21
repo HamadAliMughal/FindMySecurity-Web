@@ -218,9 +218,12 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
     ...(isSubscriber && subscriptionTier !== "Basic"
       ? [
           { icon: <FaBell />, label: "Notifications", isNotification: true },
-          { icon: <FiFileText />, label: "Document Applicants", isDocumentApplicants: true },
         ]
       : []),
+   ...(roleId === 3 && isSubscriber && subscriptionTier !== "Basic"
+      ? [{ icon: <FiFileText />, label: "Document Applicants", isDocumentApplicants: true }]
+      : []),
+      
     ...(roleId !== 3
       ? isSubscriber && subscriptionTier !== "Basic"
         ? [{ icon: <FaAd />, label: "Post Free Ad", route: "/post-ad" }]
