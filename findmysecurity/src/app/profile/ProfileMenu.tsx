@@ -92,9 +92,8 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
         try {
           const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
           const userId = parsedData.id;
-
           const response = await axios.get(
-            `${API_URL}/document-access-requests/posted-by/${userId}`,
+            `${API_URL}/document/user/${userId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
