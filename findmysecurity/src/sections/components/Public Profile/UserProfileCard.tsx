@@ -387,6 +387,8 @@ interface User {
   screenName?: string;
   phoneNumber?: string;
   dateOfBirth?: string;
+  isSubscriber?: boolean;
+  subscriptionTier?: string;
   address?: string;
   postcode?: string;
   role: string;
@@ -418,6 +420,8 @@ const UserProfileCard = ({ user }: UserProfileCardProps) => {
     address,
     postcode,
     role,
+    isSubscriber,
+    subscriptionTier,
     createdAt,
     updatedAt,
   } = user;
@@ -465,14 +469,38 @@ serviceRequirements : profileData?.serviceRequirements,
       {/* Header */}
       <div className="flex flex-col items-left text-left bg-white rounded-lg shadow p-6">
         <div className="flex flex-row">
-          <div>
-            <img
-              src={profilePhoto || img.src}
-              alt="Profile"
-              className="w-32 h-32 rounded-full object-cover border mb-4"
-            />
-            <ProfessionalIcons />
-          </div>
+     <div className="relative w-fit">
+  <div
+    className={`w-36 h-36 rounded-full p-1 ${
+      isSubscriber
+        ? subscriptionTier === "Premium"
+          ? "bg-gradient-to-tr from-yellow-400 via-yellow-300 to-yellow-500"
+          : subscriptionTier === "Standard"
+          ? "bg-gradient-to-tr from-gray-300 via-gray-200 to-gray-400"
+          : "bg-green-500"
+        : ""
+    }`}
+  >
+    <div className="w-32 h-32 rounded-full overflow-hidden bg-white p-[2px]">
+      <img
+        src={profilePhoto || img.src}
+        alt="Profile"
+        className="w-full h-full rounded-full object-cover"
+      />
+    </div>
+  </div>
+
+  {/* Subscriber Badge */}
+  {isSubscriber && (
+    <div className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-md border border-gray-300">
+      <span className="text-green-600 text-xs font-bold">Subscriber {subscriptionTier}</span>
+    </div>
+  )}
+
+  {/* Professional Icons */}
+  {documents && documents.length > 0 && <ProfessionalIcons />}
+</div>
+
           <div className="mx-6 my-4">
             <h2 className="text-2xl font-bold text-gray-800">{firstName} {lastName}</h2>
             <p className="text-gray-600">{role}</p>
