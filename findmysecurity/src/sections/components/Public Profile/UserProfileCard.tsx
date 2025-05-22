@@ -253,7 +253,9 @@ const DocumentsSection = ({
     }
   };
 
-  if (!approvedDocuments || approvedDocuments.length === 0) return null;
+  if (!approvedDocuments || approvedDocuments.length === 0) return  <div className="mt-10 bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-500 shadow-sm">
+          No Documents Approved.
+        </div>;
 
   return (
     <div className="mt-10 bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
