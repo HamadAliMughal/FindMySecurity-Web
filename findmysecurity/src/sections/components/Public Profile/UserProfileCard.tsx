@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import img from "../../../../public/images/profile.png";
 import { FiMail, FiPhone, FiMessageSquare } from "react-icons/fi";
 import { FileText, Award, CheckCircle } from "lucide-react";
@@ -13,7 +13,6 @@ import {
   AiFillFilePpt,
   AiFillFileText,
 } from "react-icons/ai";
-
 interface SectionProps {
   label: string;
   value?: string | number | Date | any[] | null | undefined;
@@ -22,7 +21,6 @@ interface SectionProps {
   hiddenValue?: boolean;
   showIcon?: boolean;
 }
-
 const Section = ({
   label,
   value,
@@ -37,7 +35,6 @@ const Section = ({
     if (val instanceof Date) return val.toLocaleString();
     return String(val);
   };
-
   const isWhatsAppField = label === "Chat on Whatsapp";
   const isCallField = label === "Mobile";
   const fieldColor = isWhatsAppField || isCallField ? "text-white" : "text-white";
@@ -46,16 +43,13 @@ const Section = ({
     : isCallField
     ? "bg-indigo-500 hover:bg-indigo-600"
     : "bg-blue-500 hover:bg-blue-600";
-
   const displayValue = hiddenValue ? "" : formatValue(value);
-
   return (
     <div
       className={`group flex items-start gap-3 ${
         clickable ? `cursor-pointer ${bgColor}` : ""
       } p-3 rounded-lg transition-all`}
-      onClick={onClick}
-    >
+      onClick={onClick}    >
       {showIcon && (
         <div className={`${fieldColor} mt-0.5`}>
           {isWhatsAppField ? (
@@ -88,21 +82,26 @@ const Section = ({
     </div>
   );
 };
-
 const ProfileGroup = ({ title, data }: { title: string; data: any }) => {
-  if (!data || Object.keys(data).length === 0) return null;
+  const validEntries = Object.entries(data || {}).filter(
+    ([, val]) =>
+      val !== null &&
+      val !== undefined &&
+      (typeof val !== "object" || (Array.isArray(val) ? val.length > 0 : Object.keys(val).length > 0))
+  );
+  if (validEntries.length === 0) return null;
   return (
     <div className="mt-8 bg-gray-50 rounded-xl border p-6 shadow-sm">
       <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">{title}</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {Object.entries(data).map(([key, val]) =>
-          typeof val === "object" && !Array.isArray(val) ? (
+        {validEntries.map(([key, val]) =>
+          typeof val === "object" && !Array.isArray(val) && val !== null ? (
             <ProfileGroup key={key} title={formatKey(key)} data={val} />
           ) : (
             <Section
               key={key}
               label={formatKey(key)}
-              value={Array.isArray(val) ? val : val?.toString()}
+              value={Array.isArray(val) ? val.join(", ") : val?.toString()}
             />
           )
         )}
@@ -110,17 +109,14 @@ const ProfileGroup = ({ title, data }: { title: string; data: any }) => {
     </div>
   );
 };
-
 const formatKey = (key: string) =>
   key
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (str) => str.toUpperCase())
     .replace(/_/g, " ");
-
 const AvailabilityTable = ({ schedule }: { schedule: any }) => {
   const timeSlots = ["Morning", "Afternoon", "Evening", "Overnight"];
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
   return (
     <div className="overflow-auto mt-4 rounded-lg border border-gray-200">
       <table className="min-w-full text-sm text-center">
@@ -155,7 +151,6 @@ const AvailabilityTable = ({ schedule }: { schedule: any }) => {
     </div>
   );
 };
-
 const getFileIcon = (filename?: string) => {
   if (!filename || typeof filename !== "string") return <AiFillFileText className="text-gray-400" size={28} />;
   const ext = filename.split(".").pop()?.toLowerCase();
@@ -166,7 +161,6 @@ const getFileIcon = (filename?: string) => {
   if (["ppt", "pptx"].includes(ext!)) return <AiFillFilePpt className="text-orange-500" size={28} />;
   return <AiFillFileText className="text-gray-400" size={28} />;
 };
-
 const getDocumentNameFromUrl = (url: string) => {
   if (typeof url !== "string") return "Unnamed Document";
   const parts = url.split("/");
@@ -174,7 +168,6 @@ const getDocumentNameFromUrl = (url: string) => {
   const namePart = fileNameWithExt.split("-").slice(1).join("-").split(".").slice(0, -1).join(".");
   return namePart || "Unnamed Document";
 };
-
 const DocumentsSection = ({
   documents,
   userId,
@@ -191,42 +184,49 @@ const DocumentsSection = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-
+  const requesterId = typeof userId === "string" ? parseInt(userId, 10) : userId;
+  const approvedDocuments = documents.filter((doc) => doc.status === "APPROVED");
+  const displayedDocuments = approvedDocuments.slice(0, visibleCount);
   const toggleShowAll = () => {
     setShowAll(!showAll);
     setVisibleCount(showAll ? 3 : approvedDocuments.length);
   };
-
-  const approvedDocuments = documents.filter((doc) => doc.status === "APPROVED");
-
-  const displayedDocuments = approvedDocuments.slice(0, visibleCount);
-
+  const checkDocumentAccess = async () => {
+    try {
+      const response = await fetch(
+        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/document/access-check?requesterId=${requesterId}&targetUserId=${targetUserId}`
+      );
+      if (response.ok) {
+        const result = await response.json();
+        console.log("API result:", result); // Logs: { hasAccess: true/false }
+        setAccessGranted(result.hasAccess); // Updates state
+      } else {
+        console.warn("Access check failed: response not OK");
+        setAccessGranted(false);
+      }
+    } catch (error) {
+      console.error("Access check failed:", error);
+      setAccessGranted(false);
+    }
+  };
   const requestDocumentAccess = async () => {
     setLoading(true);
     setError(null);
     setRequestSent(false);
-
-    const requesterId = typeof userId === "string" ? parseInt(userId, 10) : userId;
-
     if (isNaN(requesterId)) {
       setError("Invalid user ID. Please ensure your user ID is a valid number.");
       setLoading(false);
       return;
     }
-
     try {
       const response = await fetch(
         "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/document/request",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            requesterId,
-            targetUserId,
-          }),
+          body: JSON.stringify({ requesterId, targetUserId }),
         }
       );
-
       if (response.ok) {
         setRequestSent(true);
         setTimeout(() => setRequestSent(false), 3000);
@@ -241,9 +241,15 @@ const DocumentsSection = ({
       setLoading(false);
     }
   };
-
-  if (!approvedDocuments || approvedDocuments.length === 0) return null;
-
+  useEffect(() => {
+    checkDocumentAccess();
+  }, [userId, targetUserId]);
+  if (!approvedDocuments || approvedDocuments.length === 0)
+    return (
+      <div className="mt-10 bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-500 shadow-sm">
+        No Documents Approved.
+      </div>
+    );
   return (
     <div className="mt-10 bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
       <div className="p-6">
@@ -254,21 +260,19 @@ const DocumentsSection = ({
               <FiLock className="mr-1.5" size={14} />
               <span>Secure Documents</span>
             </div>
-            {!isEditing && (
+            {/* {!isEditing && (
               <button
                 onClick={() => setIsEditing(true)}
                 className="text-sm px-3 py-1 bg-black text-white rounded hover:bg-gray-800 transition ml-auto"
               >
                 Edit
               </button>
-            )}
+            )} */}
           </div>
         </div>
-
         <p className="text-sm text-gray-600 mb-6">
           This member has provided us with electronic copies of the following documents. These copies are held on file unless specified as deleted. The documents have been certified by the member as being true and accurate. We recommend you ask to see original copies of the documents before you hire them in order to verify the true accuracy for yourself.
         </p>
-
         <div className="space-y-3">
           {displayedDocuments.map((doc, index) => {
             const documentName = getDocumentNameFromUrl(doc.url);
@@ -309,7 +313,6 @@ const DocumentsSection = ({
             );
           })}
         </div>
-
         {approvedDocuments.length > 3 && (
           <button
             onClick={toggleShowAll}
@@ -329,7 +332,6 @@ const DocumentsSection = ({
           </button>
         )}
       </div>
-
       <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
         <button
           onClick={requestDocumentAccess}
@@ -343,14 +345,7 @@ const DocumentsSection = ({
               fill="none"
               viewBox="0 0 24 24"
             >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path
                 className="opacity-75"
                 fill="currentColor"
@@ -360,25 +355,14 @@ const DocumentsSection = ({
           ) : (
             <FiLock className="text-blue-100" size={16} />
           )}
-          <span>
-            {loading ? "Requesting..." : "Request Access for All Documents"}
-          </span>
+          <span>{loading ? "Requesting..." : "Request Access for All Documents"}</span>
         </button>
-        {requestSent && (
-          <div className="mt-2 text-green-600 text-sm">
-            Your request is delivered
-          </div>
-        )}
-        {error && (
-          <div className="mt-2 text-red-600 text-sm">
-            {error}
-          </div>
-        )}
+        {requestSent && <div className="mt-2 text-green-600 text-sm">Your request is delivered</div>}
+        {error && <div className="mt-2 text-red-600 text-sm">{error}</div>}
       </div>
     </div>
   );
 };
-
 interface User {
   id: number;
   email: string;
@@ -404,11 +388,9 @@ interface User {
   profile?: any;
   permissions?: any;
 }
-
 interface UserProfileCardProps {
   user: User;
 }
-
 const UserProfileCard = ({ user }: UserProfileCardProps) => {
   const {
     email,
@@ -425,7 +407,6 @@ const UserProfileCard = ({ user }: UserProfileCardProps) => {
     createdAt,
     updatedAt,
   } = user;
-
   const profileData =
     user?.individualProfessional?.profile ||
     user?.additionalData?.profileData ||
@@ -452,21 +433,16 @@ const UserProfileCard = ({ user }: UserProfileCardProps) => {
     website : profileData?.website,
     }
   const services = {
-    
 securityServicesOfferings: profileData?.securityServicesOfferings,
 serviceRequirements : profileData?.serviceRequirements,
-
-
     }
   const profilePhoto = user?.individualProfessional?.profile?.profilePhoto;
   const documents = user?.individualProfessional?.documents || [];
   const currentUser = localStorage.getItem("loginData");
   const userId = currentUser ? JSON.parse(currentUser).id : null;
   const targetUserId = user.id || 38;
-
   return (
     <div className="max-w-5xl mx-auto my-10 px-6 bg-white rounded-lg shadow p-6">
-      {/* Header */}
       <div className="flex flex-col items-left text-left bg-white rounded-lg shadow p-6">
         <div className="flex flex-row">
      <div className="relative w-fit">
@@ -489,18 +465,13 @@ serviceRequirements : profileData?.serviceRequirements,
       />
     </div>
   </div>
-
-  {/* Subscriber Badge */}
   {isSubscriber && (
     <div className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-md border border-gray-300">
       <span className="text-green-600 text-xs font-bold">Subscriber {subscriptionTier}</span>
     </div>
   )}
-
-  {/* Professional Icons */}
   {documents && documents.length > 0 && <ProfessionalIcons />}
 </div>
-
           <div className="mx-6 my-4">
             <h2 className="text-2xl font-bold text-gray-800">{firstName} {lastName}</h2>
             <p className="text-gray-600">{role}</p>
@@ -538,7 +509,6 @@ serviceRequirements : profileData?.serviceRequirements,
           </div>
         </div>
       </div>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-10 mt-10 bg-white rounded-lg shadow p-6">
         <Section label="Date of Birth" value={dateOfBirth} />
         <Section label="Address" value={address} />
@@ -547,13 +517,11 @@ serviceRequirements : profileData?.serviceRequirements,
         <Section label="Account Created" value={new Date(createdAt).toLocaleString()} />
         <Section label="Last Updated" value={new Date(updatedAt).toLocaleString()} />
       </div>
-
       <ProfileGroup title="Basic Info" data={basicInfo} />
       <ProfileGroup title="About" data={aboutMe} />
       <ProfileGroup title="Fees" data={fee} />
       <ProfileGroup title="Contact Info" data={contactInfo} />
       <ProfileGroup title="Services" data={services} />
-
       {profileData?.weeklySchedule ? (
         <div className="mt-10 bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">Availability</h3>
@@ -567,7 +535,6 @@ serviceRequirements : profileData?.serviceRequirements,
           No professional profile available.
         </div>
       )}
-
       {documents && documents.length > 0 ? (
         <DocumentsSection documents={documents} userId={userId} targetUserId={targetUserId} />
       ) : (
@@ -575,7 +542,6 @@ serviceRequirements : profileData?.serviceRequirements,
           No documents available.
         </div>
       )}
-
       <ProfileGroup
         title="Permissions"
         data={user?.individualProfessional?.permissions || user?.permissions}
@@ -583,7 +549,6 @@ serviceRequirements : profileData?.serviceRequirements,
     </div>
   );
 };
-
 export default UserProfileCard;
 
 
@@ -592,6 +557,212 @@ export default UserProfileCard;
 
 
 
+
+// const DocumentsSection = ({
+//   documents,
+//   userId,
+//   targetUserId,
+// }: {
+//   documents: { id: number; individualProfessionalId: number; status: string; uploadedAt: string; url: string }[];
+//   userId: string | number;
+//   targetUserId: number;
+// }) => {
+//   const [visibleCount, setVisibleCount] = useState(3);
+//   const [showAll, setShowAll] = useState(false);
+//   const [accessGranted, setAccessGranted] = useState(false);
+//   const [requestSent, setRequestSent] = useState(false);
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState<string | null>(null);
+//   const [isEditing, setIsEditing] = useState(false);
+
+//   const toggleShowAll = () => {
+//     setShowAll(!showAll);
+//     setVisibleCount(showAll ? 3 : approvedDocuments.length);
+//   };
+
+//   const approvedDocuments = documents.filter((doc) => doc.status === "APPROVED");
+
+//   const displayedDocuments = approvedDocuments.slice(0, visibleCount);
+
+//   const requestDocumentAccess = async () => {
+//     setLoading(true);
+//     setError(null);
+//     setRequestSent(false);
+
+//     const requesterId = typeof userId === "string" ? parseInt(userId, 10) : userId;
+
+//     if (isNaN(requesterId)) {
+//       setError("Invalid user ID. Please ensure your user ID is a valid number.");
+//       setLoading(false);
+//       return;
+//     }
+
+//     try {
+//       const response = await fetch(
+//         "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/document/request",
+//         {
+//           method: "POST",
+//           headers: { "Content-Type": "application/json" },
+//           body: JSON.stringify({
+//             requesterId,
+//             targetUserId,
+//           }),
+//         }
+//       );
+
+//       if (response.ok) {
+//         setRequestSent(true);
+//         setTimeout(() => setRequestSent(false), 3000);
+//       } else {
+//         const errorData = await response.json();
+//         setError(errorData.message || "Failed to request access. Please try again.");
+//       }
+//     } catch (error) {
+//       setError("Network error. Please check your connection and try again.");
+//       console.error("Error requesting document access:", error);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   if (!approvedDocuments || approvedDocuments.length === 0) return  <div className="mt-10 bg-white rounded-xl border border-gray-200 p-6 text-center text-gray-500 shadow-sm">
+//           No Documents Approved.
+//         </div>;
+
+//   return (
+//     <div className="mt-10 bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+//       <div className="p-6">
+//         <div className="flex items-center justify-between w-full px-4 mb-3">
+//           <h3 className="text-xl font-semibold text-gray-800">My Documents</h3>
+//           <div className="flex items-center gap-4">
+//             <div className="flex items-center text-sm text-gray-500">
+//               <FiLock className="mr-1.5" size={14} />
+//               <span>Secure Documents</span>
+//             </div>
+//             {!isEditing && (
+//               <button
+//                 onClick={() => setIsEditing(true)}
+//                 className="text-sm px-3 py-1 bg-black text-white rounded hover:bg-gray-800 transition ml-auto"
+//               >
+//                 Edit
+//               </button>
+//             )}
+//           </div>
+//         </div>
+
+//         <p className="text-sm text-gray-600 mb-6">
+//           This member has provided us with electronic copies of the following documents. These copies are held on file unless specified as deleted. The documents have been certified by the member as being true and accurate. We recommend you ask to see original copies of the documents before you hire them in order to verify the true accuracy for yourself.
+//         </p>
+
+//         <div className="space-y-3">
+//           {displayedDocuments.map((doc, index) => {
+//             const documentName = getDocumentNameFromUrl(doc.url);
+//             return (
+//               <div
+//                 key={index}
+//                 className="flex items-start p-3 hover:bg-gray-50 rounded-lg transition-colors border border-gray-100"
+//               >
+//                 <div className="flex items-center">{getFileIcon(documentName)}</div>
+//                 <div className="ml-3 flex-1">
+//                   <div className="flex justify-between items-center">
+//                     <div className="flex items-center gap-1">
+//                       <span className="font-medium text-gray-800">
+//                         {accessGranted ? (
+//                           <a
+//                             href={doc.url}
+//                             target="_blank"
+//                             rel="noopener noreferrer"
+//                             className="flex items-center gap-1 hover:text-blue-600"
+//                           >
+//                             <FiDownload size={14} />
+//                             {documentName}
+//                           </a>
+//                         ) : (
+//                           <span className="flex items-center gap-1 text-gray-400">
+//                             <FiLock size={14} />
+//                             {documentName} (Access Denied)
+//                           </span>
+//                         )}
+//                       </span>
+//                       <span className="text-xs text-gray-500 ml-2">
+//                         added on {new Date(doc.uploadedAt).toLocaleDateString()}
+//                       </span>
+//                     </div>
+//                   </div>
+//                 </div>
+//               </div>
+//             );
+//           })}
+//         </div>
+
+//         {approvedDocuments.length > 3 && (
+//           <button
+//             onClick={toggleShowAll}
+//             className="mt-4 text-sm text-blue-600 hover:text-blue-800 flex items-center"
+//           >
+//             {showAll ? (
+//               <>
+//                 <FiChevronUp className="mr-1.5" />
+//                 Show less
+//               </>
+//             ) : (
+//               <>
+//                 <FiChevronDown className="mr-1.5" />
+//                 Show more
+//               </>
+//             )}
+//           </button>
+//         )}
+//       </div>
+
+//       <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+//         <button
+//           onClick={requestDocumentAccess}
+//           className="w-full sm:w-auto px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center space-x-2 shadow-sm disabled:opacity-50"
+//           disabled={loading || requestSent}
+//         >
+//           {loading ? (
+//             <svg
+//               className="animate-spin h-5 w-5 text-white mr-2"
+//               xmlns="http://www.w3.org/2000/svg"
+//               fill="none"
+//               viewBox="0 0 24 24"
+//             >
+//               <circle
+//                 className="opacity-25"
+//                 cx="12"
+//                 cy="12"
+//                 r="10"
+//                 stroke="currentColor"
+//                 strokeWidth="4"
+//               />
+//               <path
+//                 className="opacity-75"
+//                 fill="currentColor"
+//                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+//               />
+//             </svg>
+//           ) : (
+//             <FiLock className="text-blue-100" size={16} />
+//           )}
+//           <span>
+//             {loading ? "Requesting..." : "Request Access for All Documents"}
+//           </span>
+//         </button>
+//         {requestSent && (
+//           <div className="mt-2 text-green-600 text-sm">
+//             Your request is delivered
+//           </div>
+//         )}
+//         {error && (
+//           <div className="mt-2 text-red-600 text-sm">
+//             {error}
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
 
 
 

@@ -44,7 +44,7 @@ const DocumentApplicantsPage = () => {
       const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
       if (!stored || !token) {
         toast.error("User not authenticated");
-        router.push("/login");
+        router.push("/signin");
         return;
       }
 
@@ -66,7 +66,7 @@ const DocumentApplicantsPage = () => {
       } else {
         data = [];
       }
-
+      console.log("data",data)
       const validData = data.filter((req) => req.id && req.status && req.createdAt && req.updatedAt)
         .map((req) => ({ ...req, documentUrl: req.documentUrl ?? "Unnamed Document" }));
 
