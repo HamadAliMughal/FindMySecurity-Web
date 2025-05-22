@@ -25,6 +25,8 @@ export default function ProfessionalsPage() {
   const page = searchParams?.get("page") || "1";
   const minHr = searchParams?.get("minHr") || "";
   const maxHr = searchParams?.get("maxHr") || "";
+  const [pageSize, setPageSize] = useState<number>(10);
+
 
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -38,43 +40,43 @@ export default function ProfessionalsPage() {
 //     }
 //   }, []); // Runs only once on the client side, after mount
 
-  const fetchData = async () => {
-    setLoading(true);
-    setError(null);
+const fetchData = async () => {
+  setLoading(true);
+  setError(null);
 
-    try {
-        const queryParamsArray: string[] = [];
+  try {
+    const queryParamsArray: string[] = [];
 
-        if (selectedCategory) queryParamsArray.push(`role=${encodeURIComponent(selectedCategory)}`);
-        if (selectedRole) queryParamsArray.push(`subcategory=${encodeURIComponent(selectedRole)}`);
-        if (pc) queryParamsArray.push(`pc=${encodeURIComponent(pc)}`);
-        if (distance) queryParamsArray.push(`distance=${encodeURIComponent(distance)}`);
-        if (experience) queryParamsArray.push(`experience=${encodeURIComponent(experience)}`);
-        if (minHr) queryParamsArray.push(`minHr=${encodeURIComponent(minHr)}`);
-        if (maxHr) queryParamsArray.push(`maxHr=${encodeURIComponent(maxHr)}`);
-        if (page !== undefined && page !== null) queryParamsArray.push(`page=${encodeURIComponent(page.toString())}`);
-        
-        const queryString = queryParamsArray.length > 0 ? `?${queryParamsArray.join('&')}` : '';
-        
+    if (selectedCategory) queryParamsArray.push(`role=${encodeURIComponent(selectedCategory)}`);
+    if (selectedRole) queryParamsArray.push(`subcategory=${encodeURIComponent(selectedRole)}`);
+    if (pc) queryParamsArray.push(`pc=${encodeURIComponent(pc)}`);
+    if (distance) queryParamsArray.push(`distance=${encodeURIComponent(distance)}`);
+    if (experience) queryParamsArray.push(`experience=${encodeURIComponent(experience)}`);
+    if (minHr) queryParamsArray.push(`minHr=${encodeURIComponent(minHr)}`);
+    if (maxHr) queryParamsArray.push(`maxHr=${encodeURIComponent(maxHr)}`);
+    if (page !== undefined && page !== null) queryParamsArray.push(`page=${encodeURIComponent(page.toString())}`);
+    if (pageSize !== undefined && pageSize !== null) queryParamsArray.push(`pageSize=${encodeURIComponent(pageSize.toString())}`);
 
-      const apiUrl = `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/users/professionals?${queryString}`;
-      const response = await fetch(apiUrl);
+    const queryString = queryParamsArray.length > 0 ? `?${queryParamsArray.join('&')}` : '';
 
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const token = localStorage.getItem("loginData");
-      setIsLoggedIn(!!token);
-      const data: ApiResponse = await response.json();
-      setApiData1(data);
-    } catch (err: any) {
-      setError(err.message || "An error occurred");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const apiUrl = `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/users/professionals${queryString}`;
+    const response = await fetch(apiUrl);
 
-  useEffect(() => {
-    fetchData();
-  }, [selectedCategory, selectedRole, pc, distance, experience, page, minHr, maxHr]);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const token = localStorage.getItem("loginData");
+    setIsLoggedIn(!!token);
+    const data: ApiResponse = await response.json();
+    setApiData1(data);
+  } catch (err: any) {
+    setError(err.message || "An error occurred");
+  } finally {
+    setLoading(false);
+  }
+};
+useEffect(() => {
+  fetchData();
+}, [selectedCategory, selectedRole, pc, distance, experience, page, pageSize, minHr, maxHr]);
+
 
   const updateSearchParams = (params: Record<string, string>) => {
     const newParams = new URLSearchParams(searchParams?.toString() || "");
@@ -236,9 +238,6 @@ export default function ProfessionalsPage() {
 
       <>
         <ProfessionalsList apiData={apiData1 as ApiResponse} loading={loading} error={error} />
-        <MapSection data={apiData1?.professionals || []} type="professionals" />
-      </>
-
       {apiData1?.totalCount && apiData1?.pageSize && (
         <div className="flex justify-center mt-6">
           {Array.from({ length: Math.ceil(apiData1.totalCount / apiData1.pageSize) }, (_, i) => (
@@ -254,6 +253,9 @@ export default function ProfessionalsPage() {
           ))}
         </div>
       )}
+        <MapSection data={apiData1?.professionals || []} type="professionals" />
+      </>
+
     </div>
   );
 }

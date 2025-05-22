@@ -1,27 +1,29 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
 interface Category {
   title: string;
   id: string;
-  roles: string[]; // Updated key from "subcategories" to "roles"
+  roles: string[];
 }
 
 interface DropdownProps {
-  jsonFile: string; // JSON file name (e.g., "security_services.json")
-  title: string; // Dropdown title (e.g., "Security Services")
-  basePath: string; // Base path for links (e.g., "/services/")
+  jsonFile: string;
+  title: string;
+  basePath: string;
 }
 
-const DynamicDropdown: React.FC<DropdownProps> = ({ jsonFile, title, basePath }) => {
+const DynamicDropdown: React.FC<DropdownProps> = ({ jsonFile, title }) => {
   const [openDropdown, setOpenDropdown] = useState(false);
   const [openSubDropdown, setOpenSubDropdown] = useState<string | null>(null);
   const [submenuStyle, setSubmenuStyle] = useState<{ top?: string; bottom?: string }>({});
   const [categories, setCategories] = useState<Category[]>([]);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
 
-  // Load categories from JSON dynamically
+  // Load categories from JSON
   useEffect(() => {
     import(`../data/${jsonFile}`)
       .then((module) => setCategories(module.default))
@@ -36,7 +38,6 @@ const DynamicDropdown: React.FC<DropdownProps> = ({ jsonFile, title, basePath })
         setOpenSubDropdown(null);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -47,12 +48,55 @@ const DynamicDropdown: React.FC<DropdownProps> = ({ jsonFile, title, basePath })
     const spaceBelow = window.innerHeight - rect.bottom;
     const spaceAbove = rect.top;
 
-    // Adjust submenu position dynamically
     setSubmenuStyle(spaceBelow < 200 && spaceAbove > 200 ? { bottom: "100%", top: "auto" } : { top: "0", bottom: "auto" });
-
-    // Toggle submenu
     setOpenSubDropdown(openSubDropdown === categoryId ? null : categoryId);
   };
+
+const handleRoleClick = (categoryTitle: string, role: string) => {
+  const params = new URLSearchParams();
+  let targetPath = "";
+
+  switch (title) {
+    case "Security Professionals":
+      targetPath = "/professionals";
+      params.set("role", categoryTitle);
+      role.split(",").forEach((sub) => {
+        if (sub.trim()) params.append("subcategory", sub.trim());
+      });
+      params.set("page", "1");
+      params.set("pageSize", "10");
+      break;
+
+    case "Security Services":
+      targetPath = "/security-companies";
+      params.set("sr", categoryTitle); // service requested
+      params.set("so", role); // service offered
+      params.set("page", "1");
+      break;
+
+    case "Training Providers":
+      targetPath = "/course-provider";
+      params.set("sr", categoryTitle);
+      params.set("so", role);
+      params.set("page", "1");
+      break;
+
+    default:
+      targetPath = "/connecting-business";
+      params.set("lookingFor", categoryTitle);
+      params.set("subCategory", role);
+      params.set("page", "1");
+      break;
+  }
+
+  router.push(`${targetPath}?${params.toString()}`);
+
+  // Close dropdowns
+  setOpenDropdown(false);
+  setOpenSubDropdown(null);
+};
+
+
 
   return (
     <div className="relative text-md font-semibold">
@@ -79,14 +123,14 @@ const DynamicDropdown: React.FC<DropdownProps> = ({ jsonFile, title, basePath })
                   className="absolute left-full top-0 ml-2 bg-white text-black rounded shadow-lg border w-80 z-50 max-h-60 overflow-y-auto"
                   style={submenuStyle}
                 >
-                  {category.roles.map((role, index) => ( // Updated from "subcategories" to "roles"
-                    <Link
+                  {category.roles.map((role, index) => (
+                    <button
                       key={index}
-                      href={`${basePath}${role.toLowerCase().replace(/\s+/g, "-")}`}
-                      className="block px-4 py-2 hover:bg-gray-200"
+                      onClick={() => handleRoleClick(category.title, role)}
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-200"
                     >
                       {role}
-                    </Link>
+                    </button>
                   ))}
                 </div>
               )}
