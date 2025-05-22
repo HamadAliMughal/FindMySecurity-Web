@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const json = await response.json();
-
+    
     // Map only the required fields
     const simplifiedJobs = json.results.map((job: any) => ({
       title: job.title || '',

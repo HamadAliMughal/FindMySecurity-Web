@@ -40,6 +40,14 @@ const PostAdLister: React.FC = () => {
 
   const isClient = typeof window !== "undefined";
 
+
+  const sourceLogos: Record<string, string> = {
+    adzuna: "/pro-icons/adzuna.png",
+    reed: "/pro-icons/reed.png",
+    monster: "/pro-icons/Monster.png",
+    local: "/pro-icons/local.png",
+  };
+  
   const fetchLocalJobs = (kw: string, loc: string, rate: number | null) => {
     if (!isClient) return [];
     const storedData = localStorage.getItem("jobs");
@@ -243,9 +251,7 @@ const PostAdLister: React.FC = () => {
             <div key={idx} className="bg-white rounded-lg shadow-md p-6 mb-6 hover:shadow-lg transition duration-300"  data-aos="fade-up">
               <div className="flex justify-between items-start gap-4">
                 <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
-                    <FaBriefcase className="text-white text-3xl" />
-                  </div>
+                
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">
                       {post.title || post.jobTitle}
@@ -275,10 +281,24 @@ const PostAdLister: React.FC = () => {
                       Visit
                     </a>
                   )}
-                  <span className="flex items-center bg-gray-200 text-xs px-2 py-1 rounded-full text-gray-700">
+                    <div>
+                  {sourceLogos[post.source] ? (
+  <img src={sourceLogos[post.source]} alt={`${post.source} logo`} className="w-72 object-contain" />
+) : (
+  <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
+    
+    <FaBriefcase className="text-white text-3xl" />
+  </div>
+)}
+
+
+                    
+                    
+                  </div>
+                  {/* <span className="flex items-center bg-gray-200 text-xs px-2 py-1 rounded-full text-gray-700">
                     <FaTag className="mr-1" />
                     {post.source}
-                  </span>
+                  </span> */}
                 </div>
               </div>
             </div>
