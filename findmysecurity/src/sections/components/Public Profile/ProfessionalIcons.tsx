@@ -21,7 +21,7 @@ const iconData = [
 
 const ProfessionalIcons = () => {
   return (
-    <div className="grid grid-cols-3 sm:grid-cols-3 gap-y-2 px-4 max-w-md sm:max-w-3xl mx-auto">
+    <div className="grid grid-cols-3 sm:grid-cols-3 gap-y-2 mt-2 px-4 max-w-md sm:max-w-3xl mx-auto">
       {iconData.map(({ title, Icon, description }) => (
         <div key={title} className="flex justify-center">
           <div className="relative group">

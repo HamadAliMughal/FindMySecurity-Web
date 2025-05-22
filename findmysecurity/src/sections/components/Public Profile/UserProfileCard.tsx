@@ -429,7 +429,7 @@ const UserProfileCard = ({ user }: UserProfileCardProps) => {
     }
     const contactInfo = {
       homeTelephone : profileData?.homeTelephone,
-  mobilePhone : profileData?.mobileTelephone,
+      mobilePhone : profileData?.mobileTelephone,
     website : profileData?.website,
     }
   const services = {
@@ -465,12 +465,25 @@ serviceRequirements : profileData?.serviceRequirements,
       />
     </div>
   </div>
+  <div>
+    
+  </div>
+  <div className="flex -mt-3 flex-col items-center ">
+  {isSubscriber && (
+    <div className="bg-white rounded-full p-1 shadow-md border border-gray-300">
+      <span className="text-green-600 text-xs font-bold">Subscriber {subscriptionTier}</span>
+    </div>
+  )}
+  {documents && documents.length > 0 && <ProfessionalIcons />}
+</div>
+  {/* <div className="gap-5">
   {isSubscriber && (
     <div className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-md border border-gray-300">
       <span className="text-green-600 text-xs font-bold">Subscriber {subscriptionTier}</span>
     </div>
   )}
   {documents && documents.length > 0 && <ProfessionalIcons />}
+  </div> */}
 </div>
           <div className="mx-6 my-4">
             <h2 className="text-2xl font-bold text-gray-800">{firstName} {lastName}</h2>

@@ -184,7 +184,90 @@ export interface MarkerData {
     validated: boolean;
   }
   
+// src/types/company.ts
+export interface Permissions {
+  acceptTerms: boolean;
+  acceptEmails: boolean;
+  premiumServiceNeed: boolean;
+}
 
+export interface SecurityCompany {
+  id: number;
+  companyName: string;
+  contactPerson: string;
+  jobTitle: string;
+  address: string;
+  phoneNumber: string;
+  postCode: string;
+  registrationNumber: string;
+  website: string;
+  servicesRequirements: string[];
+  securityServicesOfferings: string[];
+  permissions: Permissions;
+  createdAt: string;
+  updatedAt: string;
+  userId: number;
+}
+
+export interface CorporateClient {
+  id: number;
+  userId: number;
+  companyName: string;
+  registrationNumber: string;
+  address: string;
+  postCode: string;
+  industryType: string;
+  contactPerson: string;
+  jobTitle: string;
+  phoneNumber: string;
+  website: string;
+  serviceRequirements: string[];
+  permissions: Permissions;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ApiUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  address: string | null;
+  role: string;
+  roleId: number;
+  createdAt: string;
+  updatedAt: string;
+  validated: boolean;
+  isSubscriber: boolean;
+  subscriptionTier: string | null;
+  securityCompany: SecurityCompany | null;
+  corporateClient: CorporateClient | null;
+  profile: { profilePhoto?: string } | null;
+}
+
+// export interface Company {
+//   securityCompany?: SecurityCompany;
+//   corporateClient?: CorporateClient;
+//   user: {
+//     id: number;
+//     firstName: string;
+//     lastName: string;
+//     email: string;
+//     phoneNumber: string;
+//     address: string | null;
+//     role: string;
+//     roleId: number;
+//     createdAt: string;
+//     updatedAt: string;
+//     validated: boolean;
+//     isSubscriber: boolean;
+//     subscriptionTier: string | null;
+//   };
+//   profile?: {
+//     profilePhoto?: string;
+//   };
+// }
 
   // export type ApiResponseUnion =
   // | ApiResponse             // has 'professionals'

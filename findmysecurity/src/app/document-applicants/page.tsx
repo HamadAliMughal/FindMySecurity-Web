@@ -16,6 +16,7 @@ interface DocumentRequest {
   createdAt: string;
   updatedAt: string;
   requester: {
+    roleId: any;
     firstName: string;
     lastName: string;
     profileImage: string;
@@ -247,6 +248,10 @@ const DocumentApplicantsPage = () => {
                     <p className="text-sm font-medium">
                       <span className="text-gray-600">Request ID:</span> {req.id}
                     </p>
+                       <p className="text-sm">
+                      <span className="font-semibold">Requester Name:</span>{" "}
+                      {req.requester?.firstName || "N/A"} {req.requester?.lastName || ""}
+                    </p>
                     <p className="text-sm font-medium">
                       <span className="text-gray-600">Status:</span>{" "}
                       <span
@@ -283,12 +288,31 @@ const DocumentApplicantsPage = () => {
                         </button>
                       </>
                     )}
+                    
                     <button
-                      onClick={() => router.push(`/public-profile/${req.requesterId}`)}
+                      onClick={() => {
+                        const roleId = req.requester?.roleId;
+                        if (roleId === 5) {
+                          router.push(`/company-profile/${req.requesterId}`);
+                        } else if (roleId === 6) {
+                          router.push(`/provider-profile/${req.requesterId}`);
+                        }else if (roleId === 7) {
+                          router.push(`/business-profile/${req.requesterId}`);
+                        }
+                        else {
+                          router.push(`/public-profile/${req.requesterId}`);
+                        }
+                      }}
                       className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 flex items-center gap-1"
                     >
                       <FaUser /> Profile
                     </button>
+                    {/* <button
+                      onClick={() => router.push(`/public-profile/${req.requesterId}`)}
+                      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 flex items-center gap-1"
+                    >
+                      <FaUser /> Profile
+                    </button> */}
                   </div>
                 </div>
               ))}
@@ -740,10 +764,7 @@ export default DocumentApplicantsPage;
 
 
 
-   {/* <p className="text-sm">
-                      <span className="font-semibold">Requester Name:</span>{" "}
-                      {req.requester?.firstName || "N/A"} {req.requester?.lastName || ""}
-                    </p> */}
+
 // "use client";
 
 // import React, { useEffect, useState } from "react";
