@@ -264,7 +264,7 @@ const PostAdLister: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                  {post.source === "local" || post.source === "security-api" ? (
+                  {post.source === "local" || post.source === "Find My Security" ? (
                     <button
                       onClick={() => applyForJob(post.id)}
                       className="text-sm px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
