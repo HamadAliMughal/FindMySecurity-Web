@@ -28,7 +28,7 @@ export default function RootLayout({
         {/* Footer */}
         <footer className="bg-black text-white text-center py-3">
           <Footer />
-          © {new Date().getFullYear()} Find My Security
+          {/* © {new Date().getFullYear()} Find My Security */}
         </footer>
       </body>
     </html>

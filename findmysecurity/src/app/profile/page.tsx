@@ -10,6 +10,7 @@ import WeeklySchedule from "./WeeklySchedule";
 import axios from "axios";
 import { API_URL } from "@/utils/path";
 import toast from "react-hot-toast";
+import ProfileOverview from "./otherProfiles";
 const UserProfile: React.FC = () => {
   const [loginData, setLoginData] = useState<any>(null);
   const router = useRouter();
@@ -185,6 +186,17 @@ const UserProfile: React.FC = () => {
         </>
          )
          }
+     {(roleId === 5 || roleId === 6 || roleId === 7) && (
+  <ProfileOverview
+    profileData={
+      loginData?.corporateClient ||
+      loginData?.securityCompany ||
+      loginData?.courseProvider
+    }
+    userId={loginData?.id}
+  />
+)}
+
        
       </div>
     </div>
