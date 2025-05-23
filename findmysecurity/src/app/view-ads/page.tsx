@@ -46,6 +46,7 @@ const PostAdLister: React.FC = () => {
     reed: "/pro-icons/reed.png",
     monster: "/pro-icons/Monster.png",
     local: "/pro-icons/local.png",
+    "Find My Security": "/pro-icons/findmysecurity.png",
   };
   
   const fetchLocalJobs = (kw: string, loc: string, rate: number | null) => {
@@ -283,7 +284,13 @@ const PostAdLister: React.FC = () => {
                   )}
                     <div>
                   {sourceLogos[post.source] ? (
-  <img src={sourceLogos[post.source]} alt={`${post.source} logo`} className="w-72 object-contain" />
+  <div className="w-32 h-16 flex items-center justify-center">
+  <img 
+    src={sourceLogos[post.source]} 
+    alt={`${post.source} logo`} 
+    className="max-w-full max-h-full object-contain" 
+  />
+</div>
 ) : (
   <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
     
