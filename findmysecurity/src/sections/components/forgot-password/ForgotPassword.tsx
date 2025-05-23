@@ -4,8 +4,10 @@ import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { API_URL } from "@/utils/path";
 
-const API_BASE = 'https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/auth';
+
+const API_BASE = `${API_URL}/auth`;
 
 const isValidEmail = (email: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);

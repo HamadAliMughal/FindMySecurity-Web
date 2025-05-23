@@ -43,6 +43,7 @@ import { uploadToS3 } from "@/utils/s3file";
 import axios from 'axios';
 import SubscriptionPopup from "@/sections/components/Subscription-plan-popup/SubscriptionPopup";
 import SubscriptionBox from "./components/SubscriptionBox";
+import { API_URL } from "@/utils/path";
  // adjust path as needed
 
  
@@ -147,7 +148,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         const token = localStorage.getItem('authToken')?.replace(/^"|"$/g, '');
 
         const response = await axios.get(
-          `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/stripe/get-subscription-details?userId=${loginData?.id || loginData?.userId || 1}`,
+          `${API_URL}/stripe/get-subscription-details?userId=${loginData?.id || loginData?.userId || 1}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -186,7 +187,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         throw new Error("Invalid S3 URL returned");
       }
 
-      const dbRes = await fetch("https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/document/upload", {
+      const dbRes = await fetch(`${API_URL}/document/upload`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -324,7 +325,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
     
     try {
-      const response = await fetch(`https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/document/${docId}`, {
+      const response = await fetch(`${API_URL}/document/${docId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

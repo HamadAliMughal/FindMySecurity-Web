@@ -7,6 +7,7 @@ import axios, { AxiosError } from "axios";  // Import AxiosError
 import { ArrowLeft } from "lucide-react";
 import TwoFAPopup from "@/sections/components/Login/TwoFAPopup";
 import toast from "react-hot-toast";
+import { API_URL } from "@/utils/path";
 
 // Define the structure of the expected error response
 interface ErrorResponse {
@@ -24,7 +25,7 @@ const SignIn = () => {
   
     try {
       const response = await axios.post(
-        "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/auth/login",
+        `${API_URL}/auth/login`,
         { email, password },
         { headers: { "Content-Type": "application/json" } }
       );

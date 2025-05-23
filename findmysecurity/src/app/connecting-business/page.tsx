@@ -14,6 +14,7 @@ import BackButton from './BackButton'
 import { ApiResponse, SearchValues, LookingForItem, CompaniesApiResponse, CourseProvidersApiResponse} from "./types";
 import CompaniesList from "./components/CompaniesList";
 import CourseProvidersList from "./components/CourseProvidersList";
+import { API_URL } from "@/utils/path";
 
 // type ApiResponseUnion = ApiResponse | CompaniesApiResponse | CourseProvidersApiResponse;
 
@@ -48,21 +49,21 @@ export default function ConnectingBusiness() {
         let data: ApiResponse | CompaniesApiResponse | CourseProvidersApiResponse | null = null;  // Use the new union type
       
         if (title?.includes("compan")) {
-          apiUrl = "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/users/security-companies";
+          apiUrl = `${API_URL}/users/security-companies`;
           response = await fetch(apiUrl);
           if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
           
           // Here we expect a CompaniesApiResponse
           data = await response.json();
         } else if (title?.includes("train")) {
-          apiUrl = "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/users/course-providers";
+          apiUrl = `${API_URL}/users/course-providers`;
           response = await fetch(apiUrl);
           if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
           
           // Here we expect an ApiResponse
           data = await response.json();
         } else {
-          apiUrl = "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/users/professionals";
+          apiUrl = `${API_URL}/users/professionals`;
           response = await fetch(apiUrl);
           if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
           

@@ -11,6 +11,8 @@ import {
   FaBriefcase,
   FaTag,
 } from "react-icons/fa";
+import { API_URL } from "@/utils/path";
+
 import toast from "react-hot-toast";
 import AnimateOnScrollProvider from "@/sections/components/animation/AnimateOnScrollProvider";
 import { ArrowLeft } from "lucide-react";
@@ -72,7 +74,7 @@ const PostAdLister: React.FC = () => {
     const currentId = data?.id || data?.user?.id;
 
     try {
-      const res = await axios.get("https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/security-jobs", {
+      const res = await axios.get(`${API_URL}/security-jobs`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -94,7 +96,7 @@ const PostAdLister: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/job-applications",
+        `${API_URL}/job-applications`,
         {
           userId: currentId as number,
           serviceAdId,

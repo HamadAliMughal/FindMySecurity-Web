@@ -9,6 +9,8 @@ import {
   MenuItem,
   Box,
 } from '@mui/material';
+import { API_URL } from "@/utils/path";
+
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import toast from 'react-hot-toast';
@@ -91,7 +93,7 @@ export default function JobPostingForm() {
         deadline: formData.deadline,
       };
   
-      await fetch('https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/security-jobs', {
+      await fetch(`${API_URL}/security-jobs`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import CompanyProfileCard from "@/sections/components/Public Profile/CompanyProfileCard";
+import { API_URL } from "@/utils/path";
 
 
 // Define interfaces based on API response
@@ -92,7 +93,7 @@ export default function UserPage() {
       try {
         const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
         const response = await axios.get(
-          `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/auth/get-user/${id}`,
+          `${API_URL}/auth/get-user/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

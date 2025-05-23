@@ -55,7 +55,7 @@ export default function Navbar() {
 
         <Link href="/" className="flex items-center gap-3 text-2xl font-bold">
           <img
-            src="/icons/logo.jpg"
+            src="/pro-icons/FindMySecurity New Logo.png"
             alt="Logo"
             width={35}
             height={35}

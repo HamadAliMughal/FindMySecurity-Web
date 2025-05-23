@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { API_URL } from "@/utils/path";
 
 interface Job {
   id: number;
@@ -21,7 +22,7 @@ interface Job {
 }
 
 const USER_ID = 5;
-const BASE_URL = `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/security-jobs`;
+const BASE_URL = `${API_URL}/security-jobs`;
 
 const JobsPage: React.FC = () => {
   const [jobs, setJobs] = useState<Job[]>([]);

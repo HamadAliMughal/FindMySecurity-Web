@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="flex justify-left mt-10 mb-15">
           <h2 className="text-2xl font-bold flex items-center">
             <img
-              src="/icons/logo.jpg" // Update this path to your logo image
+              src="/pro-icons/FindMySecurity New Logo.png" // Update this path to your logo image
               alt="Logo"
               width={40} // Adjust size as needed
               height={40}

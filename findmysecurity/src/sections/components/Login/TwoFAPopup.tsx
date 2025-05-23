@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import axios, { AxiosError, AxiosResponse } from "axios";  // Import AxiosError
+import { API_URL } from "@/utils/path";
 
 interface TwoFAPopupProps {
   onVerify: (code: string) => void;
@@ -71,7 +72,7 @@ export default function TwoFAPopup({ onVerify, email }: TwoFAPopupProps) {
     try {
       // Make the API call and type the response data
       const response: AxiosResponse<any> = await axios.post(
-        "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/auth/login/verify",
+        `${API_URL}/auth/login/verify`,
         { email, code }
       );
 
