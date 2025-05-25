@@ -32,7 +32,7 @@ export default function Hero({ initialSearchMode = "basic" }: { initialSearchMod
           lookingForData={lookingForData}
           searchData={searchData}
           title="Professionals"
-          onSearchSubmit={handleSearchSubmit} // Pass the callback to handle the submit
+          onSearchSubmit={handleSearchSubmit} 
           searchMode={initialSearchMode} // Pass the searchMode prop to SearchComponent
         />
       </div>
