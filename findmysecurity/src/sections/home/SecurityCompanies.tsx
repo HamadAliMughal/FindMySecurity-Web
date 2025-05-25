@@ -9,7 +9,7 @@ const features = [
   { title: "Physical Security & Manned Guarding Services", image: "/companies/Physical security & manned guarding Services.jpg" },
   { title: "Specialist Security Services", image: "/companies/Specialist Security Services.jpg" },
   { title: "Serveillance & Monitoring Services", image: "/companies/Serveillance & Monitoring services 1.jpg" },
-  { title: "Transport & Maritime Security Services", image: "/companies/Transport & Maritime security .jpg" },
+  { title: "Transport & Maritime Security Services", image: "/companies/Transport & Maritime security.jpg" },
   { title: "Advanced Intelligence & Technical Serveillance Services", image: "/companies/Advanced intelligence & Technical serveillance services.jpg" },
   { title: "Technical &  Network Security Services", image: "/companies/Technical & Network Security Services.jpg" },
   { title: "Public Safety & Law Enforcement Security Services", image: "/companies/Publice Safety & Law enforcement security services.jpg" },
