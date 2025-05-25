@@ -6,15 +6,15 @@ import searchData from "@/sections/data/hero_section.json";
 import AnimateOnScrollProvider from "@/sections/components/animation/AnimateOnScrollProvider";
 
 const features = [
-  { title: "Physical Security & Manned Guarding Services", image: "/companies/Physical security & manned guarding Services.jpg" },
-  { title: "Specialist Security Services", image: "/companies/Specialist Security Services.jpg" },
-  { title: "Serveillance & Monitoring Services", image: "/companies/Serveillance & Monitoring services 1.jpg" },
-  { title: "Transport & Maritime Security Services", image: "/companies/Transport & Maritime security.jpg" },
-  { title: "Advanced Intelligence & Technical Serveillance Services", image: "/companies/Advanced intelligence & Technical serveillance services.jpg" },
-  { title: "Technical &  Network Security Services", image: "/companies/Technical & Network Security Services.jpg" },
-  { title: "Public Safety & Law Enforcement Security Services", image: "/companies/Publice Safety & Law enforcement security services.jpg" },
-  { title: "Access Control Specialist", image: "/companies/Access Control Specialist 1.jpg" },
-  { title: "Private Investigation & Specialist Services", image: "/companies/Private Investigation & Specialist Services.jpg" },
+  { title: "Physical Security & Manned Guarding Services", image: "/companies/Physical-security-&-manned-guarding-Services.jpg" },
+  { title: "Specialist Security Services", image: "/companies/Specialist-Security-Services.jpg" },
+  { title: "Serveillance & Monitoring Services", image: "/companies/Serveillance-&-Monitoring-services.jpg" },
+  { title: "Transport & Maritime Security Services", image: "/companies/Transport-&-Maritime-security.jpg" },
+  { title: "Advanced Intelligence & Technical Serveillance Services", image: "/companies/Advanced-intelligence-&-Technical-serveillance-services.jpg" },
+  { title: "Technical &  Network Security Services", image: "/companies/Technical-&-Network-Security-Services.jpg" },
+  { title: "Public Safety & Law Enforcement Security Services", image: "/companies/Publice-Safety-&-Law-enforcement-security-services.jpg" },
+  { title: "Access Control Specialist", image: "/companies/Access-Control-Specialist.jpg" },
+  { title: "Private Investigation & Specialist Services", image: "/companies/Private-Investigation-&-Specialist-Services.jpg" },
 ];
 
 export default function SecurityCompanies({ initialSearchMode = "basic" }: { initialSearchMode?: "basic" | "advanced" }) {
