@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import SearchComponent from "./SearchComponent";
+import Link from 'next/link';
 import lookingForData from "@/sections/data/training_providers.json";
 import searchData from "@/sections/data/hero_section.json";
 import AnimateOnScrollProvider from "@/sections/components/animation/AnimateOnScrollProvider";
@@ -58,36 +59,40 @@ export default function TrainingProviders({ initialSearchMode = "basic" }: { ini
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 lg:px-13 relative z-10" data-aos="fade-up">
               <div className="w-full px-4 sm:px-8 md:px-12 lg:px-20 py-6">
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-4 justify-center">
-                  {features.map((feature, index) => (
-                    <div
-                      key={index}
-                      className="flex flex-col items-center w-full max-w-[13rem]"
-                    >
-                      {/* Image Container with Fixed Aspect Ratio */}
-                      <div className="relative w-full aspect-[4/3] overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-200 group" data-aos="fade-up">
-                        <Image
-                          src={feature.image}
-                          alt={feature.title}
-                          className="object-cover w-full h-full transform group-hover:scale-110 transition-transform duration-500 ease-in-out"
-                          fill
-                        />
-        
-                        {/* Overlay - Desktop Only */}
-                        <div
-                          className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-75 transition-opacity duration-500 flex items-center justify-center text-center px-2 md:flex hidden"
-                          style={{ zIndex: 10 }}
-                        >
-                          <h3 className="text-white text-sm font-semibold">
-                            {feature.title}
-                          </h3>
-                        </div>
-                      </div>
-        
-                      <h3 className="mt-3 text-center text-white text-sm font-semibold md:hidden px-1 min-h-[2rem]">
-                        {feature.title}
-                      </h3>
-                    </div>
-                  ))}
+
+{features.map((feature, index) => (
+  <Link
+    key={index}
+    href={`/course-provider?sr=${encodeURIComponent(feature.title)}`}
+    className="flex flex-col items-center w-full max-w-[13rem]"
+  >
+    {/* Image Container with Fixed Aspect Ratio */}
+    <div className="relative w-full aspect-[4/3] overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-200 group" data-aos="fade-up">
+      <Image
+        src={feature.image}
+        alt={feature.title}
+        className="object-cover w-full h-full transform group-hover:scale-110 transition-transform duration-500 ease-in-out"
+        fill
+      />
+
+      {/* Overlay - Desktop Only */}
+      <div
+        className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-75 transition-opacity duration-500 flex items-center justify-center text-center px-2 md:flex hidden"
+        style={{ zIndex: 10 }}
+      >
+        <h3 className="text-white text-sm font-semibold">
+          {feature.title}
+        </h3>
+      </div>
+    </div>
+
+    {/* Text Below Image - Mobile Only */}
+    <h3 className="mt-3 text-center text-white text-sm font-semibold md:hidden px-1 min-h-[2rem]">
+      {feature.title}
+    </h3>
+  </Link>
+))}
+
                 </div>
               </div>
         {/* Search Component */}
