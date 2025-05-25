@@ -83,7 +83,6 @@ export default function TrainingProviders({ initialSearchMode = "basic" }: { ini
                         </div>
                       </div>
         
-                      {/* Text Below Image - Mobile Only */}
                       <h3 className="mt-3 text-center text-white text-sm font-semibold md:hidden px-1 min-h-[2rem]">
                         {feature.title}
                       </h3>
