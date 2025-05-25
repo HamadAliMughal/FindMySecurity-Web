@@ -38,7 +38,6 @@ const testimonials: Testimonial[] = [
 const Testimonials: React.FC = () => {
   return (
     <section className="bg-gradient-to-b from-gray-100 to-white py-20 px-6 md:px-16">
-      {/* Heading */}
       <h2 className="text-center text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight">
         What Our <span className="text-blue-600">Clients Say</span>
       </h2>
@@ -46,7 +45,6 @@ const Testimonials: React.FC = () => {
         Discover what professionals, businesses, and security experts have to say about FindMySecurity.
       </p>
 
-      {/* Testimonials Grid with Animation */}
       <AnimateOnScrollProvider>
         <div className="grid grid-cols-1 md:grid-cols-3 md:gap-2 gap-5 max-w-6xl mx-auto">
           {testimonials.map((testimonial, index) => (
@@ -59,7 +57,6 @@ const Testimonials: React.FC = () => {
               data-aos-delay={index * 200}
               data-aos-duration="800"
             >
-              {/* Quote Icon */}
               <div className={`text-8xl font-bold ${testimonial.quoteColor} mb-2`}>&ldquo;</div>
 
               {/* Testimonial Text */}
