@@ -15,7 +15,7 @@ const features = [
   { title: "Public Safety & Law Enforcement Training", image: "/providers/Public Safety & Law enforcement Training.jpg" },
   { title: "Technical & Control Room Training", image: "/providers/Technical & Control room Training.jpg" },
   { title: "Online & E-learning Courses", image: "/providers/Online & E-learning courses.jpg" },
-  { title: "Trainer & Assessor Certification", image: "/providers/Traineer & accessor certification .jpg" },
+  { title: "Trainer & Assessor Certification", image: "/providers/Traineer & accessor certification.jpg" },
 ];
 
 export default function TrainingProviders({ initialSearchMode = "basic" }: { initialSearchMode?: "basic" | "advanced" }) {
