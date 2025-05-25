@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import img from "../../../../public/images/training.jpg";
+// import img from "../../../../public/images/training.jpg";
 import { FiMail, FiPhone, FiGlobe } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 
@@ -213,7 +213,7 @@ const TrainingProfileCard: React.FC<{ provider: Provider }> = ({ provider }) => 
       <div className="flex flex-col sm:flex-row items-start gap-6 bg-white rounded-lg p-6">
         <div className="flex-shrink-0">
           <img
-            src={profile?.profilePhoto || img.src}
+            src={profile?.profilePhoto || '/images/training.jpg'}
             alt={`${companyName} logo`}
             className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border border-gray-200"
           />

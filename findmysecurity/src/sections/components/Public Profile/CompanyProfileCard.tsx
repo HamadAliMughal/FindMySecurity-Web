@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import img from "../../../../public/images/company.jpg";
+// import img from "../../../../public/images/company.jpg";
 import { FiMail, FiPhone, FiMessageSquare } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import CompanyIcons from "./ProfessionalIcons";
@@ -203,7 +203,7 @@ const CompanyProfileCard: React.FC<{ company: Company }> = ({ company }) => {
       <div className="flex flex-col sm:flex-row items-start gap-6 bg-white rounded-lg p-6">
         <div className="flex-shrink-0">
           <img
-            src={profile?.profilePhoto || img.src}
+            src={profile?.profilePhoto || '/images/company.jpg'}
             alt={`${companyName} logo`}
             className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border border-gray-200"
           />
