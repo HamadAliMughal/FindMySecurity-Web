@@ -29,7 +29,6 @@ export default function TrainingProviders({ initialSearchMode = "basic" }: { ini
     <section
     className="py-10 relative"// Change this path
     >
-      {/* Background Video */}
     <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
       <video
         autoPlay

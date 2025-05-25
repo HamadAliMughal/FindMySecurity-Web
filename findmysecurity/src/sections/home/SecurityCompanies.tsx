@@ -37,7 +37,6 @@ export default function SecurityCompanies({ initialSearchMode = "basic" }: { ini
         className="w-full h-full object-cover opacity-60"
       >
         <source src="/videos/video1.mp4" type="video/mp4" />
-        {/* <source src="/videos/background.webm" type="video/webm" /> */}
         Your browser does not support the video tag.
       </video>
     </div>

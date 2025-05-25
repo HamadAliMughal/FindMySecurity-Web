@@ -18,7 +18,7 @@ const securityCompanies = [
   { name: "jooble.png", src: "/pro-icons/jooble.png" },
   { name: "Mas Security Solutions Group", src: "/pro-icons/Mas-Security-Solutions-Group.jpg" },
   { name: "MCGEE & DURRANI CONSULTING FIRM.webp", src: "/pro-icons/MCGEE-&-DURRANI-CONSULTING-FIRM.webp" },
-  { name: "MinSec", src: "/pro-icons/MinSec.JPG" },
+  { name: "MinSec", src: "/pro-icons/MinSec.jpg" },
   { name: "NORVIC GUARDS SECURITY", src: "/pro-icons/NORVIC-GUARDS-SECURITY.png" },
   { name: "NSB GLOBAL ENTERPRISE LTD", src: "/pro-icons/NSB-GLOBAL-ENTERPRISE-LTD.png" },
   { name: "ONSEC FM LTD", src: "/pro-icons/ONSEC-FM-LTD.png" },
