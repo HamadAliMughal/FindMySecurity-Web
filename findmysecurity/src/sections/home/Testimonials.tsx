@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import AnimateOnScrollProvider from "@/sections/components/animation/AnimateOnScrollProvider";
 
 interface Testimonial {
   name: string;
@@ -45,38 +46,41 @@ const Testimonials: React.FC = () => {
         Discover what professionals, businesses, and security experts have to say about FindMySecurity.
       </p>
 
-      {/* Testimonials Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 md:gap-2 gap-5 max-w-6xl mx-auto">
-  {testimonials.map((testimonial, index) => (
-    <div 
-      key={index} 
-      className="bg-white shadow-lg rounded-xl p-8 text-center border border-gray-200 
-                 transition-all transform hover:-translate-y-2 hover:shadow-2xl 
-                 max-w-xs mx-auto"
-    >
-      {/* Quote Icon */}
-      <div className={`text-8xl font-bold ${testimonial.quoteColor} mb-2`}>&ldquo;</div>
-      
-      {/* Testimonial Text */}
-      <p className="text-gray-700 text-xl italic leading-relaxed mb-4">
-        {testimonial.text}
-      </p>
+      {/* Testimonials Grid with Animation */}
+      <AnimateOnScrollProvider>
+        <div className="grid grid-cols-1 md:grid-cols-3 md:gap-2 gap-5 max-w-6xl mx-auto">
+          {testimonials.map((testimonial, index) => (
+            <div
+              key={index}
+              className="bg-white shadow-lg rounded-xl p-8 text-center border border-gray-200 
+                         transition-all transform hover:-translate-y-2 hover:shadow-2xl 
+                         max-w-xs mx-auto"
+              data-aos="fade-left"
+              data-aos-delay={index * 200}
+              data-aos-duration="800"
+            >
+              {/* Quote Icon */}
+              <div className={`text-8xl font-bold ${testimonial.quoteColor} mb-2`}>&ldquo;</div>
 
-      {/* Profile Section */}
-      <div className="flex flex-col items-center">
-        <img 
-          src={testimonial.image} 
-          alt={testimonial.name} 
-          className="w-20 h-20 rounded-full border-2 border-gray-300 object-cover shadow-md"
-        />
-        <h4 className="font-bold text-gray-900 text-lg">{testimonial.name}</h4>
-        <p className="text-sm text-gray-500">{testimonial.position}</p>
-      </div>
-    </div>
-  ))}
-</div>
+              {/* Testimonial Text */}
+              <p className="text-gray-700 text-xl italic leading-relaxed mb-4">
+                {testimonial.text}
+              </p>
 
-
+              {/* Profile Section */}
+              <div className="flex flex-col items-center">
+                <img
+                  src={testimonial.image}
+                  alt={testimonial.name}
+                  className="w-20 h-20 rounded-full border-2 border-gray-300 object-cover shadow-md"
+                />
+                <h4 className="font-bold text-gray-900 text-lg">{testimonial.name}</h4>
+                <p className="text-sm text-gray-500">{testimonial.position}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </AnimateOnScrollProvider>
     </section>
   );
 };

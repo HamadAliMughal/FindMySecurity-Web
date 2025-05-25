@@ -3,18 +3,19 @@ import Image from "next/image";
 import SearchComponent from "./SearchComponent";
 import lookingForData from "@/sections/data/training_providers.json";
 import searchData from "@/sections/data/hero_section.json";
+import AnimateOnScrollProvider from "@/sections/components/animation/AnimateOnScrollProvider";
 
 const features = [
-  { title: "SIA Licence Courses", image: "/images/training_providers_pic1.jpg" },
-  { title: "Specialist & Advanced Training", image: "/images/training_providers_pic2.jpg" },
-  { title: "First Aid & Emergency Training", image: "/images/training_providers_pic3.jpg" },
-  { title: "Transport & Maritime Security Training", image: "/images/training_providers_pic2.jpg" },
-  { title: "Advanced Intelligence & Technical Serveillance Training", image: "/images/training_providers_pic1.jpg" },
-  { title: "Corporate & In-House Training", image: "/images/training_providers_pic3.jpg" },
-  { title: "Public Safety & Law Enforcement Training", image: "/images/training_providers_pic1.jpg" },
-  { title: "Technical & Control Room Training", image: "/images/training_providers_pic3.jpg" },
-  { title: "Online & E-learning Courses", image: "/images/training_providers_pic2.jpg" },
-  { title: "Trainer & Assessor Certification", image: "/images/training_providers_pic1.jpg" },
+  { title: "SIA Licence Courses", image: "/providers/SIA Licence Courses.jpg" },
+  { title: "Specialist & Advanced Training", image: "/providers/Specialist & Advance Training.jpg" },
+  { title: "First Aid & Emergency Training", image: "/providers/First Aid & Emergency Training.jpg" },
+  { title: "Transport & Maritime Security Training", image: "/providers/Transport & Maritime Security Training.jpeg" },
+  { title: "Advanced Intelligence & Technical Serveillance Training", image: "/providers/Advance Intelligence and Technical Serveillance Training.jpg" },
+  { title: "Corporate & In-House Training", image: "/providers/Corporate & In-House Training.jpg" },
+  { title: "Public Safety & Law Enforcement Training", image: "/providers/Public Safety & Law enforcement Training.jpg" },
+  { title: "Technical & Control Room Training", image: "/providers/Technical & Control room Training.jpg" },
+  { title: "Online & E-learning Courses", image: "/providers/Online & E-learning courses.jpg" },
+  { title: "Trainer & Assessor Certification", image: "/providers/Traineer & accessor certification .jpg" },
 ];
 
 export default function TrainingProviders({ initialSearchMode = "basic" }: { initialSearchMode?: "basic" | "advanced" }) {
@@ -26,48 +27,70 @@ export default function TrainingProviders({ initialSearchMode = "basic" }: { ini
 
   return (
     <section
-      className="py-10 bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: "url('/images/training_providers.jpg')" }} // Change this path
+    className="py-10 relative"// Change this path
     >
+      {/* Background Video */}
+    <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="w-full h-full object-cover opacity-60"
+      >
+        <source src="/videos/front.mp4" type="video/mp4" />
+        {/* <source src="/videos/background.webm" type="video/webm" /> */}
+        Your browser does not support the video tag.
+      </video>
+    </div>
       {/* Header */}
-      <div className="text-center max-w-3xl mx-auto mb-12">
-        <h1 className="text-4xl font-extrabold text-gray-900">
-          FindMySecurity
-        </h1>
-        <h2 className="text-4xl font-extrabold text-gray-900">
-          Training Providers
-        </h2>
-      </div>
+      <div className="text-center max-w-3xl mx-auto mb-12 relative z-10">
+      <h1 className="text-4xl font-extrabold text-gray-900">
+        FindMySecurity
+      </h1>
+      <h2 className="text-4xl font-extrabold text-gray-900">
+        Training Providers
+      </h2>
+    </div>
 
-      {/* Feature Grid */}
-      <div className="max-w-8xl mx-auto px-10 md:px-20 lg:px-26">
-        <div className="flex flex-wrap justify-center gap-6">
-          {features.map((feature, index) => {
-            return (
-              <div
-                key={index}
-                className="relative w-68 h-60 bg-white rounded-xl shadow-lg transition-all duration-300 transform  hover:shadow-2xl border border-gray-200 overflow-hidden flex flex-col"
-              >
-                {/* Image Wrapper with Hidden Overflow */}
-                <div className="w-full h-50 overflow-hidden">
-                  <Image
-                    src={feature.image}
-                    alt={feature.title}
-                    width={280}
-                    height={200}
-                    className="w-full h-full object-cover transition-transform duration-800 ease-in-out hover:scale-120"
-                  />
-                </div>
+    <AnimateOnScrollProvider>
 
-                {/* Feature Title */}
-                <div className="flex-1 flex items-center justify-center px-4 text-center">
-                  <h3 className="text-sm font-semibold text-gray-900">{feature.title}</h3>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 lg:px-13 relative z-10" data-aos="fade-up">
+              <div className="w-full px-4 sm:px-8 md:px-12 lg:px-20 py-6">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-4 justify-center">
+                  {features.map((feature, index) => (
+                    <div
+                      key={index}
+                      className="flex flex-col items-center w-full max-w-[13rem]"
+                    >
+                      {/* Image Container with Fixed Aspect Ratio */}
+                      <div className="relative w-full aspect-[4/3] overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-200 group" data-aos="fade-up">
+                        <Image
+                          src={feature.image}
+                          alt={feature.title}
+                          className="object-cover w-full h-full transform group-hover:scale-110 transition-transform duration-500 ease-in-out"
+                          fill
+                        />
+        
+                        {/* Overlay - Desktop Only */}
+                        <div
+                          className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-75 transition-opacity duration-500 flex items-center justify-center text-center px-2 md:flex hidden"
+                          style={{ zIndex: 10 }}
+                        >
+                          <h3 className="text-white text-sm font-semibold">
+                            {feature.title}
+                          </h3>
+                        </div>
+                      </div>
+        
+                      {/* Text Below Image - Mobile Only */}
+                      <h3 className="mt-3 text-center text-white text-sm font-semibold md:hidden px-1 min-h-[2rem]">
+                        {feature.title}
+                      </h3>
+                    </div>
+                  ))}
                 </div>
               </div>
-            );
-          })}
-        </div>
-
         {/* Search Component */}
         <div className="flex justify-center w-full mt-10">
           <SearchComponent
@@ -80,6 +103,8 @@ export default function TrainingProviders({ initialSearchMode = "basic" }: { ini
           />
         </div>
       </div>
+          </AnimateOnScrollProvider>
+      
     </section>
   );
 }

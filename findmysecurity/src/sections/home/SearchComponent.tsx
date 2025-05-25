@@ -149,12 +149,14 @@ export default function SearchComponent({
   return (
     <form
       onSubmit={handleSubmit}
-      className="relative bg-gray-300 z-10 p-6 rounded-lg w-full max-w-5xl shadow-xl"
+      // className="relative bg-gray-300 z-10 p-6 rounded-lg w-full max-w-5xl shadow-xl"
+      className="relative z-10 p-6 rounded-lg w-full max-w-5xl shadow-xl"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }}
     >
-      <h2 className="text-lg font-bold text-center text-gray-800 -mb-2">
+      <h2 className="text-lg font-bold text-center text-white -mb-2">
         FindMySecurity
       </h2>
-      <h2 className="text-lg font-bold text-center text-gray-800 mb-2">
+      <h2 className="text-lg font-bold text-center text-white mb-2">
         {title}
       </h2>
 
@@ -217,7 +219,7 @@ export default function SearchComponent({
 
         <input
           type="text"
-          className="flex-1 px-4 py-2 rounded-lg text-black border border-black w-full focus:outline-none focus:ring-2 focus:ring-black"
+          className="flex-1 px-4 py-2 rounded-lg text-white border border-white w-full focus:outline-none focus:ring-2 focus:ring-white"
           placeholder="Postcode"
           value={searchValues.postcode}
           onChange={(e) =>
@@ -234,13 +236,13 @@ export default function SearchComponent({
                 searchValues.distance &&
                 (hideExperienceField || searchValues.experience) &&
                 searchValues.postcode
-                ? "bg-black text-white hover:bg-gray-800"
-                : "bg-gray-400 text-gray-600 cursor-not-allowed"
+                ? "bg-black text-white hover:bg-gray-900"
+                : "bg-gray-800 text-white cursor-not-allowed"
               : searchValues.lookingFor &&
                 searchValues.subCategory &&
                 searchValues.postcode
-              ? "bg-black text-white hover:bg-gray-800"
-              : "bg-gray-400 text-gray-600 cursor-not-allowed"
+              ? "bg-black text-white hover:bg-gray-900"
+              : "bg-gray-800 text-white cursor-not-allowed"
           }`}
           onClick={(e) => {
             const validBasic =
@@ -302,7 +304,7 @@ export default function SearchComponent({
       </div>
 
       <button
-        className="flex items-center px-4 py-2 mt-4 bg-black text-white rounded-lg hover:bg-gray-800"
+        className="flex items-center px-4 py-2 mt-4 bg-black text-white rounded-lg hover:bg-gray-900"
         onClick={(e) => {
           e.preventDefault();
           handleToggleAdvancedSearch();

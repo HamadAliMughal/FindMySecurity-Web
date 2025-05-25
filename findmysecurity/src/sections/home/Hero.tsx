@@ -14,7 +14,19 @@ export default function Hero({ initialSearchMode = "basic" }: { initialSearchMod
   return (
     <section className="relative w-full min-h-screen flex flex-col items-center justify-center text-center bg-gray-900 text-white px-4 md:px-8">
       {/* Background Image */}
-      <div className="absolute inset-0 w-full h-full">
+      <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover opacity-50"
+        >
+          <source src="/videos/front.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
+      {/* <div className="absolute inset-0 w-full h-full">
         <Image
           src="/images/hero-bg.jpg"
           alt="Hero Background"
@@ -24,7 +36,7 @@ export default function Hero({ initialSearchMode = "basic" }: { initialSearchMod
           className="opacity-50"
           priority
         />
-      </div>
+      </div> */}
 
       {/* Content */}
       <div className="relative z-10 flex justify-center w-full my-40">

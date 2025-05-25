@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import { Sparkles } from "lucide-react";
+import AnimateOnScrollProvider from "@/sections/components/animation/AnimateOnScrollProvider";
 
 interface Category {
   title: string;
@@ -49,44 +51,54 @@ const categories: Category[] = [
 
 const GetStarted: React.FC = () => {
   return (
-    <section className="bg-gradient-to-b from-gray-100 to-gray-300 py-30 px-6 md:px-16">
-      {/* Title */}
-      <h2 className="text-center text-3xl md:text-4xl font-extrabold text-gray-900 mb-20 leading-snug">
-        It's <span className="text-gray-500">Easy</span> and{" "}
-        <span className="text-gray-700">Free</span> to Get Started With{" "}
-        <span className="bg-gray-900 text-white px-3 py-1 rounded-md shadow-md">
+    <section className="bg-gradient-to-br from-slate-100 via-slate-200 to-slate-300 py-24 px-4 md:px-16">
+      <h2 className="text-center text-4xl font-extrabold text-gray-800 mb-20 leading-snug">
+        It's{" "}
+        <span className="text-indigo-500 font-bold">Easy</span> and{" "}
+        <span className="text-emerald-600 font-bold">Free</span> to Get Started With{" "}
+        <span className="inline-block bg-black text-white px-3 py-1 rounded-full shadow-md">
           FindMySecurity
         </span>
       </h2>
 
-      {/* Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mx-auto sm:max-w-6xl">
-        {categories.map((category, index) => (
-          <div
-            key={index}
-            className="relative bg-white text-gray-900 shadow-lg rounded-2xl p-8 border border-gray-200 flex flex-col w-full max-w-[90%] mx-auto sm:max-w-none transition-all transform hover:-translate-y-2 hover:shadow-2xl"
-          >
-            <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">{category.title}</h3>
+      <AnimateOnScrollProvider>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-10 lg:px-13 relative z-10">
+          {categories.map((category, index) => (
+            <div
+              key={index}
+              className="bg-white/70 backdrop-blur-md border border-gray-200 rounded-3xl p-6 shadow-xl transition-transform duration-300 hover:-translate-y-2 hover:shadow-2xl"
+              data-aos="fade-left"
+              data-aos-delay={index * 150} // delay each for staggered effect
+              data-aos-duration="800"
+            >
+              <div className="flex justify-center mb-4">
+                <Sparkles className="h-6 w-6 text-indigo-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-center text-gray-800 mb-6">
+                {category.title}
+              </h3>
 
-            {/* Steps List */}
-            <ul className="text-gray-600 text-sm space-y-4">
-              {category.steps.map((step, stepIndex) => (
-                <li key={stepIndex} className="flex items-start space-x-4">
-                  {/* Step Number */}
-                  <span className="flex items-center justify-center p-2 bg-gray-900 text-white font-bold text-sm">
-                    {stepIndex + 1}
-                  </span>
-                  {/* Step Text */}
-                  <p className="leading-relaxed">{step}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
+              <ul className="space-y-4 text-sm text-gray-700">
+                {category.steps.map((step, stepIndex) => (
+                  <li key={stepIndex} className="flex items-start space-x-3">
+                    <span className="min-w-[28px] h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs font-semibold shadow-sm">
+                      {stepIndex + 1}
+                    </span>
+                    <p className="leading-relaxed">{step}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </AnimateOnScrollProvider>
     </section>
   );
 };
 
 export default GetStarted;
+
+
+
+
 
