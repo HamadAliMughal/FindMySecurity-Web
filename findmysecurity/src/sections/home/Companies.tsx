@@ -30,7 +30,7 @@ const securityCompanies = [
   { name: "Streetwise Security Services", src: "/pro-icons/Streetwise-Security-Services.svg" },
   { name: "Total Task Consultansy", src: "/pro-icons/Total-Task-Consultansy.webp" },
 ];
-
+// TrustedCompanies
 const TrustedCompanies = () => {
   return (
     <section className="bg-white px-4 sm:px-6 lg:px-10 my-20 flex flex-col items-center text-center">
