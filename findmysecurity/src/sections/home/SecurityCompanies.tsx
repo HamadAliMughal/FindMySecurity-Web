@@ -26,7 +26,7 @@ export default function SecurityCompanies({ initialSearchMode = "basic" }: { ini
   };
 
   return (
-    <section className="py-10 relative">
+    <section className="py-10 relative bg-gray-900 text-white">
     {/* Background Video */}
     <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
       <video
@@ -36,7 +36,7 @@ export default function SecurityCompanies({ initialSearchMode = "basic" }: { ini
         playsInline
         className="w-full h-full object-cover opacity-60"
       >
-        <source src="/videos/front.mp4" type="video/mp4" />
+        <source src="/videos/video1.mp4" type="video/mp4" />
         {/* <source src="/videos/background.webm" type="video/webm" /> */}
         Your browser does not support the video tag.
       </video>
@@ -44,10 +44,10 @@ export default function SecurityCompanies({ initialSearchMode = "basic" }: { ini
   
     {/* Header */}
     <div className="text-center max-w-3xl mx-auto mb-12 relative z-10">
-      <h1 className="text-4xl font-extrabold text-gray-900">
+      <h1 className="text-4xl font-extrabold text-white">
         FindMySecurity
       </h1>
-      <h2 className="text-4xl font-extrabold text-gray-900">
+      <h2 className="text-4xl font-extrabold text-white">
         Security Companies
       </h2>
     </div>
