@@ -4,6 +4,12 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 
 const securityCompanies = [
+  { name: "1st Choice Connected", src: "/pro-icons/1st Choice Connected .png" },
+  { name: "Monster", src: "/pro-icons/Monster.png" },
+  { name: "HADES SECURITY", src: "/pro-icons/HADES SECURITY.png" },
+  { name: "CROWDSAFE UK", src: "/pro-icons/CROWDSAFE UK.png" },
+  { name: "Ultra Professional Protection", src: "/pro-icons/Ultra Professional Protection.png" },
+  { name: "adzuna", src: "/pro-icons/adzuna.png" },
   { name: "All4 security Ltd", src: "/pro-icons/All4-security-Ltd.jpg" },
   { name: "CERBERUS GLOBAL LOGO", src: "/pro-icons/CERBERUS-GLOBAL-LOGO.jpg" },
   { name: "CONCEPT SECURITY & INVESTIGATIONS", src: "/pro-icons/CONCEPT-SECURITY-&-INVESTIGATIONS.png" },
