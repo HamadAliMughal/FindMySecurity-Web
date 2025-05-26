@@ -6,6 +6,7 @@ import { FaEnvelope, FaMapMarkerAlt, FaUser, FaPhone } from "react-icons/fa";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import MembershipDialog from "./MembershipDialog"; // Adjust the import path as needed
 import TextField from '@mui/material/TextField';
+import toast from "react-hot-toast";
 
 interface ClientGeneralFormProps {
   id: number;
@@ -161,44 +162,63 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
     return isValid && Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    const isValid = validateForm();
-    setIsFormValid(isValid);
+  const isValid = validateForm();
+  setIsFormValid(isValid);
 
-    if (!isValid) {
-      setShowAllErrors(true);
-      setTimeout(() => {
-        const firstError = document.querySelector('.border-red-500');
-        if (firstError) {
-          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 100);
+  if (!isValid) {
+    setShowAllErrors(true);
+    setTimeout(() => {
+      const firstError = document.querySelector('.border-red-500');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+    return;
+  }
+
+  // Validate postcode via postcodes.io
+  try {
+    const response = await fetch(`https://api.postcodes.io/postcodes/${formData.postcode.trim()}`);
+    const data = await response.json();
+
+    if (!data.result || data.status !== 200) {
+    toast.error("Invalid UK postcode. Please enter a valid one.");
+      const postcodeInput = document.querySelector('input[name="postcode"]');
+      if (postcodeInput) {
+        postcodeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
+  } catch (error) {
+    console.error("Postcode validation failed:", error);
+    alert("Failed to validate postcode. Please try again later.");
+    return;
+  }
 
-    const { day, month, year } = formData.dateOfBirth;
-    const formattedDateOfBirth = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+  const { day, month, year } = formData.dateOfBirth;
+  const formattedDateOfBirth = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 
-    const submissionData = {
-      email: formData.email,
-      password: formData.password,
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      screenName: formData.screenName,
-      phoneNumber: formData.phoneNumber,
-      dateOfBirth: formattedDateOfBirth,
-      address: formData.address,
-      postcode: formData.postcode,
-      permissions: {},
-      roleId: id,
-    };
-
-    // Save the submission data and show the membership dialog
-    setFormSubmissionData(submissionData);
-    setShowMembershipDialog(true);
+  const submissionData = {
+    email: formData.email,
+    password: formData.password,
+    firstName: formData.firstName,
+    lastName: formData.lastName,
+    screenName: formData.screenName,
+    phoneNumber: formData.phoneNumber,
+    dateOfBirth: formattedDateOfBirth,
+    address: formData.address,
+    postcode: formData.postcode,
+    permissions: {},
+    roleId: id,
   };
+
+  setFormSubmissionData(submissionData);
+  setShowMembershipDialog(true);
+};
+
 
   const handlePlanSelected = (plan: string) => {
     // Add the selected plan to the submission data

@@ -233,7 +233,7 @@ export default function RegistrationSelector() {
               placeholder="Enter the code sent to your email"
             />
             <div className="flex justify-between">
-              <button
+              {/* <button
                 onClick={() => {
                   localStorage.removeItem("loginData");
                   localStorage.removeItem("profileData");
@@ -243,7 +243,7 @@ export default function RegistrationSelector() {
                 className="px-4 py-2 text-sm bg-gray-300 rounded hover:bg-gray-400"
               >
                 Skip
-              </button>
+              </button> */}
               <button
                 onClick={async () => {
                   try {

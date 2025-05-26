@@ -9,6 +9,7 @@ import MembershipDialog from "./MembershipDialog";
 import TextField from '@mui/material/TextField';
 import companiesList from "@/sections/data/secuirty_services.json";
 import providersList from "@/sections/data/training_providers.json";
+import toast from "react-hot-toast";
 
 interface ClientGeneralFormProps {
   id: number;
@@ -241,7 +242,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
     })
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const isValid = validateForm();
@@ -257,7 +258,23 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
       }, 100);
       return;
     }
+  try {
+    const postcodeResponse = await fetch(`https://api.postcodes.io/postcodes/${formData.postcode.trim()}`);
+    const postcodeData = await postcodeResponse.json();
 
+    if (!postcodeData.result || postcodeData.status !== 200) {
+      toast.error("Invalid UK postcode. Please enter a valid one.");
+      const postcodeInput = document.querySelector('input[name="postcode"]');
+      if (postcodeInput) {
+        postcodeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+  } catch (error) {
+    console.error("Postcode validation failed:", error);
+    alert("Failed to validate postcode. Please try again later.");
+    return;
+  }
     // Get unique titles from selected roles
     const serviceRequirements = Array.from(
       new Set(formData.selectedRoles.map(item => item.title))

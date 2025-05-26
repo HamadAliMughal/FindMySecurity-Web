@@ -8,6 +8,7 @@ import Select from "react-select";
 import MembershipDialog from "./MembershipDialog";
 import TextField from '@mui/material/TextField';
 import professionalsList from "@/sections/data/secuirty_professional.json";
+import toast from "react-hot-toast";
 
 
 interface ClientGeneralFormProps {
@@ -229,56 +230,75 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
       handleInputChange('selectedRoles', selectedValues);
     };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    const isValid = validateForm();
-    setIsFormValid(isValid);
+  const isValid = validateForm();
+  setIsFormValid(isValid);
 
-    if (!isValid) {
-      setShowAllErrors(true);
-      setTimeout(() => {
-        const firstError = document.querySelector('.border-red-500');
-        if (firstError) {
-          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 100);
+  if (!isValid) {
+    setShowAllErrors(true);
+    setTimeout(() => {
+      const firstError = document.querySelector('.border-red-500');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+    return;
+  }
+
+  // ✅ Validate postcode with postcodes.io API
+  try {
+    const postcodeResponse = await fetch(`https://api.postcodes.io/postcodes/${formData.postcode.trim()}`);
+    const postcodeData = await postcodeResponse.json();
+
+    if (!postcodeData.result || postcodeData.status !== 200) {
+      toast.error("Invalid UK postcode. Please enter a valid one.");
+      const postcodeInput = document.querySelector('input[name="postcode"]');
+      if (postcodeInput) {
+        postcodeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       return;
     }
+  } catch (error) {
+    console.error("Postcode validation failed:", error);
+    alert("Failed to validate postcode. Please try again later.");
+    return;
+  }
 
-    const formattedData = {
-      email: formData.email,
-      password: formData.password,
-      firstName: formData.companyName.split(" ")[0],
-      lastName: formData.companyName.split(" ")[1] || "",
+  const formattedData = {
+    email: formData.email,
+    password: formData.password,
+    firstName: formData.companyName.split(" ")[0],
+    lastName: formData.companyName.split(" ")[1] || "",
+    phoneNumber: formData.phone,
+    companyData: {
+      companyName: formData.companyName,
+      registrationNumber: formData.registrationNumber,
+      address: formData.address,
+      industryType: formData.industryType,
+      postCode: formData.postcode,
+      contactPerson: formData.contactPerson,
+      jobTitle: formData.jobTitle,
       phoneNumber: formData.phone,
-      companyData: {
-        companyName: formData.companyName,
-        registrationNumber: formData.registrationNumber,
-        address: formData.address,
-        industryType: formData.industryType,
-        postCode: formData.postcode,
-        contactPerson: formData.contactPerson,
-        jobTitle: formData.jobTitle,
-        phoneNumber: formData.phone,
-        website: formData.website,
-      },
-      serviceRequirements: formData.selectedRoles,
-      securityServicesOfferings: formData.otherService 
-    ? [formData.otherService.trim()] // Convert string to array (with trimming)
-    : [], // Empty array if no other service provided
-      permissions: {
-        premiumServiceNeed: formData.premiumService,
-        acceptEmails: formData.receiveEmails,
-        acceptTerms: formData.acceptTerms,
-      },
-      roleId: id,
-    };
-
-    // Save the submission data and show the membership dialog
-    setFormSubmissionData(formattedData);
-    setShowMembershipDialog(true);
+      website: formData.website,
+    },
+    serviceRequirements: formData.selectedRoles,
+    securityServicesOfferings: formData.otherService 
+      ? [formData.otherService.trim()]
+      : [],
+    permissions: {
+      premiumServiceNeed: formData.premiumService,
+      acceptEmails: formData.receiveEmails,
+      acceptTerms: formData.acceptTerms,
+    },
+    roleId: id,
   };
+
+  setFormSubmissionData(formattedData);
+  setShowMembershipDialog(true);
+};
+
 
   const handlePlanSelected = (plan: string) => {
     // Add the selected plan to the submission data
