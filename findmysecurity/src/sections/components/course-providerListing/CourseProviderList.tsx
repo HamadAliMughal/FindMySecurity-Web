@@ -104,10 +104,10 @@ export default function CourseProviderList() {
 
   return (
     <div className="mt-20 px-4">
-      <h1 className="text-3xl font-bold mb-8 text-center text-black">Security Companies</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center text-black">Training Providers</h1>
 
       <div className="bg-white  p-6 w-full max-w-5xl mx-auto">
-        <h2 className="text-2xl font-semibold text-black mb-4">Filter Security Companies</h2>
+        <h2 className="text-2xl font-semibold text-black mb-4">Filter Training Providers</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <input
             type="text"
@@ -203,8 +203,6 @@ export default function CourseProviderList() {
         loading={loading}
         error={error}
       />
-      <MapSection data={apiData?.providers || []} type="security companies" />
-
       {apiData?.totalCount && apiData?.pageSize && (
         <div className="flex justify-center mt-6">
           {Array.from({ length: Math.ceil(apiData.totalCount / apiData.pageSize) }, (_, i) => (
@@ -220,6 +218,9 @@ export default function CourseProviderList() {
           ))}
         </div>
       )}
+      <MapSection data={apiData?.providers || []} type="security companies" />
+
+      
     </div>
   );
 }

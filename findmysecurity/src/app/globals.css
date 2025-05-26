@@ -46,6 +46,131 @@
   }
 }
 
+
+
+
+@keyframes text-glow {
+  0%, 100% {
+    text-shadow:
+      0 0 4px #8b5cf6aa,
+      0 0 8px #a78bfa88;
+  }
+  50% {
+    text-shadow:
+      0 0 6px #a78bfaaa,
+      0 0 10px #c4b5fd88;
+  }
+}
+
+@keyframes card-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 6px 2px rgba(139, 92, 246, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 10px 4px rgba(167, 139, 250, 0.5);
+  }
+}
+
+.animate-text-glow {
+  animation: text-glow 5s ease-in-out infinite;
+}
+
+.animate-card-glow {
+  animation: card-glow 5s ease-in-out infinite;
+}
+
+.glow-transition {
+  transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+@keyframes modern-glow-text {
+  0%, 100% {
+    text-shadow:
+      0 0 8px #22cfcfaa,
+      0 0 20px #14b8a6cc;
+  }
+  50% {
+    text-shadow:
+      0 0 15px #22cfcfff,
+      0 0 25px #14b8a6ff;
+  }
+}
+
+@keyframes modern-glow-card {
+  0%, 100% {
+    box-shadow:
+      0 0 8px 2px rgba(20, 184, 166, 0.35),
+      0 4px 20px rgba(20, 184, 166, 0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 20px 5px rgba(34, 207, 207, 0.6),
+      0 8px 30px rgba(34, 207, 207, 0.4);
+  }
+}
+
+/* Text glow for header */
+.glow-text-modern {
+  animation: modern-glow-text 6s ease-in-out infinite;
+  color: #14b8a6;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Card container */
+.card-modern {
+  background: rgba(20, 184, 166, 0.15);
+  backdrop-filter: blur(12px);
+  border-radius: 1rem;
+  border: 1.5px solid rgba(20, 184, 166, 0.3);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  box-shadow:
+    0 4px 15px rgba(20, 184, 166, 0.15);
+}
+
+.card-modern:hover {
+  transform: scale(1.05);
+  animation: modern-glow-card 6s ease-in-out infinite;
+  border-color: #22cfcf;
+  box-shadow:
+    0 0 20px 5px rgba(34, 207, 207, 0.7),
+    0 10px 30px rgba(34, 207, 207, 0.45);
+}
+
+/* Overlay on image on hover */
+.card-overlay-modern {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+  border-radius: 1rem;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  color: #ffffffcc;
+  font-weight: 600;
+  padding: 0 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+}
+
+.card-modern:hover .card-overlay-modern {
+  opacity: 1;
+}
+
+/* Responsive text below image for mobile */
+.feature-title-mobile {
+  color: #14b8a6;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-top: 0.75rem;
+  min-height: 2rem;
+  text-align: center;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+
 /* *{
   font-family:
   ui-sans-serif
