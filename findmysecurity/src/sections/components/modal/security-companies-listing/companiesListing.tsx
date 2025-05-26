@@ -221,7 +221,6 @@ const validatePostcode = async (postcode: string) => {
       {apiData ? (
         <>
           <CompaniesList apiData={apiData} loading={loading} error={error} />
-          <MapSection data={apiData.companies} type="security companies" />
 
           {/* Pagination */}
           {apiData.totalCount && apiData.pageSize && (
@@ -239,6 +238,9 @@ const validatePostcode = async (postcode: string) => {
               ))}
             </div>
           )}
+          <MapSection data={apiData.companies} type="security companies" />
+
+          
         </>
       ) : (
         <p className="text-center mt-8 text-gray-500">Loading security companies...</p>
