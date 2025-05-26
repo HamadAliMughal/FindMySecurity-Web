@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import AnimateOnScrollProvider from "@/sections/components/animation/AnimateOnScrollProvider";
+import { useEffect, useRef } from "react";
 
 const securityCompanies = [
   { name: "All4 security Ltd", src: "/pro-icons/All4-security-Ltd.jpg" },
@@ -17,7 +17,7 @@ const securityCompanies = [
   { name: "FISHER SECURITY & CONSULTING", src: "/pro-icons/FISHER-SECURITY-&-CONSULTING.jpg" },
   { name: "jooble.png", src: "/pro-icons/jooble.png" },
   { name: "Mas Security Solutions Group", src: "/pro-icons/Mas-Security-Solutions-Group.jpg" },
-  { name: "MCGEE & DURRANI CONSULTING FIRM.webp", src: "/pro-icons/MCGEE-&-DURRANI-CONSULTING-FIRM.webp" },
+  { name: "MCGEE & DURRANI CONSULTING FIRM", src: "/pro-icons/MCGEE-&-DURRANI-CONSULTING-FIRM.webp" },
   { name: "MinSec", src: "/pro-icons/minsec.jpg" },
   { name: "NORVIC GUARDS SECURITY", src: "/pro-icons/NORVIC-GUARDS-SECURITY.png" },
   { name: "NSB GLOBAL ENTERPRISE LTD", src: "/pro-icons/NSB-GLOBAL-ENTERPRISE-LTD.png" },
@@ -30,34 +30,64 @@ const securityCompanies = [
   { name: "Streetwise Security Services", src: "/pro-icons/Streetwise-Security-Services.svg" },
   { name: "Total Task Consultansy", src: "/pro-icons/Total-Task-Consultansy.webp" },
 ];
-// TrustedCompanies
+
 const TrustedCompanies = () => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
+
+    const scroll = () => {
+      if (scrollContainer.scrollLeft + scrollContainer.clientWidth >= scrollContainer.scrollWidth) {
+        scrollContainer.scrollLeft = 0;
+      } else {
+        scrollContainer.scrollLeft += 1;
+      }
+    };
+
+    const intervalId = setInterval(scroll, 30);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
-    <section className="bg-white px-4 sm:px-6 lg:px-10 my-20 flex flex-col items-center text-center">
-<h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-center mb-10 text-transparent bg-clip-text bg-gradient-to-r from-black via-gray-800 to-black tracking-tight animate-fade-in">
-  Trusted Worldwide to Achieve<br className="hidden sm:inline" /> Operational Excellence
-</h1>
+    <section className="bg-white px-4 sm:px-6 lg:px-10 my-20 flex flex-col items-center text-center overflow-hidden">
+      <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-center mb-10 text-transparent bg-clip-text bg-gradient-to-r from-black via-gray-800 to-black tracking-tight animate-fade-in">
+        Trusted Worldwide to Achieve<br className="hidden sm:inline" /> Operational Excellence
+      </h1>
 
+      <div 
+        ref={scrollRef}
+        className="flex gap-x-8 overflow-x-hidden w-full max-w-7xl"
+        style={{
+          WebkitOverflowScrolling: "touch",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none"
+        }}
+      >
+        {/* Duplicate the companies array to create a seamless loop */}
+        {[...securityCompanies, ...securityCompanies].map((company, index) => (
+          <div
+            key={index}
+            className="flex-shrink-0 w-[150px] h-40 flex items-center justify-center"
+          >
+            <Image
+              src={company.src}
+              alt={company.name}
+              width={100}
+              height={60}
+              className="object-contain max-h-full"
+            />
+          </div>
+        ))}
+      </div>
 
-      <AnimateOnScrollProvider>
-        <div className="flex flex-wrap justify-center gap-x-8 gap-y-6 max-w-7xl">
-          {securityCompanies.map((company, index) => (
-            <div
-              key={index}
-              className="w-auto h-40 flex items-center justify-center"
-              data-aos="fade-up"
-            >
-              <Image
-                src={company.src}
-                alt={company.name}
-                width={100}
-                height={60}
-                className="object-contain max-h-full"
-              />
-            </div>
-          ))}
-        </div>
-      </AnimateOnScrollProvider>
+      <style jsx>{`
+        div::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </section>
   );
 };
