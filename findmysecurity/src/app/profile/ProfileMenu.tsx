@@ -212,9 +212,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
           ) : notifications.length === 0 ? (
             <p className="text-gray-500 text-center">No new notifications</p>
           ) : (
-            [...notifications]
-  .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-  .map((notif) => (
+            notifications.map((notif) => (
               <div key={notif.id} className="flex items-start gap-3 p-2 border-b">
                 <div className="flex-1">
                   <p className="text-sm">
