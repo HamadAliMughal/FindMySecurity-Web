@@ -9,7 +9,7 @@ import {
   FaCogs,
   FaAd,
   FaUserPlus,
-  FaList
+  FaList,
   FaBell,
 } from "react-icons/fa";
 import { FiFileText } from "react-icons/fi";
