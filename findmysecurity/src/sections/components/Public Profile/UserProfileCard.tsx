@@ -71,13 +71,13 @@ const Section = ({
         >
           {label}
         </p>
-        <p
-          className={`text-base font-medium ${
-            clickable ? fieldColor : "text-gray-800"
-          } break-words`}
-        >
-          {displayValue}
-        </p>
+     <p
+  className={`text-base font-medium ${
+    clickable ? fieldColor : "text-gray-800"
+  } break-words whitespace-pre-wrap max-w-full`}
+>
+  {displayValue}
+</p>
       </div>
     </div>
   );
@@ -525,10 +525,10 @@ serviceRequirements : profileData?.serviceRequirements,
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-10 mt-10 bg-white rounded-lg shadow p-6">
         <Section label="Date of Birth" value={dateOfBirth} />
         <Section label="Address" value={address} />
-        <Section label="Postcode" value={postcode} />
+      {postcode &&  <Section label="Postcode" value={postcode} />}
         <Section label="Screen Name" value={screenName} />
-        <Section label="Account Created" value={new Date(createdAt).toLocaleString()} />
-        <Section label="Last Updated" value={new Date(updatedAt).toLocaleString()} />
+        {/* <Section label="Account Created" value={new Date(createdAt).toLocaleString()} />
+        <Section label="Last Updated" value={new Date(updatedAt).toLocaleString()} /> */}
       </div>
       <ProfileGroup title="Basic Info" data={basicInfo} />
       <ProfileGroup title="About" data={aboutMe} />

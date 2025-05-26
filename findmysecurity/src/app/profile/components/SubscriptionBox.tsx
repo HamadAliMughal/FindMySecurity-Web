@@ -115,10 +115,10 @@ const SubscriptionBox: React.FC<SubscriptionProps> = ({ subscriptionDetails, pay
           <p className="opacity-70">Cardholder</p>
           <p className="font-medium">{name || 'N/A'}</p>
         </div>
-        <div>
+        {/* <div>
           <p className="opacity-70">Email</p>
           <p className="font-medium">{email}</p>
-        </div>
+        </div> */}
         <div>
           <p className="opacity-70">Country</p>
           <p className="font-medium">{address.country || 'N/A'}</p>

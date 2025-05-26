@@ -125,7 +125,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
   const subscriptionTier = loginData?.subscriptionTier;
 
   const menuItems = [
-    { icon: <FaSearch />, label: "My Searches" },
+    // { icon: <FaSearch />, label: "My Searches" },
     { icon: <FaHeart />, label: "My Favourites" },
     {
       icon: <FaUserShield />,
@@ -135,7 +135,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
     ...(roleId !== 3 && isSubscriber && subscriptionTier !== "Basic"
       ? [{ icon: <FaCogs />, label: "My Ads", route: "/my-ads" }]
       : []),
-    { icon: <FaSearch />, label: "Advance Search" },
+    // { icon: <FaSearch />, label: "Advance Search" },
     { icon: <FaCogs />, label: "Customer Support" },
     ...(isSubscriber && subscriptionTier !== "Basic"
       ? [
@@ -212,7 +212,9 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
           ) : notifications.length === 0 ? (
             <p className="text-gray-500 text-center">No new notifications</p>
           ) : (
-            notifications.map((notif) => (
+            [...notifications]
+  .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  .map((notif) => (
               <div key={notif.id} className="flex items-start gap-3 p-2 border-b">
                 <div className="flex-1">
                   <p className="text-sm">
