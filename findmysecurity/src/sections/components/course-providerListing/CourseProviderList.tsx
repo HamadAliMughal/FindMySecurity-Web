@@ -27,7 +27,13 @@ export default function CourseProviderList() {
   const [page, setPage] = useState(searchParams?.get("page") || "1");
 
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [postcodeValid, setPostcodeValid] = useState(true);
+const [postcodeError, setPostcodeError] = useState("");
+
   const [showLoginModal, setShowLoginModal] = useState(false);
+useEffect(() => {
+  validatePostcode(pc);
+}, [pc]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -71,7 +77,28 @@ export default function CourseProviderList() {
 
     router.push(`${pathname}?${newParams.toString()}`);
   };
+const validatePostcode = async (postcode: string) => {
+  if (!postcode) {
+    setPostcodeValid(true);
+    setPostcodeError("");
+    return;
+  }
 
+  try {
+    const res = await fetch(`https://api.postcodes.io/postcodes/${postcode}/validate`);
+    const data = await res.json();
+    if (data.result) {
+      setPostcodeValid(true);
+      setPostcodeError("");
+    } else {
+      setPostcodeValid(false);
+      setPostcodeError("Invalid UK postcode");
+    }
+  } catch (err) {
+    setPostcodeValid(false);
+    setPostcodeError("Error validating postcode");
+  }
+};
   const handleFilterChange = (updatedParams: Record<string, string>) => {
     if (updatedParams.sr !== undefined) {
       setSelectedCategory(updatedParams.sr);
@@ -113,10 +140,11 @@ export default function CourseProviderList() {
             type="text"
             placeholder="Postcode"
             value={pc}
-            onChange={(e) => handleFilterChange({ pc: e.target.value })}
-            className="border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-black text-black"
+            onChange={(e) => handleFilterChange({ pc: e.target.value })} 
+             className={`border px-4 py-2 rounded-md focus:outline-none focus:ring-2 text-black ${
+    postcodeValid ? 'border-gray-300 focus:ring-black' : 'border-red-500 focus:ring-red-500'
+  }`}
           />
-
           <select
             value={selectedCategory}
             onChange={(e) => handleFilterChange({ sr: e.target.value })}

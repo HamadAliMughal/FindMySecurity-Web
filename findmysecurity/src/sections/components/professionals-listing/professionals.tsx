@@ -16,7 +16,7 @@ export default function ProfessionalsPage() {
   const [apiData1, setApiData1] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+ const [postcodeValid, setPostcodeValid] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(searchParams?.get("role") || "");
   const [selectedRole, setSelectedRole] = useState(searchParams?.get("subcategory") || "");
   const pc = searchParams?.get("pc") || "";
@@ -39,7 +39,9 @@ export default function ProfessionalsPage() {
 //       setIsLoggedIn(!!token);
 //     }
 //   }, []); // Runs only once on the client side, after mount
-
+useEffect(() => {
+  validatePostcode(pc);
+}, [pc]);
 const fetchData = async () => {
   setLoading(true);
   setError(null);
@@ -88,7 +90,28 @@ useEffect(() => {
 
     router.push(`${pathname}?${newParams.toString()}`);
   };
+const validatePostcode = async (postcode: string) => {
+  if (!postcode) {
+    setPostcodeValid(true);
+   // setPostcodeError("");
+    return;
+  }
 
+  try {
+    const res = await fetch(`https://api.postcodes.io/postcodes/${postcode}/validate`);
+    const data = await res.json();
+    if (data.result) {
+      setPostcodeValid(true);
+     // setPostcodeError("");
+    } else {
+      setPostcodeValid(false);
+      //setPostcodeError("Invalid UK postcode");
+    }
+  } catch (err) {
+    setPostcodeValid(false);
+    //setPostcodeError("Error validating postcode");
+  }
+};
   const handleFilterChange = (updatedParams: Record<string, string>) => {
     if (updatedParams.role !== undefined) {
       setSelectedCategory(updatedParams.role);
@@ -130,7 +153,10 @@ useEffect(() => {
             placeholder="Postcode"
             value={pc}
             onChange={(e) => handleFilterChange({ pc: e.target.value })}
-            className="border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-black text-black"
+              className={`border px-4 py-2 rounded-md focus:outline-none focus:ring-2 text-black ${
+    postcodeValid ? 'border-gray-300 focus:ring-black' : 'border-red-500 focus:ring-red-500'
+  }`}
+  //className="border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-black text-black"
           />
 
           <select
