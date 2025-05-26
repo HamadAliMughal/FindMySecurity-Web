@@ -1,3 +1,9 @@
+
+
+*.mp4
+/videos
+/public/videos
+
 # Logs
 logs
 *.log

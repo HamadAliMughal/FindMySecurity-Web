@@ -11,7 +11,7 @@ export default function Footer() {
           <Link href="/">
             <h2 className="text-2xl font-bold flex items-center cursor-pointer">
               <img
-                src="/pro-icons/FindMySecurity New Logo.png"
+                src="/pro-icons/FindMySecurity-New-Logo.png"
                 alt="Logo"
                 width={40}
                 height={40}

@@ -7,16 +7,16 @@ import searchData from "@/sections/data/hero_section.json";
 import AnimateOnScrollProvider from "@/sections/components/animation/AnimateOnScrollProvider";
 
 const features = [
-  { title: "SIA Licence Courses", image: "/providers/SIA Licence Courses.jpg" },
-  { title: "Specialist & Advanced Training", image: "/providers/Specialist & Advance Training.jpg" },
-  { title: "First Aid & Emergency Training", image: "/providers/First Aid & Emergency Training.jpg" },
-  { title: "Transport & Maritime Security Training", image: "/providers/Transport & Maritime Security Training.jpeg" },
-  { title: "Advanced Intelligence & Technical Serveillance Training", image: "/providers/Advance Intelligence and Technical Serveillance Training.jpg" },
-  { title: "Corporate & In-House Training", image: "/providers/Corporate & In-House Training.jpg" },
-  { title: "Public Safety & Law Enforcement Training", image: "/providers/Public Safety & Law enforcement Training.jpg" },
-  { title: "Technical & Control Room Training", image: "/providers/Technical & Control room Training.jpg" },
-  { title: "Online & E-learning Courses", image: "/providers/Online & E-learning courses.jpg" },
-  { title: "Trainer & Assessor Certification", image: "/providers/Traineer & accessor certification.jpg" },
+  { title: "SIA Licence Courses", image: "/providers/SIA-Licence-Courses.jpg" },
+  { title: "Specialist & Advanced Training", image: "/providers/Specialist-&-Advance-Training.jpg" },
+  { title: "First Aid & Emergency Training", image: "/providers/First-Aid-&-Emergency-Training.jpg" },
+  { title: "Transport & Maritime Security Training", image: "/providers/Transport-&-Maritime-Security-Training.jpeg" },
+  { title: "Advanced Intelligence & Technical Serveillance Training", image: "/providers/Advance-Intelligence-and-Technical-Serveillance-Training.jpg" },
+  { title: "Corporate & In-House Training", image: "/providers/Corporate-&-In-House-Training.jpg" },
+  { title: "Public Safety & Law Enforcement Training", image: "/providers/Public-Safety-&-Law-enforcement-Training.jpg" },
+  { title: "Technical & Control Room Training", image: "/providers/Technical-&-Control-room-Training.jpg" },
+  { title: "Online & E-learning Courses", image: "/providers/Online-&-E-learning-courses.jpg" },
+  { title: "Trainer & Assessor Certification", image: "/providers/Traineer-&-accessor-certification.jpg" },
 ];
 
 export default function TrainingProviders({ initialSearchMode = "basic" }: { initialSearchMode?: "basic" | "advanced" }) {
@@ -30,7 +30,6 @@ export default function TrainingProviders({ initialSearchMode = "basic" }: { ini
     <section
     className="py-10 relative"// Change this path
     >
-      {/* Background Video */}
     <div className="absolute inset-0 w-full h-full overflow-hidden z-0">
       <video
         autoPlay
