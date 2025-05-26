@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 import MapSection from "@/app/connecting-business/components/MapSection";
-import filtersData from "@/sections/data/secuirty_services.json";
+import filtersData from "@/sections/data/training_providers.json";
  import {CourseProvidersApiResponse} from "@/app/connecting-business/types"; // Use shared types
 import CourseProvidersList from "@/app/connecting-business/components/CourseProvidersList";
 import { API_URL } from "@/utils/path";
@@ -27,7 +27,13 @@ export default function CourseProviderList() {
   const [page, setPage] = useState(searchParams?.get("page") || "1");
 
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [postcodeValid, setPostcodeValid] = useState(true);
+const [postcodeError, setPostcodeError] = useState("");
+
   const [showLoginModal, setShowLoginModal] = useState(false);
+useEffect(() => {
+  validatePostcode(pc);
+}, [pc]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -71,7 +77,28 @@ export default function CourseProviderList() {
 
     router.push(`${pathname}?${newParams.toString()}`);
   };
+const validatePostcode = async (postcode: string) => {
+  if (!postcode) {
+    setPostcodeValid(true);
+    setPostcodeError("");
+    return;
+  }
 
+  try {
+    const res = await fetch(`https://api.postcodes.io/postcodes/${postcode}/validate`);
+    const data = await res.json();
+    if (data.result) {
+      setPostcodeValid(true);
+      setPostcodeError("");
+    } else {
+      setPostcodeValid(false);
+      setPostcodeError("Invalid UK postcode");
+    }
+  } catch (err) {
+    setPostcodeValid(false);
+    setPostcodeError("Error validating postcode");
+  }
+};
   const handleFilterChange = (updatedParams: Record<string, string>) => {
     if (updatedParams.sr !== undefined) {
       setSelectedCategory(updatedParams.sr);
@@ -104,19 +131,20 @@ export default function CourseProviderList() {
 
   return (
     <div className="mt-20 px-4">
-      <h1 className="text-3xl font-bold mb-8 text-center text-black">Security Companies</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center text-black">Training Providers</h1>
 
       <div className="bg-white  p-6 w-full max-w-5xl mx-auto">
-        <h2 className="text-2xl font-semibold text-black mb-4">Filter Security Companies</h2>
+        <h2 className="text-2xl font-semibold text-black mb-4">Filter Training Providers</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <input
             type="text"
             placeholder="Postcode"
             value={pc}
-            onChange={(e) => handleFilterChange({ pc: e.target.value })}
-            className="border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-black text-black"
+            onChange={(e) => handleFilterChange({ pc: e.target.value })} 
+             className={`border px-4 py-2 rounded-md focus:outline-none focus:ring-2 text-black ${
+    postcodeValid ? 'border-gray-300 focus:ring-black' : 'border-red-500 focus:ring-red-500'
+  }`}
           />
-
           <select
             value={selectedCategory}
             onChange={(e) => handleFilterChange({ sr: e.target.value })}
@@ -203,8 +231,6 @@ export default function CourseProviderList() {
         loading={loading}
         error={error}
       />
-      <MapSection data={apiData?.providers || []} type="security companies" />
-
       {apiData?.totalCount && apiData?.pageSize && (
         <div className="flex justify-center mt-6">
           {Array.from({ length: Math.ceil(apiData.totalCount / apiData.pageSize) }, (_, i) => (
@@ -220,6 +246,9 @@ export default function CourseProviderList() {
           ))}
         </div>
       )}
+      <MapSection data={apiData?.providers || []} type="security companies" />
+
+      
     </div>
   );
 }

@@ -71,13 +71,17 @@ const Section = ({
         >
           {label}
         </p>
-        <p
-          className={`text-base font-medium ${
-            clickable ? fieldColor : "text-gray-800"
-          } break-words`}
-        >
-          {displayValue}
-        </p>
+<p
+  className={`text-base font-medium ${
+    clickable ? fieldColor : "text-gray-800"
+  } break-words whitespace-pre-wrap`}
+>
+  {displayValue
+    .split(" ")
+    .map((word) => (word.length > 15 ? word.slice(0, 15) + "..." : word))
+    .join(" ")}
+</p>
+
       </div>
     </div>
   );
@@ -86,6 +90,7 @@ const ProfileGroup = ({ title, data }: { title: string; data: any }) => {
   const validEntries = Object.entries(data || {}).filter(
     ([, val]) =>
       val !== null &&
+    val !== "" &&
       val !== undefined &&
       (typeof val !== "object" || (Array.isArray(val) ? val.length > 0 : Object.keys(val).length > 0))
   );
@@ -525,10 +530,10 @@ serviceRequirements : profileData?.serviceRequirements,
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-10 mt-10 bg-white rounded-lg shadow p-6">
         <Section label="Date of Birth" value={dateOfBirth} />
         <Section label="Address" value={address} />
-        <Section label="Postcode" value={postcode} />
-        <Section label="Screen Name" value={screenName} />
-        <Section label="Account Created" value={new Date(createdAt).toLocaleString()} />
-        <Section label="Last Updated" value={new Date(updatedAt).toLocaleString()} />
+      {postcode &&  <Section label="Postcode" value={postcode} />}
+       {screenName && <Section label="Screen Name" value={profileData?.screenName ||screenName} />}
+        {/* <Section label="Account Created" value={new Date(createdAt).toLocaleString()} />
+        <Section label="Last Updated" value={new Date(updatedAt).toLocaleString()} /> */}
       </div>
       <ProfileGroup title="Basic Info" data={basicInfo} />
       <ProfileGroup title="About" data={aboutMe} />

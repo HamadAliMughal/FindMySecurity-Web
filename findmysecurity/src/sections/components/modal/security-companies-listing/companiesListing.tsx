@@ -23,10 +23,12 @@ export default function SecurityCompaniesPage() {
   const [distance, setDistance] = useState(searchParams?.get("distance") || "");
   const [experience, setExperience] = useState(searchParams?.get("experience") || "");
   const [page, setPage] = useState(searchParams?.get("page") || "1");
-
+ const [postcodeValid, setPostcodeValid] = useState(true);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-
+useEffect(() => {
+  validatePostcode(pc);
+}, [pc]);
   const fetchData = async () => {
     setLoading(true);
     setError(null);
@@ -69,7 +71,28 @@ export default function SecurityCompaniesPage() {
 
     router.push(`${pathname}?${newParams.toString()}`);
   };
+const validatePostcode = async (postcode: string) => {
+  if (!postcode) {
+    setPostcodeValid(true);
+    //setPostcodeError("");
+    return;
+  }
 
+  try {
+    const res = await fetch(`https://api.postcodes.io/postcodes/${postcode}/validate`);
+    const data = await res.json();
+    if (data.result) {
+      setPostcodeValid(true);
+      //setPostcodeError("");
+    } else {
+      setPostcodeValid(false);
+     // setPostcodeError("Invalid UK postcode");
+    }
+  } catch (err) {
+    setPostcodeValid(false);
+   // setPostcodeError("Error validating postcode");
+  }
+};
   const handleFilterChange = (updatedParams: Record<string, string>) => {
     if (updatedParams.sr !== undefined) {
       setSelectedCategory(updatedParams.sr);
@@ -112,8 +135,9 @@ export default function SecurityCompaniesPage() {
             placeholder="Postcode"
             value={pc}
             onChange={(e) => handleFilterChange({ pc: e.target.value })}
-            className="border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-black text-black"
-          />
+             className={`border px-4 py-2 rounded-md focus:outline-none focus:ring-2 text-black ${
+    postcodeValid ? 'border-gray-300 focus:ring-black' : 'border-red-500 focus:ring-red-500'
+  }`}     />
 
           <select
             value={selectedCategory}
@@ -197,7 +221,6 @@ export default function SecurityCompaniesPage() {
       {apiData ? (
         <>
           <CompaniesList apiData={apiData} loading={loading} error={error} />
-          <MapSection data={apiData.companies} type="security companies" />
 
           {/* Pagination */}
           {apiData.totalCount && apiData.pageSize && (
@@ -215,6 +238,9 @@ export default function SecurityCompaniesPage() {
               ))}
             </div>
           )}
+          <MapSection data={apiData.companies} type="security companies" />
+
+          
         </>
       ) : (
         <p className="text-center mt-8 text-gray-500">Loading security companies...</p>

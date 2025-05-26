@@ -125,7 +125,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
   const subscriptionTier = loginData?.subscriptionTier;
 
   const menuItems = [
-    { icon: <FaSearch />, label: "My Searches" },
+    // { icon: <FaSearch />, label: "My Searches" },
     { icon: <FaHeart />, label: "My Favourites" },
     {
       icon: <FaUserShield />,
@@ -135,7 +135,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
     ...(roleId !== 3 && isSubscriber && subscriptionTier !== "Basic"
       ? [{ icon: <FaCogs />, label: "My Ads", route: "/my-ads" }]
       : []),
-    { icon: <FaSearch />, label: "Advance Search" },
+    // { icon: <FaSearch />, label: "Advance Search" },
     { icon: <FaCogs />, label: "Customer Support" },
     ...(isSubscriber && subscriptionTier !== "Basic"
       ? [
