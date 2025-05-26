@@ -59,7 +59,7 @@ export default function SecurityCompanies({ initialSearchMode = "basic" }: { ini
                     </div>
                   </div>
 
-                  <h3 className="mt-3 text-center text-sm font-semibold text-gray-800 dark:text-white md:hidden px-1 min-h-[2rem]">
+                  <h3 className="mt-3 text-center text-sm font-semibold text-white dark:text-white md:hidden px-1 min-h-[2rem]">
                     {feature.title}
                   </h3>
                 </Link>
