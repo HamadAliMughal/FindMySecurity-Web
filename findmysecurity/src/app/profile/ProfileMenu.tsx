@@ -125,42 +125,57 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
   const isSubscriber = loginData?.isSubscriber;
   const subscriptionTier = loginData?.subscriptionTier;
 
-  const menuItems = [
-     { icon: <FaList />, label: "Courses" , route:'/course-listing'},
-    { icon: <FaHeart />, label: "My Favourites" },
-    {
-      icon: <FaUserShield />,
-      label: roleId !== 3 ? "My Job Applicants" : "Visitors",
-      route: roleId !== 3 ? "/my-job-applicants" : "/visitors",
-    },
-    ...(roleId !== 3 && isSubscriber && subscriptionTier !== "Basic"
-      ? [{ icon: <FaCogs />, label: "My Ads", route: "/my-ads" }]
-      : []),
-    // { icon: <FaSearch />, label: "Advance Search" },
-    { icon: <FaCogs />, label: "Customer Support" },
-    ...(isSubscriber && subscriptionTier !== "Basic"
-      ? [
-          { icon: <FaBell />, label: "Notifications", isNotification: true },
-        ]
-      : []),
-    ...(roleId === 3 && isSubscriber && subscriptionTier !== "Basic"
-      ? [{ icon: <FiFileText />, label: "Document Applicants", route: "/document-applicants" }]
-      : []),
-    ...(roleId !== 3
-      ? isSubscriber && subscriptionTier !== "Basic"
-        ? [{ icon: <FaAd />, label: "Post Free Ad", route: "/post-ad" }]
-        : []
-      : [{ icon: <FaAd />, label: "View Jobs", route: "/view-ads" }]),
-    ...(shouldShowCreateProfile
-      ? [
-          {
-            icon: <FaUserPlus />,
-            label: "Create Public Profile",
-            route: "/public-profile",
-          },
-        ]
-      : []),
-  ];
+const menuItems = [
+  { icon: <FaList />, label: "Courses", route: "/course-listing" },
+  { icon: <FaHeart />, label: "My Favourites" },
+
+  {
+    icon: <FaUserShield />,
+    label: roleId !== 3 ? "My Job Applicants" : "Visitors",
+    route: roleId !== 3 ? "/my-job-applicants" : "/visitors",
+  },
+
+  ...(roleId !== 3 && isSubscriber && subscriptionTier !== "Basic"
+    ? [{ icon: <FaCogs />, label: "My Ads", route: "/my-ads" }]
+    : []),
+
+  ...(roleId === 5 || roleId === 6 || roleId === 7
+    ? [{ icon: <FaSearch />, label: "Tender Board", route:'/tender-board-listing' }]
+    : []),
+
+  { icon: <FaCogs />, label: "Customer Support" },
+
+  ...(isSubscriber && subscriptionTier !== "Basic"
+    ? [{ icon: <FaBell />, label: "Notifications", isNotification: true }]
+    : []),
+
+  ...(roleId === 3 && isSubscriber && subscriptionTier !== "Basic"
+    ? [
+        {
+          icon: <FiFileText />,
+          label: "Document Applicants",
+          route: "/document-applicants",
+        },
+      ]
+    : []),
+
+  ...(roleId !== 3
+    ? isSubscriber && subscriptionTier !== "Basic"
+      ? [{ icon: <FaAd />, label: "Post Free Ad", route: "/post-ad" }]
+      : []
+    : [{ icon: <FaAd />, label: "View Jobs", route: "/view-ads" }]),
+
+  ...(shouldShowCreateProfile
+    ? [
+        {
+          icon: <FaUserPlus />,
+          label: "Create Public Profile",
+          route: "/public-profile",
+        },
+      ]
+    : []),
+];
+
 
   const handleMenuClick = (item: any) => {
     if (item.isNotification) {
