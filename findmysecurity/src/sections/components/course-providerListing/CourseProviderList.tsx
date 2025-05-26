@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 import MapSection from "@/app/connecting-business/components/MapSection";
-import filtersData from "@/sections/data/secuirty_services.json";
+import filtersData from "@/sections/data/training_providers.json";
  import {CourseProvidersApiResponse} from "@/app/connecting-business/types"; // Use shared types
 import CourseProvidersList from "@/app/connecting-business/components/CourseProvidersList";
 import { API_URL } from "@/utils/path";
