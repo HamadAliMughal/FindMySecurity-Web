@@ -9,6 +9,7 @@ import {
   FaCogs,
   FaAd,
   FaUserPlus,
+  FaList
   FaBell,
 } from "react-icons/fa";
 import { FiFileText } from "react-icons/fi";
@@ -125,7 +126,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
   const subscriptionTier = loginData?.subscriptionTier;
 
   const menuItems = [
-    // { icon: <FaSearch />, label: "My Searches" },
+     { icon: <FaList />, label: "Courses" , route:'/course-listing'},
     { icon: <FaHeart />, label: "My Favourites" },
     {
       icon: <FaUserShield />,
