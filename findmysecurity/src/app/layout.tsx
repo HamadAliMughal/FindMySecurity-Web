@@ -7,7 +7,7 @@ import ToastProvider from "@/sections/components/ToastProvider/ToastProvider";
 
 export const metadata: Metadata = {
   title: "FindMySecurity",
-  description: "Welcome to my Next.js app",
+  description: "Trusted ecosystem for security providers, businesses, and training providers",
 };
 
 export default function RootLayout({

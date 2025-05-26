@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 export default function ContactUs() {
   const handleEmailClick = () => {
-    window.location.href = 'mailto:contact@findmysecurity.com';
+    window.location.href = 'mailto:info@findmysecurity.co.uk';
   };
 
   return (
