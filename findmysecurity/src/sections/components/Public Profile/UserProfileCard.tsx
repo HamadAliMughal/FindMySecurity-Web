@@ -71,13 +71,17 @@ const Section = ({
         >
           {label}
         </p>
-     <p
+<p
   className={`text-base font-medium ${
     clickable ? fieldColor : "text-gray-800"
-  } break-words whitespace-pre-wrap max-w-full`}
+  } break-words whitespace-pre-wrap`}
 >
-  {displayValue}
+  {displayValue
+    .split(" ")
+    .map((word) => (word.length > 15 ? word.slice(0, 15) + "..." : word))
+    .join(" ")}
 </p>
+
       </div>
     </div>
   );
@@ -86,6 +90,7 @@ const ProfileGroup = ({ title, data }: { title: string; data: any }) => {
   const validEntries = Object.entries(data || {}).filter(
     ([, val]) =>
       val !== null &&
+    val !== "" &&
       val !== undefined &&
       (typeof val !== "object" || (Array.isArray(val) ? val.length > 0 : Object.keys(val).length > 0))
   );
@@ -526,7 +531,7 @@ serviceRequirements : profileData?.serviceRequirements,
         <Section label="Date of Birth" value={dateOfBirth} />
         <Section label="Address" value={address} />
       {postcode &&  <Section label="Postcode" value={postcode} />}
-        <Section label="Screen Name" value={screenName} />
+       {screenName && <Section label="Screen Name" value={profileData?.screenName ||screenName} />}
         {/* <Section label="Account Created" value={new Date(createdAt).toLocaleString()} />
         <Section label="Last Updated" value={new Date(updatedAt).toLocaleString()} /> */}
       </div>
