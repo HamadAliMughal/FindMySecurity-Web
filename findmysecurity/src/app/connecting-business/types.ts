@@ -82,7 +82,7 @@ export interface MarkerData {
     pageSize: number;
     companies: Company[];
   }
-  
+ 
   export interface Company {
     name: any;
     id: number;
@@ -96,12 +96,31 @@ export interface MarkerData {
     phoneNumber: string;
     website: string;
     servicesRequirements: string[];
-    securityServicesOfferings: string[];
+    securityServicesOfferings: { role: string; title?: string }[]; // Update type
     permissions: CompanyPermissions;
     createdAt: string;
     updatedAt: string;
     user: CompanyUser;
   }
+  // export interface Company {
+  //   name: any;
+  //   id: number;
+  //   userId: number;
+  //   companyName: string;
+  //   registrationNumber: string;
+  //   address: string;
+  //   postCode: string;
+  //   contactPerson: string;
+  //   jobTitle: string;
+  //   phoneNumber: string;
+  //   website: string;
+  //   servicesRequirements: string[];
+  //   securityServicesOfferings: string[];
+  //   permissions: CompanyPermissions;
+  //   createdAt: string;
+  //   updatedAt: string;
+  //   user: CompanyUser;
+  // }
   
   export interface CompanyPermissions {
     canPostAd?: boolean;
