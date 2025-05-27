@@ -274,7 +274,29 @@ const DocumentApplicantsPage = () => {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-2">
-                    {req.status === "pending" && (
+                  <>
+  <button
+    onClick={() => handleUpdateStatus(req.id, "approved")}
+    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md"
+  >
+    <FaCheck /> Approve
+  </button>
+  <button
+    onClick={() => handleUpdateStatus(req.id, "rejected")}
+    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md"
+  >
+    <FaTimes /> Reject
+  </button>
+  <span
+    className={`ml-3 px-3 py-1 rounded-md font-semibold ${
+      req.status === "approved" ? "bg-green-200 text-green-800" : req.status === "rejected" ? "bg-red-200 text-red-800" : "bg-gray-200 text-gray-800"
+    }`}
+  >
+    {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
+  </span>
+</>
+
+                    {/* {req.status === "pending" && (
                       <>
                         <button
                           onClick={() => handleUpdateStatus(req.id, "approved")}
@@ -289,7 +311,7 @@ const DocumentApplicantsPage = () => {
                           <FaTimes /> Reject
                         </button>
                       </>
-                    )}
+                    )} */}
                     
                     <button
                       onClick={() => {
