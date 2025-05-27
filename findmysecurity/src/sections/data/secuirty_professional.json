@@ -7,6 +7,8 @@
         "Retail Security Officer",
         "Corporate Security Officer",
         "Door Supervisor",
+        "Dog Handler",
+        "Dog Handler Services",
         "Event Security Officer",
         "Mobile Patrol Officer",
         "Loss Prevention Officer",
@@ -19,6 +21,7 @@
         "Concierge Security Officer",
         "Hotel Security Officer",
         "Bank & Financial Institution Security Officer"
+        
       ]
     },
     {

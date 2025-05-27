@@ -3,24 +3,31 @@
       "title": "SIA Licence Courses",
       "id": "sia-licence",
       "roles": [
-        "Door Supervisor",
-        "Security Guarding",
-        "CCTV Operator",
-        "Close Protection",
-        "Cash & Value in Transit (CVIT)",
-        "Vehicle Immobiliser"
+        "Close Protec-on Training",
+        "CCTV Operator Training",
+        "Basic Handcuff Training",
+        "Door Supervisor Training",
+        "L2 Award for Cash & Valuables In Transit (CViT)",
+        "Security Guard Training",
+        "Security Screening BS7858",
+        "SIA Top-Up Refresher Training for Door Supervisor",
+        "SIA Top-Up Refresher Training for Security Guard",
+        "SIA Top-Up Training for Close Protec-on",
+        "SIA Top-Up Training for Security Guard",
+        "Use of Mechanical Restraints (Handcuffs) - L3 Award"
       ]
     },
     {
       "title": "Specialist & Advanced Training",
       "id": "specialist-advanced",
       "roles": [
-        "Close Protection Advanced",
-        "Hostile Environment Awareness (HEAT)",
+        "Close Protec-on Firearms (Level 4)",
+        "Hos-le Environment Awareness (HEAT)",
         "Surveillance & Counter-surveillance",
         "VIP Escort & Executive Protection",
         "Tactical Driving",
-        "Maritime Security"
+        "Maritime Security",
+        "Security Drone Pilot"
       ]
     },
     {
@@ -29,7 +36,8 @@
       "roles": [
         "Emergency First Aid at Work (EFAW)",
         "First Aid at Work (FAW)",
-        "Trauma / Tactical Medical Training"
+        "Trauma / Tactical Medical Training",
+        "Paediatric First Aid Level 3"
       ]
     },
     {
@@ -39,7 +47,7 @@
         "Conflict Management",
         "Physical Intervention",
         "Workplace Violence & Harassment Prevention",
-        "Fire Marshal & Health & Safety"
+        "Fire Marshal - Health & Safety"
       ]
     },
     {
