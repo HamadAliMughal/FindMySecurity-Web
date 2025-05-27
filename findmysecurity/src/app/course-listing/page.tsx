@@ -62,6 +62,7 @@ import {
   PoundSterling,
   Loader2
 } from "lucide-react";
+import Link from "next/link";
  // adjust import based on your structure
 
 const CourseListPage = () => {
@@ -119,7 +120,7 @@ const CourseListPage = () => {
     }
   };
 
-  const handleApply = async (courseId: number) => {
+  const handleApply = async (courseId: number , postedBy: number) => {
     const storedData = localStorage.getItem('loginData');
     const data = storedData ? JSON.parse(storedData) : null;
     const currentId = data?.id || data?.user?.id;
@@ -135,7 +136,7 @@ const CourseListPage = () => {
         },
         body: JSON.stringify({
           userId: Number(currentId),
-          postedBy: 1,
+          postedBy: postedBy,
           courseAdId: courseId,
           status: "pending"
         })
@@ -257,14 +258,14 @@ const CourseListPage = () => {
                 <p className="text-lg font-semibold text-black mt-2 md:mt-0 flex items-center gap-1">
                   <PoundSterling size={18} /> £{course.price}
                 </p>
-                <button
-                  onClick={() => handleApply(course.id)}
+            {course.createdBy.id===1 ? <Link href={course.bookingLink} className="mt-4 inline-block w-full text-center px-4 py-2 border border-black text-black rounded-lg hover:bg-black hover:text-white transition whitespace-nowrap flex items-center justify-center gap-2">Follow Link</Link> :    <button
+                  onClick={() => handleApply(course.id , course.createdBy.id)}
                   disabled={applyingId === course.id}
                   className="mt-4 inline-block w-full text-center px-4 py-2 border border-black text-black rounded-lg hover:bg-black hover:text-white transition whitespace-nowrap flex items-center justify-center gap-2"
                 >
                   {applyingId === course.id ? <Loader2 className="animate-spin" size={18} /> : null}
                   {applyingId === course.id ? "Applying..." : "Apply"}
-                </button>
+                </button>}
               </div>
             </div>
           ))}

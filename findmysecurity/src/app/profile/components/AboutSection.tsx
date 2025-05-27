@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Section from "./Section";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { API_URL } from "@/utils/path";
 
 const AboutSection = ({ about, id }: { about: any; id: any }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -37,7 +38,7 @@ const AboutSection = ({ about, id }: { about: any; id: any }) => {
       };
 
       await axios.put(
-        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/profile/individual/${id}`,
+        `${API_URL}/profile/individual/${id}`,
         payload,
         {
           headers: {

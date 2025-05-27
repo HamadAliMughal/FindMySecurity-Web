@@ -393,12 +393,24 @@ const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
   try {
     // Upload to S3
     const uploadedUrl = await uploadToS3({ file });
-
-    // Store uploaded file URL in formData
+    const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, '');
+    const response = await fetch(
+            `${API_URL}/users/${loginData.id}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                'Authorization': `Bearer ${token}`,
+    
+              },
+              body: JSON.stringify({profile:uploadedUrl}), // send merged data directly, no wrapper object
+    })
+    console.log("response", response)
     setFormData((prev: any) => ({
       ...prev,
       profile: uploadedUrl, // store S3 URL, not the file itself
     }));
+
   } catch (err) {
     console.error('Image upload failed:', err);
     alert('Failed to upload image. Please try again.');
