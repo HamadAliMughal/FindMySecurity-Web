@@ -30,14 +30,21 @@ const SignIn = () => {
         { headers: { "Content-Type": "application/json" } }
       );
   
-      const data = response.data; // ✅ already parsed JSON
-      console.log("Login Success:", data);
+      const data = response.data;
+      if(data?.needed2FA){
+       setShow2FA(true);
+      toast.success(` Check your email for 2FA code`);
+      }else{
+        localStorage.setItem("loginData", JSON.stringify(data));
+        localStorage.setItem("authToken", JSON.stringify(data.token)); 
+        toast.success(`Login Success`);
+        router.push('/profile');
+         // Store in localStorage
+      } // ✅ already parsed JSON
   
-      setSessionToken(data.code); // Used for 2FA validation
-      toast.success(` your 2FA code is : ${data.code}`); // Show 2FA for dev testing
   
   
-      setShow2FA(true); // Show 2FA input
+       // Show 2FA input
     } catch (error) {
       const axiosError = error as AxiosError;
   
@@ -86,7 +93,7 @@ const SignIn = () => {
   const handle2FAVerify = async (code: string) => {
     if(code===""){
       setShow2FA(false);
-    } else if(code === sessionToken){
+    } else {
       router.push('/profile')
     }
   };

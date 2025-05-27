@@ -10,6 +10,7 @@ import {
   FaAd,
   FaUserPlus,
   FaList,
+  FaPlus,
   FaBell,
 } from "react-icons/fa";
 import { FiFileText } from "react-icons/fi";
@@ -144,7 +145,8 @@ const menuItems = [
     : []),
 
   { icon: <FaCogs />, label: "Customer Support" },
-
+...(roleId === 6
+  ?[{ icon: <FaPlus />, label: "Course Board Management", route:'/course-board-management' }]:[]),
   ...(isSubscriber && subscriptionTier !== "Basic"
     ? [{ icon: <FaBell />, label: "Notifications", isNotification: true }]
     : []),
