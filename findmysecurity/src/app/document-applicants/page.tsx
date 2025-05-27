@@ -23,6 +23,8 @@ interface DocumentRequest {
   };
 }
 
+
+
 const ITEMS_PER_PAGE = 5;
 
 const DocumentApplicantsPage = () => {
@@ -36,7 +38,6 @@ const DocumentApplicantsPage = () => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  // Fetch document requests
   const fetchRequests = async () => {
     setLoading(true);
     setError(null);
@@ -68,14 +69,12 @@ const DocumentApplicantsPage = () => {
       } else {
         data = [];
       }
-
-      const validData = data
-        .filter((req) => req.id && req.status && req.createdAt && req.updatedAt)
+      console.log("data",data)
+      const validData = data.filter((req) => req.id && req.status && req.createdAt && req.updatedAt)
         .map((req) => ({ ...req, documentUrl: req.documentUrl ?? "Unnamed Document" }));
 
       setRequests(validData);
       setFilteredRequests(validData);
-      setCurrentPage(1);
     } catch (error: any) {
       const message =
         error.response?.status === 401
@@ -95,24 +94,19 @@ const DocumentApplicantsPage = () => {
     fetchRequests();
   }, []);
 
-  // Filter requests on search or status change
   useEffect(() => {
     let matches = requests;
-
     if (requestIdSearch.trim() !== "") {
       const searchId = parseInt(requestIdSearch.trim(), 10);
       matches = !isNaN(searchId) ? matches.filter((req) => req.id === searchId) : [];
     }
-
     if (statusFilter !== "all") {
       matches = matches.filter((req) => req.status === statusFilter);
     }
-
     setFilteredRequests(matches);
     setCurrentPage(1);
   }, [requestIdSearch, statusFilter, requests]);
 
-  // Update request status handler
   const handleUpdateStatus = async (requestId: number, status: "approved" | "rejected") => {
     try {
       const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
@@ -122,20 +116,17 @@ const DocumentApplicantsPage = () => {
         return;
       }
 
-      await axios.put(
-        `${API_URL}/document/request/${requestId}`,
-        { status },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.put(`${API_URL}/document/request/${requestId}`, { status }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       toast.success(`Access request ${status}`);
       fetchRequests();
-    } catch {
+    } catch (error: any) {
       toast.error("Failed to update access request status");
     }
   };
 
-  // Clear all requests handler
   const handleClearAll = async () => {
     setIsClearing(true);
     const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
@@ -157,7 +148,6 @@ const DocumentApplicantsPage = () => {
       toast.success("All document access requests cleared");
       setRequests([]);
       setFilteredRequests([]);
-      setCurrentPage(1);
     } catch {
       toast.error("Failed to clear document access requests");
     } finally {
@@ -165,7 +155,6 @@ const DocumentApplicantsPage = () => {
     }
   };
 
-  // Extract document name from URL helper
   const extractDocumentName = (url: string | null) => {
     if (!url) return "Unnamed Document";
     const parts = url.split("/");
@@ -173,7 +162,6 @@ const DocumentApplicantsPage = () => {
     return fileName.split("-").slice(1).join("-").split(".").slice(0, -1).join(".") || "Unnamed Document";
   };
 
-  // Reset filters handler
   const resetFilters = () => {
     setRequestIdSearch("");
     setStatusFilter("all");
@@ -181,7 +169,6 @@ const DocumentApplicantsPage = () => {
     setCurrentPage(1);
   };
 
-  // Group requests by document name
   const grouped = filteredRequests.reduce((acc: Record<string, DocumentRequest[]>, req) => {
     const docName = extractDocumentName(req.documentUrl);
     if (!acc[docName]) acc[docName] = [];
@@ -189,7 +176,6 @@ const DocumentApplicantsPage = () => {
     return acc;
   }, {});
 
-  // Pagination for grouped entries
   const paginatedEntries = Object.entries(grouped).slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
@@ -203,7 +189,9 @@ const DocumentApplicantsPage = () => {
         <FaArrowLeft className="mr-2" /> Back
       </button>
 
-      <h1 className="text-4xl font-extrabold text-gray-800 text-center mb-2">📄 Document Access Requests</h1>
+      <h1 className="text-4xl font-extrabold text-gray-800 text-center mb-2">
+        📄 Document Access Requests
+      </h1>
       <p className="text-center text-gray-500 mb-6">Manage and review incoming requests efficiently</p>
 
       <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md border">
@@ -220,7 +208,6 @@ const DocumentApplicantsPage = () => {
             className="w-full border px-4 py-2 rounded-md bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-blue-600"
           />
         </div>
-
         <div>
           <label htmlFor="statusFilter" className="block text-sm font-semibold text-gray-600 mb-1">
             Status
@@ -237,12 +224,8 @@ const DocumentApplicantsPage = () => {
             <option value="rejected">Rejected</option>
           </select>
         </div>
-
         <div className="flex items-end">
-          <button
-            onClick={resetFilters}
-            className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 w-full"
-          >
+          <button onClick={resetFilters} className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 w-full">
             Reset Filters
           </button>
         </div>
@@ -251,483 +234,133 @@ const DocumentApplicantsPage = () => {
       {loading ? (
         <p className="text-center text-gray-500">Loading...</p>
       ) : error ? (
-        <p className="text-center text-red-600 font-semibold">{error}</p>
-      ) : filteredRequests.length === 0 ? (
+        <div className="text-center bg-red-100 text-red-700 px-4 py-3 rounded mb-4 border border-red-300">
+          <p>{error}</p>
+        </div>
+      ) : paginatedEntries.length === 0 ? (
         <p className="text-center text-gray-500">No document access requests found.</p>
       ) : (
-        <>
-          <div className="space-y-8">
-            {paginatedEntries.map(([docName, requestsForDoc]) => (
-              <div
-                key={docName}
-                className="border rounded-md p-4 bg-gray-100 hover:shadow-md transition-shadow duration-200"
-              >
-                <h3 className="text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                  <FaUser className="text-blue-600" />
-                  {docName}
-                </h3>
-                <ul className="divide-y divide-gray-300">
-                  {requestsForDoc.map((req) => (
-                    <li key={req.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-2">
-                      <div>
-                        <p className="text-gray-900 font-semibold">
-                          Request ID: <span className="font-normal">{req.id}</span>
-                        </p>
-                        <p className="text-gray-700">
-                          Requester: {req.requester.firstName} {req.requester.lastName}
-                        </p>
-                        <p className="text-gray-500 text-sm">Status: {req.status}</p>
-                      </div>
-                      <div className="flex space-x-2 mt-2 sm:mt-0">
-                        {req.status === "pending" && (
-                          <>
-                            <button
-                              onClick={() => handleUpdateStatus(req.id, "approved")}
-                              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md"
-                            >
-                              <FaCheck /> Approve
-                            </button>
-                            <button
-                              onClick={() => handleUpdateStatus(req.id, "rejected")}
-                              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md"
-                            >
-                              <FaTimes /> Reject
-                            </button>
-                          </>
-                        )}
-                        {req.status !== "pending" && (
-                          <span
-                            className={`px-3 py-1 rounded-md font-semibold ${
-                              req.status === "approved" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"
-                            }`}
-                          >
-                            {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
-                          </span>
-                        )}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+        paginatedEntries.map(([docName, requests]) => (
+          <div key={docName} className="mb-10">
+            <h2 className="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4">📑 Document Applicants</h2>
+            <div className="space-y-4">
+              {requests.map((req) => (
+                <div key={req.id} className="rounded-xl shadow-md border p-5 bg-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all hover:shadow-lg">
+                  <div>
+                    <p className="text-sm font-medium">
+                      <span className="text-gray-600">Request ID:</span> {req.id}
+                    </p>
+                       <p className="text-sm">
+                      <span className="font-semibold">Requester Name:</span>{" "}
+                      {req.requester?.firstName || "N/A"} {req.requester?.lastName || ""}
+                    </p>
+                    <p className="text-sm font-medium">
+                      <span className="text-gray-600">Status:</span>{" "}
+                      <span
+                        className={`font-bold ${
+                          req.status === "approved"
+                            ? "text-green-600"
+                            : req.status === "rejected"
+                            ? "text-red-600"
+                            : "text-yellow-600"
+                        }`}
+                      >
+                        {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
+                      </span>
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Requested on: {new Date(req.createdAt).toLocaleString()}
+                    </p>
+                  </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <nav className="mt-8 flex justify-center space-x-2">
-              <button
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50"
-              >
-                Previous
-              </button>
-              {[...Array(totalPages)].map((_, idx) => {
-                const page = idx + 1;
-                return (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`px-3 py-1 rounded border border-gray-300 ${
-                      page === currentPage ? "bg-blue-600 text-white" : "hover:bg-gray-200"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                );
-              })}
-              <button
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50"
-              >
-                Next
-              </button>
-            </nav>
-          )}
-
-          <div className="mt-6 flex justify-center">
-            <button
-              onClick={handleClearAll}
-              disabled={isClearing || requests.length === 0}
-              className="bg-red-600 hover:bg-red-700 text-white font-semibold px-5 py-2 rounded disabled:opacity-50"
-            >
-              {isClearing ? "Clearing..." : "Clear All Requests"}
-            </button>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    {req.status === "pending" && (
+                      <>
+                        <button
+                          onClick={() => handleUpdateStatus(req.id, "approved")}
+                          className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 flex items-center gap-1"
+                        >
+                          <FaCheck /> Approve
+                        </button>
+                        <button
+                          onClick={() => handleUpdateStatus(req.id, "rejected")}
+                          className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1"
+                        >
+                          <FaTimes /> Reject
+                        </button>
+                      </>
+                    )}
+                    
+                    <button
+                      onClick={() => {
+                        const roleId = req.requester?.roleId;
+                        if (roleId === 5) {
+                          router.push(`/company-profile/${req.requesterId}`);
+                        } else if (roleId === 6) {
+                          router.push(`/provider-profile/${req.requesterId}`);
+                        }else if (roleId === 7) {
+                          router.push(`/business-profile/${req.requesterId}`);
+                        }
+                        else {
+                          router.push(`/public-profile/${req.requesterId}`);
+                        }
+                      }}
+                      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 flex items-center gap-1"
+                    >
+                      <FaUser /> Profile
+                    </button>
+                    {/* <button
+                      onClick={() => router.push(`/public-profile/${req.requesterId}`)}
+                      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 flex items-center gap-1"
+                    >
+                      <FaUser /> Profile
+                    </button> */}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        </>
+        ))
+      )}
+
+      {totalPages > 1 && !error && (
+        <div className="flex justify-center mt-8 gap-4">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            className="px-4 py-2 border rounded disabled:opacity-40 hover:bg-gray-100"
+          >
+            Previous
+          </button>
+          <span className="py-2 px-4 border rounded bg-blue-600 text-white font-medium">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+            className="px-4 py-2 border rounded disabled:opacity-40 hover:bg-gray-100"
+          >
+            Next
+          </button>
+        </div>
+      )}
+
+      {requests.length > 0 && (
+        <div className="text-center mt-10">
+          <button
+            onClick={handleClearAll}
+            className="text-sm text-red-600 hover:underline disabled:opacity-50"
+            disabled={isClearing}
+          >
+            {isClearing ? "Clearing..." : "Clear All Requests"}
+          </button>
+        </div>
       )}
     </div>
   );
 };
 
 export default DocumentApplicantsPage;
-
-
-
-// "use client";
-
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import toast from "react-hot-toast";
-// import { useRouter } from "next/navigation";
-// import { API_URL } from "@/utils/path";
-// import { FaUser, FaCheck, FaTimes, FaArrowLeft } from "react-icons/fa";
-
-// interface DocumentRequest {
-//   id: number;
-//   requesterId: number;
-//   documentOwnerId: number;
-//   documentUrl: string | null;
-//   status: "pending" | "approved" | "rejected";
-//   createdAt: string;
-//   updatedAt: string;
-//   requester: {
-//     roleId: any;
-//     firstName: string;
-//     lastName: string;
-//     profileImage: string;
-//   };
-// }
-
-
-
-// const ITEMS_PER_PAGE = 5;
-
-// const DocumentApplicantsPage = () => {
-//   const [requests, setRequests] = useState<DocumentRequest[]>([]);
-//   const [filteredRequests, setFilteredRequests] = useState<DocumentRequest[]>([]);
-//   const [loading, setLoading] = useState(true);
-//   const [isClearing, setIsClearing] = useState(false);
-//   const [requestIdSearch, setRequestIdSearch] = useState("");
-//   const [statusFilter, setStatusFilter] = useState("all");
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [error, setError] = useState<string | null>(null);
-//   const router = useRouter();
-
-//   const fetchRequests = async () => {
-//     setLoading(true);
-//     setError(null);
-
-//     try {
-//       const stored = localStorage.getItem("loginData");
-//       const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
-//       if (!stored || !token) {
-//         toast.error("User not authenticated");
-//         router.push("/signin");
-//         return;
-//       }
-
-//       const { id: documentOwnerId } = JSON.parse(stored);
-
-//       const response = await axios.get(`${API_URL}/document/user/${documentOwnerId}`, {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-
-//       let data: DocumentRequest[] = [];
-//       if (Array.isArray(response.data?.data)) {
-//         data = response.data.data;
-//       } else if (Array.isArray(response.data?.results)) {
-//         data = response.data.results;
-//       } else if (Array.isArray(response.data?.documents)) {
-//         data = response.data.documents;
-//       } else if (Array.isArray(response.data)) {
-//         data = response.data;
-//       } else {
-//         data = [];
-//       }
-//       console.log("data",data)
-//       const validData = data.filter((req) => req.id && req.status && req.createdAt && req.updatedAt)
-//         .map((req) => ({ ...req, documentUrl: req.documentUrl ?? "Unnamed Document" }));
-
-//       setRequests(validData);
-//       setFilteredRequests(validData);
-//     } catch (error: any) {
-//       const message =
-//         error.response?.status === 401
-//           ? "Authentication failed. Please log in again."
-//           : error.response?.status === 404
-//           ? "No document access requests found."
-//           : error.message || "Failed to fetch document access requests";
-//       setError(message);
-//       toast.error(message);
-//       if (error.response?.status === 401) router.push("/login");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchRequests();
-//   }, []);
-
-//   useEffect(() => {
-//     let matches = requests;
-//     if (requestIdSearch.trim() !== "") {
-//       const searchId = parseInt(requestIdSearch.trim(), 10);
-//       matches = !isNaN(searchId) ? matches.filter((req) => req.id === searchId) : [];
-//     }
-//     if (statusFilter !== "all") {
-//       matches = matches.filter((req) => req.status === statusFilter);
-//     }
-//     setFilteredRequests(matches);
-//     setCurrentPage(1);
-//   }, [requestIdSearch, statusFilter, requests]);
-
-//   const handleUpdateStatus = async (requestId: number, status: "approved" | "rejected") => {
-//     try {
-//       const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
-//       if (!token) {
-//         toast.error("User not authenticated");
-//         router.push("/signin");
-//         return;
-//       }
-
-//       await axios.put(`${API_URL}/document/request/${requestId}`, { status }, {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-
-//       toast.success(`Access request ${status}`);
-//       fetchRequests();
-//     } catch (error: any) {
-//       toast.error("Failed to update access request status");
-//     }
-//   };
-
-//   const handleClearAll = async () => {
-//     setIsClearing(true);
-//     const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
-//     if (!token) {
-//       toast.error("User not authenticated");
-//       router.push("/signin");
-//       setIsClearing(false);
-//       return;
-//     }
-
-//     try {
-//       await Promise.all(
-//         requests.map((req) =>
-//           axios.delete(`${API_URL}/document/user/${req.id}`, {
-//             headers: { Authorization: `Bearer ${token}` },
-//           })
-//         )
-//       );
-//       toast.success("All document access requests cleared");
-//       setRequests([]);
-//       setFilteredRequests([]);
-//     } catch {
-//       toast.error("Failed to clear document access requests");
-//     } finally {
-//       setIsClearing(false);
-//     }
-//   };
-
-//   const extractDocumentName = (url: string | null) => {
-//     if (!url) return "Unnamed Document";
-//     const parts = url.split("/");
-//     const fileName = decodeURIComponent(parts.pop() || "Unnamed Document");
-//     return fileName.split("-").slice(1).join("-").split(".").slice(0, -1).join(".") || "Unnamed Document";
-//   };
-
-//   const resetFilters = () => {
-//     setRequestIdSearch("");
-//     setStatusFilter("all");
-//     setFilteredRequests(requests);
-//     setCurrentPage(1);
-//   };
-
-//   const grouped = filteredRequests.reduce((acc: Record<string, DocumentRequest[]>, req) => {
-//     const docName = extractDocumentName(req.documentUrl);
-//     if (!acc[docName]) acc[docName] = [];
-//     acc[docName].push(req);
-//     return acc;
-//   }, {});
-
-//   const paginatedEntries = Object.entries(grouped).slice(
-//     (currentPage - 1) * ITEMS_PER_PAGE,
-//     currentPage * ITEMS_PER_PAGE
-//   );
-
-//   const totalPages = Math.ceil(Object.keys(grouped).length / ITEMS_PER_PAGE);
-
-//   return (
-//     <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10 bg-white rounded-lg shadow-lg mt-24 text-black">
-//       <button onClick={() => router.back()} className="mb-4 text-gray-700 flex items-center hover:underline">
-//         <FaArrowLeft className="mr-2" /> Back
-//       </button>
-
-//       <h1 className="text-4xl font-extrabold text-gray-800 text-center mb-2">
-//         📄 Document Access Requests
-//       </h1>
-//       <p className="text-center text-gray-500 mb-6">Manage and review incoming requests efficiently</p>
-
-//       <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-md border">
-//         <div>
-//           <label htmlFor="requestIdSearch" className="block text-sm font-semibold text-gray-600 mb-1">
-//             Request ID
-//           </label>
-//           <input
-//             id="requestIdSearch"
-//             type="text"
-//             placeholder="Enter Request ID"
-//             value={requestIdSearch}
-//             onChange={(e) => setRequestIdSearch(e.target.value)}
-//             className="w-full border px-4 py-2 rounded-md bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-blue-600"
-//           />
-//         </div>
-//         <div>
-//           <label htmlFor="statusFilter" className="block text-sm font-semibold text-gray-600 mb-1">
-//             Status
-//           </label>
-//           <select
-//             id="statusFilter"
-//             value={statusFilter}
-//             onChange={(e) => setStatusFilter(e.target.value)}
-//             className="w-full border px-4 py-2 rounded-md bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-blue-600"
-//           >
-//             <option value="all">All</option>
-//             <option value="pending">Pending</option>
-//             <option value="approved">Approved</option>
-//             <option value="rejected">Rejected</option>
-//           </select>
-//         </div>
-//         <div className="flex items-end">
-//           <button onClick={resetFilters} className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 w-full">
-//             Reset Filters
-//           </button>
-//         </div>
-//       </div>
-
-//       {loading ? (
-//         <p className="text-center text-gray-500">Loading...</p>
-//       ) : error ? (
-//         <div className="text-center bg-red-100 text-red-700 px-4 py-3 rounded mb-4 border border-red-300">
-//           <p>{error}</p>
-//         </div>
-//       ) : paginatedEntries.length === 0 ? (
-//         <p className="text-center text-gray-500">No document access requests found.</p>
-//       ) : (
-//         paginatedEntries.map(([docName, requests]) => (
-//           <div key={docName} className="mb-10">
-//             <h2 className="text-2xl font-semibold text-gray-700 border-b pb-2 mb-4">📑 Document Applicants</h2>
-//             <div className="space-y-4">
-//               {requests.map((req) => (
-//                 <div key={req.id} className="rounded-xl shadow-md border p-5 bg-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all hover:shadow-lg">
-//                   <div>
-//                     <p className="text-sm font-medium">
-//                       <span className="text-gray-600">Request ID:</span> {req.id}
-//                     </p>
-//                        <p className="text-sm">
-//                       <span className="font-semibold">Requester Name:</span>{" "}
-//                       {req.requester?.firstName || "N/A"} {req.requester?.lastName || ""}
-//                     </p>
-//                     <p className="text-sm font-medium">
-//                       <span className="text-gray-600">Status:</span>{" "}
-//                       <span
-//                         className={`font-bold ${
-//                           req.status === "approved"
-//                             ? "text-green-600"
-//                             : req.status === "rejected"
-//                             ? "text-red-600"
-//                             : "text-yellow-600"
-//                         }`}
-//                       >
-//                         {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
-//                       </span>
-//                     </p>
-//                     <p className="text-xs text-gray-500">
-//                       Requested on: {new Date(req.createdAt).toLocaleString()}
-//                     </p>
-//                   </div>
-
-//                   <div className="flex flex-col sm:flex-row gap-2">
-//                     {req.status === "pending" && (
-//                       <>
-//                         <button
-//                           onClick={() => handleUpdateStatus(req.id, "approved")}
-//                           className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 flex items-center gap-1"
-//                         >
-//                           <FaCheck /> Approve
-//                         </button>
-//                         <button
-//                           onClick={() => handleUpdateStatus(req.id, "rejected")}
-//                           className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 flex items-center gap-1"
-//                         >
-//                           <FaTimes /> Reject
-//                         </button>
-//                       </>
-//                     )}
-                    
-//                     <button
-//                       onClick={() => {
-//                         const roleId = req.requester?.roleId;
-//                         if (roleId === 5) {
-//                           router.push(`/company-profile/${req.requesterId}`);
-//                         } else if (roleId === 6) {
-//                           router.push(`/provider-profile/${req.requesterId}`);
-//                         }else if (roleId === 7) {
-//                           router.push(`/business-profile/${req.requesterId}`);
-//                         }
-//                         else {
-//                           router.push(`/public-profile/${req.requesterId}`);
-//                         }
-//                       }}
-//                       className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 flex items-center gap-1"
-//                     >
-//                       <FaUser /> Profile
-//                     </button>
-//                     {/* <button
-//                       onClick={() => router.push(`/public-profile/${req.requesterId}`)}
-//                       className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 flex items-center gap-1"
-//                     >
-//                       <FaUser /> Profile
-//                     </button> */}
-//                   </div>
-//                 </div>
-//               ))}
-//             </div>
-//           </div>
-//         ))
-//       )}
-
-//       {totalPages > 1 && !error && (
-//         <div className="flex justify-center mt-8 gap-4">
-//           <button
-//             disabled={currentPage === 1}
-//             onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-//             className="px-4 py-2 border rounded disabled:opacity-40 hover:bg-gray-100"
-//           >
-//             Previous
-//           </button>
-//           <span className="py-2 px-4 border rounded bg-blue-600 text-white font-medium">
-//             Page {currentPage} of {totalPages}
-//           </span>
-//           <button
-//             disabled={currentPage === totalPages}
-//             onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-//             className="px-4 py-2 border rounded disabled:opacity-40 hover:bg-gray-100"
-//           >
-//             Next
-//           </button>
-//         </div>
-//       )}
-
-//       {requests.length > 0 && (
-//         <div className="text-center mt-10">
-//           <button
-//             onClick={handleClearAll}
-//             className="text-sm text-red-600 hover:underline disabled:opacity-50"
-//             disabled={isClearing}
-//           >
-//             {isClearing ? "Clearing..." : "Clear All Requests"}
-//           </button>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default DocumentApplicantsPage;
 
 
 
