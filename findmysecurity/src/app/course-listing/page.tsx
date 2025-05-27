@@ -129,7 +129,7 @@ const CourseListPage = () => {
     setApplyingId(courseId);
 
     try {
-      const response = await fetch("https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course/course-ads", {
+      const response = await fetch("https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course-applications", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
