@@ -1,5 +1,4 @@
 'use client';
-
 interface CreatedBy {
   id: number;
   email: string;
@@ -52,9 +51,6 @@ export interface CourseResponse {
   data: Course[];
   meta: MetaData;
 }
-
-
-
 import React, { useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -66,6 +62,7 @@ import {
   PoundSterling,
   Loader2
 } from "lucide-react";
+ // adjust import based on your structure
 
 const CourseListPage = () => {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -73,40 +70,54 @@ const CourseListPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
   const [applyingId, setApplyingId] = useState<number | null>(null);
 
-  useEffect(() => {
-    fetchJobs(currentPage, 5, searchTerm);
-  }, [currentPage, searchTerm]);
+  const [filters, setFilters] = useState({
+    title: '',
+    location: '',
+    price: '',
+    startDate: '',
+    duration: ''
+  });
 
-  async function fetchJobs(page: number, limit: number, searchTerm: string) {
+  const [touched, setTouched] = useState({
+    price: false,
+    startDate: false
+  });
+
+  useEffect(() => {
+    fetchCourses(currentPage, 5);
+  }, [currentPage, filters]);
+
+  const fetchCourses = async (page: number, limit: number) => {
     setLoading(true);
     setError(null);
     try {
       const params = new URLSearchParams();
       params.append("page", page.toString());
       params.append("limit", limit.toString());
-      if (searchTerm.trim()) {
-        params.append("search", searchTerm.trim());
-      }
 
-      const url = `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/admin/course-ads?${params.toString()}`;
+      if (filters.title) params.append("title", filters.title);
+      if (filters.location) params.append("location", filters.location);
+      if (filters.price && !isNaN(Number(filters.price))) params.append("price", filters.price);
+      if (filters.startDate) params.append("startDate", filters.startDate);
+      if (filters.duration) params.append("duration", filters.duration);
+
+      const url = `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course/course-ads?${params.toString()}`;
       const res = await fetch(url);
 
-      if (!res.ok) throw new Error("Failed to fetch jobs");
+      if (!res.ok) throw new Error("Failed to fetch courses");
 
       const data: CourseResponse = await res.json();
-
       setCourses(data?.data);
       setTotalPages(data?.meta?.totalPages || 1);
-    } catch (err: unknown) {
+    } catch (err) {
       setError("Unknown error");
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const handleApply = async (courseId: number) => {
     const storedData = localStorage.getItem('loginData');
@@ -117,7 +128,7 @@ const CourseListPage = () => {
     setApplyingId(courseId);
 
     try {
-      const response = await fetch("https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course-applications", {
+      const response = await fetch("https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course/course-ads", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -140,6 +151,17 @@ const CourseListPage = () => {
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({ ...prev, [name]: value }));
+    if (name in touched) {
+      setTouched(prev => ({ ...prev, [name]: true }));
+    }
+  };
+
+  const isPriceInvalid = touched.price && (filters.price !== "" && isNaN(Number(filters.price)));
+  const isStartDateInvalid = touched.startDate && (filters.startDate !== "" && isNaN(Date.parse(filters.startDate)));
+
   return (
     <div className="min-h-screen bg-white mt-30 text-black px-4 pt-36 pb-10 flex flex-col items-center">
       <button
@@ -149,8 +171,61 @@ const CourseListPage = () => {
         <ArrowLeft size={18} /> Back
       </button>
 
-      <h1 className="text-3xl font-bold mb-12 text-center">Available Courses</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">Available Courses</h1>
 
+      {/* Filters */}
+      <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-10">
+        <input
+          type="text"
+          name="title"
+          placeholder="Course Title"
+          value={filters.title}
+          onChange={handleChange}
+          className="border border-gray-300 px-3 py-2 rounded"
+        />
+        <input
+          type="text"
+          name="location"
+          placeholder="Location"
+          value={filters.location}
+          onChange={handleChange}
+          className="border border-gray-300 px-3 py-2 rounded"
+        />
+        <div>
+          <input
+            type="text"
+            name="price"
+            placeholder="Max Price"
+            value={filters.price}
+            onChange={handleChange}
+            onBlur={() => setTouched(prev => ({ ...prev, price: true }))}
+            className={`border px-3 py-2 rounded w-full ${isPriceInvalid ? 'border-red-500' : 'border-gray-300'}`}
+          />
+          {isPriceInvalid && <p className="text-sm text-red-600 mt-1">Enter a valid number</p>}
+        </div>
+        <div>
+          <input
+            type="date"
+            name="startDate"
+            placeholder="Start Date"
+            value={filters.startDate}
+            onChange={handleChange}
+            onBlur={() => setTouched(prev => ({ ...prev, startDate: true }))}
+            className={`border px-3 py-2 rounded w-full ${isStartDateInvalid ? 'border-red-500' : 'border-gray-300'}`}
+          />
+          {isStartDateInvalid && <p className="text-sm text-red-600 mt-1">Enter a valid date</p>}
+        </div>
+        <input
+          type="text"
+          name="duration"
+          placeholder="Duration (e.g., 2 days)"
+          value={filters.duration}
+          onChange={handleChange}
+          className="border border-gray-300 px-3 py-2 rounded"
+        />
+      </div>
+
+      {/* Course Cards */}
       {loading ? (
         <p>Loading...</p>
       ) : error ? (
@@ -196,6 +271,7 @@ const CourseListPage = () => {
         </div>
       )}
 
+      {/* Pagination */}
       <div className="mt-12 flex flex-wrap justify-center gap-4">
         <button
           onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
@@ -218,5 +294,3 @@ const CourseListPage = () => {
 };
 
 export default CourseListPage;
-
-
