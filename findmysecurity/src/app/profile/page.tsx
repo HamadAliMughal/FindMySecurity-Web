@@ -156,8 +156,7 @@ const UserProfile: React.FC = () => {
       toast.error("Error updating profile. Please try again.");
     }
   };
-  
-  
+    
 
   if (!loginData) return null;
 
@@ -187,12 +186,14 @@ const UserProfile: React.FC = () => {
          )
          }
      {(roleId === 5 || roleId === 6 || roleId === 7) && (
+      
   <ProfileOverview
     profileData={
       loginData?.corporateClient ||
       loginData?.securityCompany ||
       loginData?.courseProvider
     }
+    roleId={loginData?.roleId}
     userId={loginData?.id}
   />
 )}

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Section from "./Section";
 import { CheckCircle, Cancel } from "@mui/icons-material";
 import toast from "react-hot-toast";
+import { API_URL } from "@/utils/path";
 
 import axios from "axios";
 const AvailabilitySection = ({ availability , id }: { availability: any , id : any }) => {
@@ -43,7 +44,7 @@ const AvailabilitySection = ({ availability , id }: { availability: any , id : a
       };
   
       await axios.put(
-        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/profile/individual/${id}`,
+        `${API_URL}/profile/individual/${id}`,
         payload,
         {
           headers: {
