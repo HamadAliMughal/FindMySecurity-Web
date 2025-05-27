@@ -1,86 +1,178 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 
-export default function TenderBoardListing() {
-  const [data, setData] = useState<any>(null);
+interface Release {
+  ocid: string;
+  tender?: {
+    title?: string;
+    description?: string;
+    procurementMethodDetails?: string;
+    contractPeriod?: {
+      startDate?: string;
+      endDate?: string;
+    };
+    value?: {
+      amount?: number;
+      currency?: string;
+    };
+    tenderPeriod?: {
+      endDate?: string;
+    };
+    items?: {
+      deliveryAddresses?: {
+        postalCode?: string;
+        region?: string;
+        countryName?: string;
+      }[];
+    }[];
+  };
+  awards?: {
+    contractPeriod?: {
+      startDate?: string;
+    };
+  }[];
+}
+
+export default function HomePage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const [query, setQuery] = useState(searchParams?.get('q') || 'Security');
+  const [page, setPage] = useState(Number(searchParams?.get('page')) || 1);
+  const [releases, setReleases] = useState<Release[]>([]);
   const [loading, setLoading] = useState(false);
-  const [query, setQuery] = useState('Security');
-  const [page, setPage] = useState(1);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(`/api/tenderboard?q=${encodeURIComponent(query)}&page=${page}`);
-        if (!res.ok) {
-          throw new Error('Failed to fetch data from API route');
+useEffect(() => {
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `https://www.contractsfinder.service.gov.uk/Published/Notices/OCDS/Search?q=${encodeURIComponent(query)}&page=${page}&pageSize=10`,
+        {
+          method: 'GET',
+         headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
         }
-        const json = await res.json();
-        setData(json);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
+      );
 
-    fetchData();
-  }, [query, page]);
+      if (!res.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await res.json();
+      setReleases(data.releases || []);
+    } catch (error) {
+      console.error('Fetch error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, [query, page]);
+
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPage(1);
+    const params = new URLSearchParams();
+    if (query) params.set('q', query);
+    params.set('page', '1');
+    router.push(`/?${params.toString()}`);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    const params = new URLSearchParams();
+    if (query) params.set('q', query);
+    params.set('page', newPage.toString());
+    router.push(`/?${params.toString()}`);
+  };
 
   return (
     <main className="p-6">
       <h1 className="text-2xl font-bold mb-4">Contracts Finder</h1>
 
-      <div className="mb-4">
+      <form onSubmit={handleSearch} className="mb-4">
         <input
           type="text"
-          placeholder="Search tenders"
+          placeholder="Search contracts..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="border px-3 py-2 rounded w-full max-w-md"
+          className="border p-2 mr-2"
         />
-      </div>
+        <button type="submit" className="bg-blue-600 text-white p-2 rounded">
+          Search
+        </button>
+      </form>
 
-      {loading && <p>Loading...</p>}
-      {error && <p className="text-red-600">Error: {error}</p>}
+      {loading ? (
+        <p>Loading results...</p>
+      ) : (
+        <div>
+          {releases.map((release) => {
+            const tender = release.tender || {};
+            const award = release.awards?.[0] || {};
+            const location =
+              tender.items?.[0]?.deliveryAddresses?.[0]?.postalCode ||
+              tender.items?.[0]?.deliveryAddresses?.[0]?.region ||
+              tender.items?.[0]?.deliveryAddresses?.[0]?.countryName ||
+              'N/A';
 
-      {data?.releases?.length === 0 && <p>No results found.</p>}
+            return (
+              <div key={release.ocid} className="border p-4 mb-4 rounded">
+                <h2 className="text-xl font-semibold">{tender.title || 'No Title'}</h2>
+                <p>{tender.description || 'No Description'}</p>
+                <p><strong>Location of Work:</strong> {location}</p>
+                <p><strong>Tender/Contract Type:</strong> {tender.procurementMethodDetails || 'N/A'}</p>
+                <p>
+                  <strong>Contract Duration:</strong>{' '}
+                  {tender.contractPeriod?.startDate || 'N/A'} to{' '}
+                  {tender.contractPeriod?.endDate || 'N/A'}
+                </p>
+                <p>
+                  <strong>Estimated Budget or Value:</strong>{' '}
+                  {tender.value
+                    ? `${tender.value.amount} ${tender.value.currency}`
+                    : 'N/A'}
+                </p>
+                <p>
+                  <strong>Deadline for Submission:</strong>{' '}
+                  {tender.tenderPeriod?.endDate || 'N/A'}
+                </p>
+                <p>
+                  <strong>Contract Start Date:</strong>{' '}
+                  {award.contractPeriod?.startDate || 'N/A'}
+                </p>
+                <p>
+                  <strong>Submission Method:</strong> Online
+                </p>
+              </div>
+            );
+          })}
 
-      {data?.releases?.map((release: any) => (
-        <div key={release.ocid} className="border p-4 mb-4 rounded">
-          <h2 className="text-xl font-semibold">
-            Tender/Contract Title: {release.tender?.title || 'N/A'}
-          </h2>
-          <p>Tender/Contract Description: {release.tender?.description || 'N/A'}</p>
-          <p>Location of Work: {release.planning?.locations?.map((loc: any) => loc.description).join(', ') || 'N/A'}</p>
-          <p>Tender/Contract Type: {release.tender?.mainProcurementCategory || 'N/A'}</p>
-          <p>Contract Duration: {release.tender?.contractPeriod?.durationInDays || 'N/A'} days</p>
-          <p>Estimated Budget or Value: {release.tender?.value?.amount || 'N/A'}</p>
-          <p>Deadline for Submission: {release.tender?.submissionDeadline || 'N/A'}</p>
-          <p>Contract Start Date: {release.tender?.contractPeriod?.startDate || 'N/A'}</p>
-          <p>Submission Method: {release.tender?.submissionMethod || 'N/A'}</p>
+          {/* Pagination */}
+          <div className="flex items-center gap-2 mt-6">
+            <button
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page <= 1}
+              className="bg-gray-300 px-3 py-1 rounded disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span>Page {page}</span>
+            <button
+              onClick={() => handlePageChange(page + 1)}
+              className="bg-gray-300 px-3 py-1 rounded"
+            >
+              Next
+            </button>
+          </div>
         </div>
-      ))}
-
-      {/* Simple Pagination */}
-      <div className="flex space-x-4 mt-6">
-        <button
-          disabled={page <= 1}
-          onClick={() => setPage((p) => Math.max(p - 1, 1))}
-          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => setPage((p) => p + 1)}
-          className="px-4 py-2 bg-gray-300 rounded"
-        >
-          Next
-        </button>
-      </div>
+      )}
     </main>
   );
 }
