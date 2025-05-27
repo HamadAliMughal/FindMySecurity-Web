@@ -18,7 +18,7 @@ export default function ChatMessage({ role, content, isNew }: ChatMessageProps) 
     if (role === 'bot') {
       let index = 0;
       const interval = setInterval(() => {
-        setDisplayedContent((prev) => prev + content.charAt(index));
+        setDisplayedContent(content.slice(0, index + 1));
         index++;
         if (index >= content.length) clearInterval(interval);
       }, 25);

@@ -14,10 +14,13 @@ import { API_URL } from "@/utils/path";
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import toast from 'react-hot-toast';
+import SecurityCategoriesModal from '@/sections/components/SecurityCategoriesModal/SecurityCategoriesModal';
+import { Search } from 'lucide-react';
 
 export default function JobPostingForm() {
   const router = useRouter();
   const [allowed, setAllowed] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     type: '',
@@ -33,6 +36,11 @@ export default function JobPostingForm() {
     shift: '',
     deadline: '',
   });
+
+  const handleCategorySelect = (category: string, role: string) => {
+    setFormData(prev => ({ ...prev, title: role, category: category }));
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     const loginData = localStorage.getItem('loginData');
@@ -151,27 +159,14 @@ export default function JobPostingForm() {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <div className="min-h-screen bg-white text-black p-6 mt-20">
-              <button
-                className="absolute top-4 left-4 mt-20 z-2 flex items-center text-gray-600 hover:text-black"
-                onClick={() => router.back()}
-              >
-                <ArrowLeft className="w-6 h-6 mr-2" />
-              </button>
-        {/* Banner */}
+        <button
+          className="absolute top-4 left-4 mt-20 z-2 flex items-center text-gray-600 hover:text-black"
+          onClick={() => router.back()}
+        >
+          <ArrowLeft className="w-6 h-6 mr-2" />
+        </button>
+        
         <div className="max-w-4xl mx-auto">
-          <div className="bg-black text-white p-4 rounded mb-8 text-sm shadow">
-            <h2 className="text-center font-bold mb-2">Hire Professional Security Experts – Post Your Job Today</h2>
-            <p>✅ <strong>Why Choose FindMySecurity?</strong></p>
-            <ul className="list-disc list-inside space-y-1 mt-2">
-              <li>Access a Verified Pool of Security Professionals – All candidates are SIA-licensed where required.</li>
-              <li>Customised Hiring Options – Post jobs for part-time, full-time, contract, or event-based security roles.</li>
-              <li>Fast & Efficient Matching – AI-powered recommendations to match your job with qualified professionals.</li>
-              <li>Compliance Support – Get guidance on UK security hiring laws and best practices.</li>
-              <li>No Hidden Fees – Transparent pricing with free job posting options and premium promotions.</li>
-            </ul>
-          </div>
-
-          {/* Job Form */}
           <h1 className="text-3xl font-bold mb-8 border-b pb-2">Post a Job</h1>
 
           <Box
@@ -183,14 +178,35 @@ export default function JobPostingForm() {
               gap: 2,
             }}
           >
-            <TextField
-              name="title"
-              label="Job Title"
-              value={formData.title}
-              onChange={handleChange}
-              variant="outlined"
-              fullWidth
-              sx={greenOutlineSx}
+            <div className="relative w-full">
+              <TextField
+                name="title"
+                label="Job Title"
+                value={formData.title}
+                onChange={handleChange}
+                variant="outlined"
+                fullWidth
+                sx={{
+                  ...greenOutlineSx,
+                  '& .MuiOutlinedInput-root': {
+                    ...greenOutlineSx['& .MuiOutlinedInput-root'],
+                    paddingRight: '48px',
+                  }
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(true)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <Search className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <SecurityCategoriesModal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              onSelect={handleCategorySelect}
             />
             <TextField
               name="type"

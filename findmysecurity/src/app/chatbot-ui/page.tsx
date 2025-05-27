@@ -22,20 +22,6 @@ export default function ChatbotUI() {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const simulateTyping = async (text: string) => {
-    setIsTyping(true);
-    const words = text.split(' ');
-    let displayText = words[0];
-    setMessages(prev => [...prev.slice(0, -1), { role: 'bot', content: displayText }]);
-    await new Promise(resolve => setTimeout(resolve, 100));
-    for (let i = 1; i < words.length; i++) {
-      displayText += ' ' + words[i];
-      setMessages(prev => [...prev.slice(0, -1), { role: 'bot', content: displayText }]);
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    setIsTyping(false);
-  };
-
   const handleSendMessage = async () => {
     if (!input.trim()) return;
 
@@ -43,47 +29,48 @@ export default function ChatbotUI() {
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
+    setIsTyping(true);
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/ask', {
+      const response = await fetch('http://34.239.116.186:5000/ask', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({ question: userMessage }),
       });
 
       if (!response.ok) throw new Error('Failed to get response');
 
       const data = await response.json();
-      setMessages(prev => [...prev, { role: 'bot', content: '' }]);
-      await simulateTyping(data.response);
+      setMessages(prev => [...prev, { role: 'bot', content: data.response }]);
     } catch (error) {
       console.error('Error:', error);
       setMessages(prev => [...prev, { role: 'bot', content: 'Sorry, I encountered an error. Please try again.' }]);
     } finally {
       setIsLoading(false);
+      setIsTyping(false);
     }
   };
 
   return (
     <div className="flex flex-col h-screen bg-gradient-to-b from-slate-50 to-slate-100">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 md:px-6 py-4 border-b bg-white/90 backdrop-blur-md shadow-sm sticky top-15 z-10 transition-all duration-300 ease-in-out">
+      <div className="flex items-center gap-3 px-4 md:px-6 py-6 border-b bg-white/90 backdrop-blur-md shadow-sm sticky top-15 z-10 transition-all duration-300 ease-in-out">
         <Link href="/" className="hover:opacity-75 transition-all duration-200 flex-shrink-0 hover:scale-105">
           <ArrowLeft className="w-6 h-6 text-slate-600" />
         </Link>
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="relative w-8 h-8 rounded-full bg-slate-800 flex-shrink-0 flex items-center justify-center overflow-hidden shadow-md transition-transform duration-200 hover:scale-105">
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="relative w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 flex-shrink-0 flex items-center justify-center overflow-hidden shadow-lg transition-transform duration-200 hover:scale-110 hover:shadow-cyan-200/50">
             <Image
               src="/pro-icons/FMS_logo_with_padding.png"
               alt="FindMySecurity Logo"
-              width={32}
-              height={32}
+              width={40}
+              height={40}
               className="object-contain"
             />
           </div>
-          <span className="font-semibold text-base md:text-lg text-slate-800 truncate transition-all duration-200">FindMySecurity AI Assistant</span>
+          <span className="font-semibold text-lg md:text-xl text-slate-800 truncate transition-all duration-200">FindMySecurity AI Assistant</span>
         </div>
       </div>
 
