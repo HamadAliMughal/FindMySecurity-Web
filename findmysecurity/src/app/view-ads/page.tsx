@@ -28,10 +28,18 @@ const PostAdLister: React.FC = () => {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [isApplying, setIsApplying] = useState(false);
 
-  const handleApplyClick = (job: any) => {
+  const [applyingJobs, setApplyingJobs] = useState<{[key: number]: boolean}>({});
+
+  const handleApplyClick = async (job: any) => {
     if (job.source === 'local' || job.source === 'Find My Security') {
-      applyForJob(job.id);
+      setApplyingJobs(prev => ({ ...prev, [job.id]: true }));
+      try {
+        await applyForJob(job.id);
+      } finally {
+        setApplyingJobs(prev => ({ ...prev, [job.id]: false }));
+      }
     } else {
       window.open(job.url, '_blank', 'noopener,noreferrer');
     }
@@ -290,45 +298,65 @@ const PostAdLister: React.FC = () => {
           {paginatedJobs.map((post, idx) => (
             <div key={idx} className="bg-white rounded-lg shadow-md p-6 mb-6 hover:shadow-lg transition duration-300"  data-aos="fade-up">
               <div className="flex justify-between items-start gap-4">
-                <div className="flex items-start gap-4">
-                
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                      {post.title || post.jobTitle}
-                    </h2>
-                    <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-gray-700">
-                      <p><strong>Location:</strong> {post.location || post.jobLocation || post.region}</p>
-                      <p><strong>Pay:</strong> ${post.payRate || post.salaryRate || post.JobSalary}</p>
-                      <p className="col-span-2"><strong>Description:</strong> {post.description || post.jobDescription}</p>
-                    </div>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    {post.title || post.jobTitle}
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 text-sm text-gray-700">
+                    <p className="col-span-1"><strong>Location:</strong> {post.location || post.jobLocation || post.region}</p>
+                    <p className="col-span-1"><strong>Pay:</strong> ${post.payRate || post.salaryRate || post.JobSalary}</p>
+                    <p className="col-span-1 md:col-span-2 mt-2"><strong>Description:</strong> {post.description || post.jobDescription}</p>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-2 flex-shrink-0">
                   {post.source === 'local' || post.source === 'Find My Security' ? (
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => {
-                          setSelectedJob(post);
-                          setIsModalOpen(true);
-                        }}
-                        className="text-sm px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-                      >
-                        View Job
-                      </button>
-                      <button
-                        onClick={() => handleApplyClick(post)}
-                        className="text-sm px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
-                      >
-                        Apply
-                      </button>
+                    <div className="flex flex-col items-end gap-2">
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => {
+                            setSelectedJob(post);
+                            setIsModalOpen(true);
+                          }}
+                          className="text-sm px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                        >
+                          View Job
+                        </button>
+                        <button
+                          onClick={() => handleApplyClick(post)}
+                          disabled={applyingJobs[post.id]}
+                          className={`text-sm px-4 py-2 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[80px] ${applyingJobs[post.id] ? 'gap-2' : ''}`}
+                        >
+                          {applyingJobs[post.id] ? (
+                            <>
+                              <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              Applying...
+                            </>
+                          ) : 'Apply'}
+                        </button>
+                      </div>
+                      <img 
+                        src={sourceLogos[post.source]} 
+                        alt={`${post.source} logo`} 
+                        className="h-6 object-contain mt-2" 
+                      />
                     </div>
                   ) : (
-                    <button
-                      onClick={() => handleApplyClick(post)}
-                      className="text-sm px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                      Visit
-                    </button>
+                    <div className="flex flex-col items-end gap-2">
+                      <button
+                        onClick={() => handleApplyClick(post)}
+                        className="text-sm px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                      >
+                        Visit
+                      </button>
+                      <img 
+                        src={sourceLogos[post.source]} 
+                        alt={`${post.source} logo`} 
+                        className="h-6 object-contain mt-2" 
+                      />
+                    </div>
                   )}
 
                 {/* Job Details Modal */}
@@ -398,9 +426,18 @@ const PostAdLister: React.FC = () => {
                             </button>
                             <button
                               onClick={() => handleApplyClick(selectedJob)}
-                              className="text-sm px-6 py-2.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                              disabled={applyingJobs[selectedJob.id]}
+                              className={`text-sm px-6 py-2.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[100px] ${applyingJobs[selectedJob.id] ? 'gap-2' : ''}`}
                             >
-                              Apply Now
+                              {applyingJobs[selectedJob.id] ? (
+                                <>
+                                  <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  Applying...
+                                </>
+                              ) : 'Apply Now'}
                             </button>
                           </div>
                         </>
