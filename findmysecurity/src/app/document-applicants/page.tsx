@@ -23,6 +23,8 @@ interface DocumentRequest {
   };
 }
 
+
+
 const ITEMS_PER_PAGE = 5;
 
 const DocumentApplicantsPage = () => {
@@ -272,7 +274,59 @@ const DocumentApplicantsPage = () => {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-2">
-                    {req.status === "pending" && (
+                  <>
+  <button
+    onClick={() => handleUpdateStatus(req.id, "approved")}
+    className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-300 ease-in-out"
+  >
+    <FaCheck className="text-white" />
+    Approve
+  </button>
+
+  <button
+    onClick={() => handleUpdateStatus(req.id, "rejected")}
+    className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-semibold rounded-full shadow-md hover:shadow-lg transition-all duration-300 ease-in-out ml-3"
+  >
+    <FaTimes className="text-white" />
+    Reject
+  </button>
+
+  <span
+    className={`ml-4 px-4 py-2 rounded-full text-sm font-semibold shadow-inner ${
+      req.status === "approved"
+        ? "bg-green-100 text-green-800"
+        : req.status === "rejected"
+        ? "bg-red-100 text-red-800"
+        : "bg-yellow-100 text-yellow-800"
+    }`}
+  >
+    {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
+  </span>
+</>
+
+                  {/* <>
+  <button
+    onClick={() => handleUpdateStatus(req.id, "approved")}
+    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md"
+  >
+    <FaCheck /> Approve
+  </button>
+  <button
+    onClick={() => handleUpdateStatus(req.id, "rejected")}
+    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md"
+  >
+    <FaTimes /> Reject
+  </button>
+  <span
+    className={`ml-3 px-3 py-1 rounded-md font-semibold ${
+      req.status === "approved" ? "bg-green-200 text-green-800" : req.status === "rejected" ? "bg-red-200 text-red-800" : "bg-gray-200 text-gray-800"
+    }`}
+  >
+    {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
+  </span>
+</> */}
+
+                    {/* {req.status === "pending" && (
                       <>
                         <button
                           onClick={() => handleUpdateStatus(req.id, "approved")}
@@ -287,7 +341,7 @@ const DocumentApplicantsPage = () => {
                           <FaTimes /> Reject
                         </button>
                       </>
-                    )}
+                    )} */}
                     
                     <button
                       onClick={() => {
