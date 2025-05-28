@@ -117,23 +117,33 @@ const handleSubmit = async (e: React.FormEvent) => {
      
     };
 
-    if (editingJobId) {
-      // Update existing job
-      await axios.patch(
-        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course/course-ads/${editingJobId}`,
-        payload
-      );
-      setSuccess('Course updated successfully!');
-      setEditingJobId(null); // reset editing state after update
-    } else {
-      // Create new job
-      await axios.post(
-        'https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course/course-ads',
-        payload
-        
-      );
-      setSuccess('Course created successfully!');
-    }
+    const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
+  if (editingJobId) {
+    // Update existing job
+    await axios.patch(
+      `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course/course-ads/${editingJobId}`,
+      payload,
+        {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    setSuccess('Course updated successfully!');
+    setEditingJobId(null); // reset editing state after update
+  } else {
+    // Create new job
+    await axios.post(
+      'https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course/course-ads',
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    setSuccess('Course created successfully!');
+  }
 
     setForm(initialForm);
     setShowForm(false);
@@ -150,31 +160,34 @@ const handleSubmit = async (e: React.FormEvent) => {
    async function fetchJobs(page: number, limit: number, searchTerm: string) {
     setLoading(true);
     setError(null);
-    try {
-      const params = new URLSearchParams();
-      params.append("page", page.toString());
-      params.append("limit", limit.toString());
-      if (searchTerm.trim()) {
-        params.append("search", searchTerm.trim());
-      }
-const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
-      const url = `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course/course-ads/${JSON.parse(localStorage.getItem('loginData') || '{}').id}?${params.toString()}`;
-      const res = await fetch(url, {
-  method: "GET",
-  headers: {
-    Authorization: `Bearer ${token}`,
-   
-  },
- // Optional: only if cookies or CORS credentials are needed
-});
+   try {
+  const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
+  const loginData = JSON.parse(localStorage.getItem("loginData") || "{}");
+  const userId = loginData.id;
 
-      if (!res.ok) throw new Error("Failed to fetch jobs");
+  if (!token || !userId) {
+    throw new Error("Missing token or user ID");
+  }
 
-      const data: CourseResponse= await res.json();
+  const params = new URLSearchParams({
+    pageSize: "10",
+    page: "1"
+    // Add other params here if needed
+  });
 
-      setCourses(data?.data);
-      setTotalPages(data?.meta?.totalPages||1);
-    } catch (err: unknown) {
+  const url = `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course/course-ads/?${params.toString()}`;
+
+  const response = await axios.get<CourseResponse>(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = response.data;
+
+ setCourses(data.data.filter(course => course.createdBy?.id === userId));
+  setTotalPages(data.meta?.totalPages || 1);
+}  catch (err: unknown) {
       setError( "Unknown error");
       console.error(err);
     } finally {
@@ -197,7 +210,7 @@ const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
   }
 const handleDelete = async (jobId: number) => {
   if (!window.confirm('Are you sure you want to delete this job?')) return;
-  const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
+  const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
   try {
     setLoading(true);
     const res = await fetch(`https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course/course-ads/${jobId}`, {

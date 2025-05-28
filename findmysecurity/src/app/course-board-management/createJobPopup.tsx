@@ -65,7 +65,7 @@ const CourseApplicantAdsPage = () => {
   const fetchAds = async () => {
     try {
      
-      const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
+      const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
       if (!token) return;
 
       const loginData = localStorage.getItem("loginData");
@@ -133,7 +133,7 @@ const CourseApplicantAdsPage = () => {
 
   const handleUpdateStatus = async (appId: number, status: "approved" | "rejected") => {
     try {
-      const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
+      const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
       if (!token) return;
 
       await axios.patch(

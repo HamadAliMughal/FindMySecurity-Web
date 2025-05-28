@@ -128,7 +128,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
 
 const menuItems = [
   { icon: <FaList />, label: "Courses", route: "/course-listing" },
-  { icon: <FaHeart />, label: "My Favourites" },
+  { icon: <FaHeart />, label: "My Favourites", route:'/my-favourites' },
 
   {
     icon: <FaUserShield />,
