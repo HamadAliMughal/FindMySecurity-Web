@@ -32,7 +32,7 @@ export default function ChatbotUI() {
     setIsTyping(true);
 
     try {
-      const response = await fetch('http://34.239.116.186:5000/ask', {
+      const response = await fetch('https://fmschatbot.duckdns.org/ask', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
