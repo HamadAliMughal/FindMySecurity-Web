@@ -17,12 +17,33 @@ import toast from "react-hot-toast";
 import AnimateOnScrollProvider from "@/sections/components/animation/AnimateOnScrollProvider";
 import { ArrowLeft } from "lucide-react";
 
+import { Fragment } from 'react';
+import { Dialog } from '@headlessui/react';
+
 const DEFAULT_KEYWORD = "Security Guard";
 const DEFAULT_LOCATION = "London";
 const DEFAULT_RATE = 30000;
 
 const PostAdLister: React.FC = () => {
   const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<any>(null);
+
+  const handleApplyClick = (job: any) => {
+    if (job.source === 'local' || job.source === 'Find My Security') {
+      applyForJob(job.id);
+    } else {
+      window.open(job.url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  };
 
   const [localJobs, setLocalJobs] = useState<any[]>([]);
   const [adzunaJobs, setAdzunaJobs] = useState<any[]>([]);
@@ -260,54 +281,121 @@ const PostAdLister: React.FC = () => {
                       {post.title || post.jobTitle}
                     </h2>
                     <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-gray-700">
-                      <p><strong>Location:</strong> {post.location || post.jobLocation}</p>
+                      <p><strong>Location:</strong> {post.location || post.jobLocation || post.region}</p>
                       <p><strong>Pay:</strong> ${post.payRate || post.salaryRate || post.JobSalary}</p>
                       <p className="col-span-2"><strong>Description:</strong> {post.description || post.jobDescription}</p>
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                  {post.source === "local" || post.source === "Find My Security" ? (
+                  {post.source === 'local' || post.source === 'Find My Security' ? (
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => {
+                          setSelectedJob(post);
+                          setIsModalOpen(true);
+                        }}
+                        className="text-sm px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                      >
+                        View Job
+                      </button>
+                      <button
+                        onClick={() => handleApplyClick(post)}
+                        className="text-sm px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                  ) : (
                     <button
-                      onClick={() => applyForJob(post.id)}
-                      className="text-sm px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+                      onClick={() => handleApplyClick(post)}
+                      className="text-sm px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                     >
                       Apply
                     </button>
-                  ) : (
-                    <a
-                      href={post.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                      Visit
-                    </a>
                   )}
-                    <div>
-                  {sourceLogos[post.source] ? (
-  <div className="w-32 h-16 flex items-center justify-center">
-  <img 
-    src={sourceLogos[post.source]} 
-    alt={`${post.source} logo`} 
-    className="max-w-full max-h-full object-contain" 
-  />
-</div>
-) : (
-  <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
-    
-    <FaBriefcase className="text-white text-3xl" />
-  </div>
-)}
 
-
-                    
-                    
+                {/* Job Details Modal */}
+                <Dialog
+                  open={isModalOpen}
+                  onClose={() => setIsModalOpen(false)}
+                  className="fixed inset-0 z-50 overflow-y-auto"
+                >
+                  <div className="flex items-center justify-center min-h-screen p-4">
+                    <div className="fixed inset-0 bg-black opacity-30" />
+                    <div className="relative bg-white rounded-lg max-w-2xl w-full p-6 shadow-xl">
+                      {selectedJob && (
+                        <>
+                          <Dialog.Title className="text-2xl font-bold mb-4">
+                            {selectedJob.jobTitle}
+                          </Dialog.Title>
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <p className="font-semibold">Job Type:</p>
+                                <p>{selectedJob.jobType}</p>
+                              </div>
+                              <div>
+                                <p className="font-semibold">Industry:</p>
+                                <p>{selectedJob.industryCategory}</p>
+                              </div>
+                              <div>
+                                <p className="font-semibold">Location:</p>
+                                <p>{selectedJob.region} - {selectedJob.postcode}</p>
+                              </div>
+                              <div>
+                                <p className="font-semibold">Salary:</p>
+                                <p>£{selectedJob.salaryRate} {selectedJob.salaryType}</p>
+                              </div>
+                              <div>
+                                <p className="font-semibold">Experience Required:</p>
+                                <p>{selectedJob.requiredExperience} years</p>
+                              </div>
+                              <div>
+                                <p className="font-semibold">Required Licenses:</p>
+                                <p>{selectedJob.requiredLicences}</p>
+                              </div>
+                              <div>
+                                <p className="font-semibold">Shift & Hours:</p>
+                                <p>{selectedJob.shiftAndHours}</p>
+                              </div>
+                              <div>
+                                <p className="font-semibold">Start Date:</p>
+                                <p>{formatDate(selectedJob.startDate)}</p>
+                              </div>
+                              <div>
+                                <p className="font-semibold">Application Deadline:</p>
+                                <p>{formatDate(selectedJob.deadline)}</p>
+                              </div>
+                            </div>
+                            <div>
+                              <p className="font-semibold">Job Description:</p>
+                              <p className="whitespace-pre-wrap">{selectedJob.jobDescription}</p>
+                            </div>
+                          </div>
+                          <div className="mt-6 flex justify-end space-x-3">
+                            <button
+                              onClick={() => setIsModalOpen(false)}
+                              className="text-sm px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                            >
+                              Close
+                            </button>
+                            <button
+                              onClick={() => handleApplyClick(selectedJob)}
+                              className="text-sm px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+                            >
+                              Apply Now
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </div>
-                  {/* <span className="flex items-center bg-gray-200 text-xs px-2 py-1 rounded-full text-gray-700">
-                    <FaTag className="mr-1" />
-                    {post.source}
-                  </span> */}
+                </Dialog>
+                {/* <span className="flex items-center bg-gray-200 text-xs px-2 py-1 rounded-full text-gray-700">
+                  <FaTag className="mr-1" />
+                  {post.source}
+                </span> */}
                 </div>
               </div>
             </div>
@@ -344,590 +432,3 @@ const PostAdLister: React.FC = () => {
 };
 
 export default PostAdLister;
-
-
-
-
-// "use client";
-
-// import React, { useEffect, useState } from "react";
-// import { useRouter } from "next/navigation";
-// import axios from "axios";
-// import {
-//   FaSearch,
-//   FaMapMarkerAlt,
-//   FaMoneyBillWave,
-//   FaCalendarAlt,
-//   FaBriefcase,
-//   FaTag,
-// } from "react-icons/fa";
-
-// const DEFAULT_KEYWORD = "Security Guard";
-// const DEFAULT_LOCATION = "London";
-// const DEFAULT_RATE = 30000;
-
-// const PostAdLister: React.FC = () => {
-//   const router = useRouter();
-
-//   const [localJobs, setLocalJobs] = useState<any[]>([]);
-//   const [adzunaJobs, setAdzunaJobs] = useState<any[]>([]);
-//   const [monsterJobs, setMonsterJobs] = useState<any[]>([]);
-//   const [securityJobs, setSecurityJobs] = useState<any[]>([]);
-
-//   const [keyword, setKeyword] = useState(DEFAULT_KEYWORD);
-//   const [location, setLocation] = useState(DEFAULT_LOCATION);
-//   const [rateFilter, setRateFilter] = useState<number | null>(DEFAULT_RATE);
-//   const [searched, setSearched] = useState(false);
-//   const [loading, setLoading] = useState(true);
-
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const pageSize = 5;
-
-//   const fetchLocalJobs = (kw: string, loc: string, rate: number | null) => {
-//     const storedData = localStorage.getItem("jobs");
-//     if (!storedData) return [];
-//     const parsed = JSON.parse(storedData);
-
-//     return parsed.filter((post: any) => {
-//       const matchTitle = kw ? post.title?.toLowerCase().includes(kw.toLowerCase()) : true;
-//       const matchLocation = loc ? post.location?.toLowerCase().includes(loc.toLowerCase()) : true;
-//       const matchRate = rate !== null ? parseFloat(post.payRate) <= rate : true;
-//       return matchTitle && matchLocation && matchRate;
-//     });
-//   };
-
-
-//   const token2 = localStorage.getItem("authToken")?.replace(/^"|"$/g, '')
-//   const storedData1 = localStorage.getItem('loginData')
-//   const data1 = storedData1 ? JSON.parse(storedData1) : null; 
-//   const currentId = data1?.id || data1?.user?.id; // Replace with your actual token
-//   const fetchSecurityJobs = async () => {
-//     try {
-  
-//       const res = await axios.get("https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/security-jobs", {
-//         headers: {
-//           Authorization: `Bearer ${token2}`,
-//         },
-//       });
-  
-//       return res.data.jobs;
-//     } catch (err) {
-//       console.error("Security Jobs API Error:", err);
-//       return [];
-//     }
-//   };
-  
-//   const applyForJob = async ( serviceAdId: number) => {
-//     try {
-//       const response = await axios.post(
-//         "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev//job-applications",
-//         {
-//           userId: currentId,
-//           serviceAdId,
-//           status: "pending"
-//         },
-//         {
-//           headers: {
-//             Authorization: `Bearer ${token2}`,
-//             "Content-Type": "application/json"
-//           }
-//         }
-//       );
-//       return response.data;
-//     } catch (error: any) {
-//       console.error("Job application failed:", error.response?.data || error.message);
-//       throw error;
-//     }
-//   };
-//   const handleSearch = async () => {
-//     setSearched(true);
-//     setLoading(true);
-//     try {
-//       const [adzunaRes, monsterRes, securityJobsData] = await Promise.all([
-//         fetch(`/api/reed-job?keyword=${keyword}&location=${location}&minSalary=${rateFilter}`),
-//         fetch(`/api/monster-job?keyword=${keyword}&location=${location}&minSalary=${rateFilter}`),
-//         fetchSecurityJobs(),
-//       ]);
-
-//       const [adzunaData, monsterData] = await Promise.all([
-//         adzunaRes.json(),
-//         monsterRes.json(),
-//       ]);
-
-//       setAdzunaJobs(adzunaRes.ok ? adzunaData : []);
-//       setMonsterJobs(monsterRes.ok ? monsterData : []);
-//       setSecurityJobs(securityJobsData || []);
-
-//       const filteredLocal = fetchLocalJobs(keyword, location, rateFilter);
-//       setLocalJobs(filteredLocal);
-//       setCurrentPage(1);
-//     } catch (err) {
-//       console.error("Fetch failed:", err);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     handleSearch();
-//   }, []);
-
-//   const mergedJobs = [
-//     ...securityJobs.map((j) => ({ ...j, source: "security-api" })),
-//     ...localJobs.map((j) => ({ ...j, source: "local" })),
-//     ...adzunaJobs.map((j) => ({ ...j, source: "adzuna" })),
-//     ...monsterJobs.map((j) => ({ ...j, source: "monster" })),
-//   ];
-
-//   const totalPages = Math.ceil(mergedJobs.length / pageSize);
-//   const paginatedJobs = mergedJobs.slice(
-//     (currentPage - 1) * pageSize,
-//     currentPage * pageSize
-//   );
-
-//   return (
-//     <div style={{ marginTop: "90px" }} className="min-h-screen bg-gray-100 p-6 md:px-32">
-//       <h1 className="text-4xl font-bold text-center text-gray-900 mb-8">
-//         Posted <span className="text-black">Job Ads</span>
-//       </h1>
-
-//       {/* Filters */}
-//       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-lg shadow mb-6">
-//         <div>
-//           <label className="text-sm font-semibold">Keyword</label>
-//           <div className="flex items-center space-x-2">
-//             <FaSearch className="text-gray-500" />
-//             <input
-//               value={keyword}
-//               onChange={(e) => setKeyword(e.target.value)}
-//               placeholder="e.g. Security"
-//               className="w-full p-2 border border-gray-300 rounded-md"
-//             />
-//           </div>
-//         </div>
-//         <div>
-//           <label className="text-sm font-semibold">Location</label>
-//           <div className="flex items-center space-x-2">
-//             <FaMapMarkerAlt className="text-gray-500" />
-//             <input
-//               value={location}
-//               onChange={(e) => setLocation(e.target.value)}
-//               placeholder="e.g. London"
-//               className="w-full p-2 border border-gray-300 rounded-md"
-//             />
-//           </div>
-//         </div>
-//         <div>
-//           <label className="text-sm font-semibold">Max Pay Rate</label>
-//           <div className="flex items-center space-x-2">
-//             <FaMoneyBillWave className="text-gray-500" />
-//             <input
-//               type="number"
-//               value={rateFilter ?? ""}
-//               onChange={(e) =>
-//                 setRateFilter(e.target.value ? parseFloat(e.target.value) : null)
-//               }
-//               placeholder="e.g. 30000"
-//               className="w-full p-2 border border-gray-300 rounded-md"
-//             />
-//           </div>
-//         </div>
-//         <div className="md:col-span-3 flex justify-end">
-//           <button
-//             onClick={handleSearch}
-//             className="px-6 py-2 bg-black text-white rounded hover:bg-gray-800"
-//           >
-//             Search Jobs
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Listings */}
-//       {loading ? (
-//         <p className="text-center text-gray-600">Loading jobs...</p>
-//       ) : mergedJobs.length === 0 ? (
-//         <p className="text-center text-gray-600">No jobs found for the current filters.</p>
-//       ) : (
-//         <>
-//           {paginatedJobs.map((post, idx) => (
-//             <div
-//               key={idx}
-//               className="bg-white rounded-lg shadow-md p-6 mb-6 hover:shadow-lg transition duration-300"
-//             >
-//               <div className="flex justify-between items-start gap-4">
-//                 <div className="flex items-start gap-4">
-//                   <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
-//                     <FaBriefcase className="text-white text-3xl" />
-//                   </div>
-//                   <div>
-//   {(post.title || post.jobTitle) && (
-//     <h2 className="text-2xl font-bold text-gray-900 mb-2">
-//       {post.title || post.jobTitle}
-//     </h2>
-//   )}
-//   <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-gray-700">
-//     {(post.type || post.jobType) && (
-//       <p><strong>Type:</strong> {post.type || post.jobType}</p>
-//     )}
-//     {(post.category || post.jobCategory) && (
-//       <p><strong>Category:</strong> {post.category || post.jobCategory}</p>
-//     )}
-//     {(post.location || post.jobLocation) && (
-//       <p><strong>Location:</strong> {post.location || post.jobLocation}</p>
-//     )}
-//     {(post.region || post.jobRegion) && (
-//       <p><strong>Region:</strong> {post.region || post.jobRegion}</p>
-//     )}
-//     {(post.postcode || post.JobPostcode) && (
-//       <p><strong>Postcode:</strong> {post.postcode || post.jobPostcode}</p>
-//     )}
-//     {(post.payRate || post.salaryRate|| post.JobSalary) && (
-//       <p>
-//         <strong>Pay:</strong> ${post.payRate || post.salaryRate || post.JobSalary}
-//         {(post.payType || post.JobPayType) && ` (${post.payType || post.JobPayType})`}
-//       </p>
-//     )}
-//     {(post.experience || post.requiredExperience) && (
-//       <p><strong>Experience:</strong> {post.experience || post.requiredExperience}</p>
-//     )}
-//     {(post.shift || post.shiftAndHours) && (
-//       <p><strong>Shift:</strong> {post.shift || post.shiftAndHours}</p>
-//     )}
-//     {(post.certifications || post.requiredLicences) && (
-//       <p><strong>Certifications:</strong> {post.certifications || post.requiredLicences}</p>
-//     )}
-//     {(post.description || post.jobDescription) && (
-//       <p className="col-span-2">
-//         <strong>Description:</strong> {post.description || post.jobDescription}
-//       </p>
-//     )}
-//     {(post.deadline || post.startDeadline) && (
-//       <p className="col-span-2 flex items-center gap-2">
-//         <FaCalendarAlt />
-//         <span><strong>Deadline:</strong> {post.deadline || post.startDeadline}</span>
-//       </p>
-//     )}
-//   </div>
-// </div>
-
-//                 </div>
-
-//                 <div className="flex flex-col items-end gap-2">
-//                   {post.source === "local" ||post.source === "security-api" ? (
-//                     <button
-//                       onClick={() => applyForJob( post.id)}
-//                       className="text-sm px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
-//                     >
-//                       Apply
-//                     </button>
-//                   ) : (
-//                     <a
-//                       href={post.url}
-//                       target="_blank"
-//                       rel="noopener noreferrer"
-//                       className="text-sm px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-//                     >
-//                       Visit
-//                     </a>
-//                   )}
-//                   <span className="flex items-center bg-gray-200 text-xs px-2 py-1 rounded-full text-gray-700">
-//                     <FaTag className="mr-1" />
-//                     {post.source === "local"
-//                       ? "FindMySecurity"
-//                       : post.source === "adzuna"
-//                       ? "Adzuna"
-//                       : post.source === "monster"
-//                       ? "Monster"
-//                       : "FindMySecurity"}
-//                   </span>
-//                 </div>
-//               </div>
-//             </div>
-//           ))}
-
-//           {/* Pagination */}
-//           <div className="flex justify-center items-center gap-4 mt-6">
-//             <button
-//               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-//               disabled={currentPage === 1}
-//               className={`px-4 py-2 rounded ${
-//                 currentPage === 1
-//                   ? "bg-gray-300 cursor-not-allowed"
-//                   : "bg-black text-white hover:bg-gray-800"
-//               }`}
-//             >
-//               Previous
-//             </button>
-//             <span className="text-sm text-gray-700">
-//               Page {currentPage} of {totalPages}
-//             </span>
-//             <button
-//               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-//               disabled={currentPage === totalPages}
-//               className={`px-4 py-2 rounded ${
-//                 currentPage === totalPages
-//                   ? "bg-gray-300 cursor-not-allowed"
-//                   : "bg-black text-white hover:bg-gray-800"
-//               }`}
-//             >
-//               Next
-//             </button>
-//           </div>
-//         </>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default PostAdLister;
-
-
-
-
-
-
-
-// "use client";
-
-// import React, { useEffect, useState } from "react";
-// import { useRouter } from "next/navigation";
-// import {
-//   FaSearch,
-//   FaMapMarkerAlt,
-//   FaMoneyBillWave,
-//   FaCalendarAlt,
-//   FaBriefcase,
-//   FaTag,
-// } from "react-icons/fa";
-
-// const DEFAULT_KEYWORD = "Security Guard";
-// const DEFAULT_LOCATION = "London";
-// const DEFAULT_RATE = 30000;
-
-// const PostAdLister: React.FC = () => {
-//   const router = useRouter();
-
-//   const [localJobs, setLocalJobs] = useState<any[]>([]);
-//   const [adzunaJobs, setAdzunaJobs] = useState<any[]>([]);
-//   const [keyword, setKeyword] = useState(DEFAULT_KEYWORD);
-//   const [location, setLocation] = useState(DEFAULT_LOCATION);
-//   const [rateFilter, setRateFilter] = useState<number | null>(DEFAULT_RATE);
-//   const [searched, setSearched] = useState(false);
-//   const [loading, setLoading] = useState(true);
-
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const pageSize = 5;
-
-//   const fetchLocalJobs = (kw: string, loc: string, rate: number | null) => {
-//     const storedData = localStorage.getItem("jobs");
-//     if (!storedData) return [];
-
-//     const parsed = JSON.parse(storedData);
-
-//     return parsed.filter((post: any) => {
-//       const matchTitle = kw ? post.title?.toLowerCase().includes(kw.toLowerCase()) : true;
-//       const matchLocation = loc ? post.location?.toLowerCase().includes(loc.toLowerCase()) : true;
-//       const matchRate = rate !== null ? parseFloat(post.payRate) <= rate : true;
-//       return matchTitle && matchLocation && matchRate;
-//     });
-//   };
-
-//   const handleSearch = async () => {
-//     setSearched(true);
-//     setLoading(true);
-//     try {
-//       const res = await fetch(
-//         `/api/reed-job?keyword=${keyword}&location=${location}&minSalary=${rateFilter}`
-//       );
-//       const data = await res.json();
-
-//       if (res.ok) {
-//         setAdzunaJobs(data || []);
-//       } else {
-//         console.log("Adzuna error:", data.error);
-//         setAdzunaJobs([]);
-//       }
-
-//       const filteredLocal = fetchLocalJobs(keyword, location, rateFilter);
-//       console.log("Filtered local jobs:", filteredLocal);
-//       setLocalJobs(filteredLocal);
-//       setCurrentPage(1); // reset to page 1 on new search
-//     } catch (err) {
-//       console.error("Fetch failed:", err);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     handleSearch();
-//   }, []);
-
-//   const mergedJobs = [
-//     ...localJobs.map((j) => ({ ...j, source: "local" })),
-//     ...adzunaJobs.map((j) => ({ ...j, source: "adzuna" })),
-//   ];
-
-//   const totalPages = Math.ceil(mergedJobs.length / pageSize);
-//   const paginatedJobs = mergedJobs.slice(
-//     (currentPage - 1) * pageSize,
-//     currentPage * pageSize
-//   );
-
-//   return (
-//     <div style={{ marginTop: "90px" }} className="min-h-screen bg-gray-100 p-6 md:px-32">
-//       <h1 className="text-4xl font-bold text-center text-gray-900 mb-8">
-//         Posted <span className="text-black">Job Ads</span>
-//       </h1>
-
-//       {/* Filters */}
-//       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-lg shadow mb-6">
-//         <div>
-//           <label className="text-sm font-semibold">Keyword</label>
-//           <div className="flex items-center space-x-2">
-//             <FaSearch className="text-gray-500" />
-//             <input
-//               value={keyword}
-//               onChange={(e) => setKeyword(e.target.value)}
-//               placeholder="e.g. Security"
-//               className="w-full p-2 border border-gray-300 rounded-md"
-//             />
-//           </div>
-//         </div>
-//         <div>
-//           <label className="text-sm font-semibold">Location</label>
-//           <div className="flex items-center space-x-2">
-//             <FaMapMarkerAlt className="text-gray-500" />
-//             <input
-//               value={location}
-//               onChange={(e) => setLocation(e.target.value)}
-//               placeholder="e.g. London"
-//               className="w-full p-2 border border-gray-300 rounded-md"
-//             />
-//           </div>
-//         </div>
-//         <div>
-//           <label className="text-sm font-semibold">Max Pay Rate</label>
-//           <div className="flex items-center space-x-2">
-//             <FaMoneyBillWave className="text-gray-500" />
-//             <input
-//               type="number"
-//               value={rateFilter ?? ""}
-//               onChange={(e) =>
-//                 setRateFilter(e.target.value ? parseFloat(e.target.value) : null)
-//               }
-//               placeholder="e.g. 30000"
-//               className="w-full p-2 border border-gray-300 rounded-md"
-//             />
-//           </div>
-//         </div>
-//         <div className="md:col-span-3 flex justify-end">
-//           <button
-//             onClick={handleSearch}
-//             className="px-6 py-2 bg-black text-white rounded hover:bg-gray-800"
-//           >
-//             Search Jobs
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Listings */}
-//       {loading ? (
-//         <p className="text-center text-gray-600">Loading jobs...</p>
-//       ) : mergedJobs.length === 0 ? (
-//         <p className="text-center text-gray-600">No jobs found for the current filters.</p>
-//       ) : (
-//         <>
-//           {paginatedJobs.map((post, idx) => (
-//             <div
-//               key={idx}
-//               className="bg-white rounded-lg shadow-md p-6 mb-6 hover:shadow-lg transition duration-300"
-//             >
-//               <div className="flex justify-between items-start gap-4">
-//                 <div className="flex items-start gap-4">
-//                   <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
-//                     <FaBriefcase className="text-white text-3xl" />
-//                   </div>
-//                   <div>
-//                     <h2 className="text-2xl font-bold text-gray-900 mb-2">{post.title}</h2>
-//                     <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-gray-700">
-//                       <p><strong>Type:</strong> {post.type}</p>
-//                       <p><strong>Category:</strong> {post.category}</p>
-//                       <p><strong>Location:</strong> {post.location}</p>
-//                       <p><strong>Region:</strong> {post.region}</p>
-//                       <p><strong>Postcode:</strong> {post.postcode}</p>
-//                       <p><strong>Pay:</strong> ${post.payRate} ({post.payType})</p>
-//                       <p><strong>Experience:</strong> {post.experience}</p>
-//                       <p><strong>Shift:</strong> {post.shift}</p>
-//                       <p><strong>Certifications:</strong> {post.certifications}</p>
-//                       <p className="col-span-2"><strong>Description:</strong> {post.description}</p>
-//                       <p className="col-span-2 flex items-center gap-2">
-//                         <FaCalendarAlt />
-//                         <span><strong>Deadline:</strong> {post.deadline}</span>
-//                       </p>
-//                     </div>
-//                   </div>
-//                 </div>
-
-//                 <div className="flex flex-col items-end gap-2">
-//                   {post.source === "local" ? (
-//                     <button
-//                       onClick={() => router.push(`/job/${idx}`)}
-//                       className="text-sm px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
-//                     >
-//                       Apply
-//                     </button>
-//                   ) : (
-//                     <a
-//                       href={post.url}
-//                       target="_blank"
-//                       rel="noopener noreferrer"
-//                       className="text-sm px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-//                     >
-//                       Visit
-//                     </a>
-//                   )}
-//                   <span className="flex items-center bg-gray-200 text-xs px-2 py-1 rounded-full text-gray-700">
-//                     <FaTag className="mr-1" />
-//                     {post.source === "local" ? "FindMySecurity" : "Adzuna"}
-//                   </span>
-//                 </div>
-//               </div>
-//             </div>
-//           ))}
-
-//           {/* Pagination Controls */}
-//           <div className="flex justify-center items-center gap-4 mt-6">
-//             <button
-//               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-//               disabled={currentPage === 1}
-//               className={`px-4 py-2 rounded ${
-//                 currentPage === 1
-//                   ? "bg-gray-300 cursor-not-allowed"
-//                   : "bg-black text-white hover:bg-gray-800"
-//               }`}
-//             >
-//               Previous
-//             </button>
-//             <span className="text-sm text-gray-700">
-//               Page {currentPage} of {totalPages}
-//             </span>
-//             <button
-//               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-//               disabled={currentPage === totalPages}
-//               className={`px-4 py-2 rounded ${
-//                 currentPage === totalPages
-//                   ? "bg-gray-300 cursor-not-allowed"
-//                   : "bg-black text-white hover:bg-gray-800"
-//               }`}
-//             >
-//               Next
-//             </button>
-//           </div>
-//         </>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default PostAdLister;
