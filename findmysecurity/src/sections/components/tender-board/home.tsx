@@ -27,6 +27,7 @@ interface Release {
         countryName?: string;
       }[];
     }[];
+    url?: string;
   };
   awards?: {
     contractPeriod?: {
@@ -49,7 +50,7 @@ useEffect(() => {
     setLoading(true);
     try {
       const res = await fetch(
-        `https://www.contractsfinder.service.gov.uk/Published/Notices/OCDS/Search?q=${encodeURIComponent(query)}&page=${page}&pageSize=10`,
+        `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/tender/contracts?q=${encodeURIComponent(query)}&page=${page}&pageSize=10`,
         {
           method: 'GET',
          headers: {
@@ -93,86 +94,116 @@ useEffect(() => {
   };
 
   return (
-    <main className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Contracts Finder</h1>
+  <main className="px-4 mt-20 py-6 max-w-5xl mx-auto">
 
-      <form onSubmit={handleSearch} className="mb-4">
-        <input
-          type="text"
-          placeholder="Search contracts..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="border p-2 mr-2"
-        />
-        <button type="submit" className="bg-blue-600 text-white p-2 rounded">
-          Search
-        </button>
-      </form>
+  <h2 className="text-xl font-semibold mb-6 text-center text-gray-600">
+    Tender Board Listing
+  </h2>
 
-      {loading ? (
-        <p>Loading results...</p>
+  <form
+    onSubmit={handleSearch}
+    className="mb-6 flex flex-col sm:flex-row items-center justify-center gap-3"
+  >
+    <input
+      type="text"
+      placeholder="Search contracts..."
+      value={query}
+      onChange={(e) => setQuery(e.target.value)}
+      className="w-full sm:w-auto flex-grow border p-2 rounded"
+    />
+    <button
+      type="submit"
+      className="bg-black text-white px-5 py-2 rounded hover:bg-gray-300 transition w-full sm:w-auto"
+    >
+      Search
+    </button>
+  </form>
+
+  {loading ? (
+    <p className="text-center text-gray-600">Loading results...</p>
+  ) : (
+    <div>
+      {releases.length === 0 ? (
+        <p className="text-center text-gray-600">No contracts found.</p>
       ) : (
-        <div>
-          {releases.map((release) => {
-            const tender = release.tender || {};
-            const award = release.awards?.[0] || {};
-            const location =
-              tender.items?.[0]?.deliveryAddresses?.[0]?.postalCode ||
-              tender.items?.[0]?.deliveryAddresses?.[0]?.region ||
-              tender.items?.[0]?.deliveryAddresses?.[0]?.countryName ||
-              'N/A';
+        releases.map((release, index) => {
+          const tender = release.tender || {};
+          const award = release.awards?.[0] || {};
+          const address = tender.items?.[0]?.deliveryAddresses?.[0];
 
-            return (
-              <div key={release.ocid} className="border p-4 mb-4 rounded">
-                <h2 className="text-xl font-semibold">{tender.title || 'No Title'}</h2>
-                <p>{tender.description || 'No Description'}</p>
-                <p><strong>Location of Work:</strong> {location}</p>
-                <p><strong>Tender/Contract Type:</strong> {tender.procurementMethodDetails || 'N/A'}</p>
-                <p>
-                  <strong>Contract Duration:</strong>{' '}
-                  {tender.contractPeriod?.startDate || 'N/A'} to{' '}
-                  {tender.contractPeriod?.endDate || 'N/A'}
-                </p>
-                <p>
-                  <strong>Estimated Budget or Value:</strong>{' '}
-                  {tender.value
-                    ? `${tender.value.amount} ${tender.value.currency}`
-                    : 'N/A'}
-                </p>
-                <p>
-                  <strong>Deadline for Submission:</strong>{' '}
-                  {tender.tenderPeriod?.endDate || 'N/A'}
-                </p>
-                <p>
-                  <strong>Contract Start Date:</strong>{' '}
-                  {award.contractPeriod?.startDate || 'N/A'}
-                </p>
-                <p>
-                  <strong>Submission Method:</strong> Online
-                </p>
+          const location =
+            address?.postalCode ||
+            address?.region ||
+            address?.countryName ||
+            'N/A';
+
+          const startDate = tender.contractPeriod?.startDate || 'N/A';
+          const endDate = tender.contractPeriod?.endDate || 'N/A';
+          const value = tender.value
+            ? `${tender.value.amount} ${tender.value.currency}`
+            : 'N/A';
+          const deadline = tender.tenderPeriod?.endDate || 'N/A';
+          const contractStart = award.contractPeriod?.startDate || 'N/A';
+
+          return (
+            <div
+              key={`${tender.title}-${index}`}
+              className="border p-5 mb-5 rounded shadow-sm bg-white"
+            >
+              <h2 className="text-xl font-semibold mb-2">
+                {tender.title || 'No Title'}
+              </h2>
+              <p className="mb-2 text-gray-700">
+                {tender.description || 'No Description available.'}
+              </p>
+
+              <div className="grid gap-2 sm:grid-cols-2 text-sm sm:text-base">
+                <p><strong>📍 Location:</strong> {location}</p>
+                <p><strong>📂 Type:</strong> {tender.procurementMethodDetails || 'N/A'}</p>
+                <p><strong>📅 Duration:</strong> {startDate} – {endDate}</p>
+                <p><strong>💰 Budget:</strong> {value}</p>
+                <p><strong>🕓 Submission Deadline:</strong> {deadline}</p>
+                <p><strong>🚀 Contract Start Date:</strong> {contractStart}</p>
+                <p><strong>📤 Submission Method:</strong> Online</p>
               </div>
-            );
-          })}
 
-          {/* Pagination */}
-          <div className="flex items-center gap-2 mt-6">
-            <button
-              onClick={() => handlePageChange(page - 1)}
-              disabled={page <= 1}
-              className="bg-gray-300 px-3 py-1 rounded disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <span>Page {page}</span>
-            <button
-              onClick={() => handlePageChange(page + 1)}
-              className="bg-gray-300 px-3 py-1 rounded"
-            >
-              Next
-            </button>
-          </div>
-        </div>
+              {tender['url'] ? (
+                <a
+                  href={tender['url']}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                >
+                  View Tender
+                </a>
+              ) : (
+                <p className="text-gray-500 italic mt-4">No tender URL available</p>
+              )}
+            </div>
+          );
+        })
       )}
-    </main>
+
+      {/* Pagination */}
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8">
+        <button
+          onClick={() => handlePageChange(page - 1)}
+          disabled={page <= 1}
+          className="bg-gray-300 px-4 py-2 rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <span className="font-medium text-gray-700">Page {page}</span>
+        <button
+          onClick={() => handlePageChange(page + 1)}
+          className="bg-gray-300 px-4 py-2 rounded"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  )}
+</main>
+
   );
 }
