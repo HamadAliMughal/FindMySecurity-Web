@@ -205,6 +205,22 @@ const PostAdLister: React.FC = () => {
 
   return (
     <div style={{ marginTop: "90px" }} className="min-h-screen bg-gray-100 p-6 md:px-32">
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #888;
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #666;
+        }
+      `}</style>
       <h1 className="text-4xl font-bold text-center text-gray-900 mb-8">
         Posted <span className="text-black">Job Ads</span>
       </h1>
@@ -287,7 +303,7 @@ const PostAdLister: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-2">
+                <div className="flex flex-col items-end gap-2 flex-shrink-0">
                   {post.source === 'local' || post.source === 'Find My Security' ? (
                     <div className="flex space-x-2">
                       <button
@@ -311,7 +327,7 @@ const PostAdLister: React.FC = () => {
                       onClick={() => handleApplyClick(post)}
                       className="text-sm px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                     >
-                      Apply
+                      Visit
                     </button>
                   )}
 
@@ -322,67 +338,67 @@ const PostAdLister: React.FC = () => {
                   className="fixed inset-0 z-50 overflow-y-auto"
                 >
                   <div className="flex items-center justify-center min-h-screen p-4">
-                    <div className="fixed inset-0 bg-black opacity-30" />
-                    <div className="relative bg-white rounded-lg max-w-2xl w-full p-6 shadow-xl">
+                    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity" />
+                    <div className="relative bg-white rounded-xl max-w-3xl w-full p-8 shadow-2xl transform transition-all">
                       {selectedJob && (
                         <>
-                          <Dialog.Title className="text-2xl font-bold mb-4">
+                          <Dialog.Title className="text-3xl font-bold mb-6 text-gray-900 border-b pb-4">
                             {selectedJob.jobTitle}
                           </Dialog.Title>
-                          <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <p className="font-semibold">Job Type:</p>
-                                <p>{selectedJob.jobType}</p>
+                          <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-4 custom-scrollbar">
+                            <div className="grid grid-cols-2 gap-6">
+                              <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="font-semibold text-gray-700 mb-2">Job Type</p>
+                                <p className="text-gray-900">{selectedJob.jobType}</p>
                               </div>
-                              <div>
-                                <p className="font-semibold">Industry:</p>
-                                <p>{selectedJob.industryCategory}</p>
+                              <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="font-semibold text-gray-700 mb-2">Industry</p>
+                                <p className="text-gray-900">{selectedJob.industryCategory}</p>
                               </div>
-                              <div>
-                                <p className="font-semibold">Location:</p>
-                                <p>{selectedJob.region} - {selectedJob.postcode}</p>
+                              <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="font-semibold text-gray-700 mb-2">Location</p>
+                                <p className="text-gray-900">{selectedJob.region} - {selectedJob.postcode}</p>
                               </div>
-                              <div>
-                                <p className="font-semibold">Salary:</p>
-                                <p>£{selectedJob.salaryRate} {selectedJob.salaryType}</p>
+                              <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="font-semibold text-gray-700 mb-2">Salary</p>
+                                <p className="text-gray-900">£{selectedJob.salaryRate} {selectedJob.salaryType}</p>
                               </div>
-                              <div>
-                                <p className="font-semibold">Experience Required:</p>
-                                <p>{selectedJob.requiredExperience} years</p>
+                              <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="font-semibold text-gray-700 mb-2">Experience Required</p>
+                                <p className="text-gray-900">{selectedJob.requiredExperience} years</p>
                               </div>
-                              <div>
-                                <p className="font-semibold">Required Licenses:</p>
-                                <p>{selectedJob.requiredLicences}</p>
+                              <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="font-semibold text-gray-700 mb-2">Required Licenses</p>
+                                <p className="text-gray-900">{selectedJob.requiredLicences}</p>
                               </div>
-                              <div>
-                                <p className="font-semibold">Shift & Hours:</p>
-                                <p>{selectedJob.shiftAndHours}</p>
+                              <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="font-semibold text-gray-700 mb-2">Shift & Hours</p>
+                                <p className="text-gray-900">{selectedJob.shiftAndHours}</p>
                               </div>
-                              <div>
-                                <p className="font-semibold">Start Date:</p>
-                                <p>{formatDate(selectedJob.startDate)}</p>
+                              <div className="bg-gray-50 p-4 rounded-lg">
+                                <p className="font-semibold text-gray-700 mb-2">Start Date</p>
+                                <p className="text-gray-900">{formatDate(selectedJob.startDate)}</p>
                               </div>
-                              <div>
-                                <p className="font-semibold">Application Deadline:</p>
-                                <p>{formatDate(selectedJob.deadline)}</p>
+                              <div className="bg-gray-50 p-4 rounded-lg col-span-2">
+                                <p className="font-semibold text-gray-700 mb-2">Application Deadline</p>
+                                <p className="text-gray-900">{formatDate(selectedJob.deadline)}</p>
                               </div>
                             </div>
-                            <div>
-                              <p className="font-semibold">Job Description:</p>
-                              <p className="whitespace-pre-wrap">{selectedJob.jobDescription}</p>
+                            <div className="bg-gray-50 p-4 rounded-lg mt-6">
+                              <p className="font-semibold text-gray-700 mb-3">Job Description</p>
+                              <p className="text-gray-900 whitespace-pre-wrap leading-relaxed">{selectedJob.jobDescription}</p>
                             </div>
                           </div>
-                          <div className="mt-6 flex justify-end space-x-3">
+                          <div className="mt-8 flex justify-end space-x-4 border-t pt-4">
                             <button
                               onClick={() => setIsModalOpen(false)}
-                              className="text-sm px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                              className="text-sm px-6 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200"
                             >
                               Close
                             </button>
                             <button
                               onClick={() => handleApplyClick(selectedJob)}
-                              className="text-sm px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+                              className="text-sm px-6 py-2.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200"
                             >
                               Apply Now
                             </button>
