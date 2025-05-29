@@ -1,24 +1,82 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Section from "./Section";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { API_URL } from "@/utils/path";
+import Select from 'react-select';
+import securityServices from '@/sections/data/secuirty_services.json';
+import trainingProviders from '@/sections/data/training_providers.json';
+import securityProfessionals from '@/sections/data/secuirty_professional.json';
+
+interface ServiceOption {
+  value: string;
+  label: string;
+  group: string;
+}
 
 const ServicesSection = ({ services, id }: { services: any; id: any }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [serviceOptions, setServiceOptions] = useState<ServiceOption[]>([]);
+  const [roleId, setRoleId] = useState<number>(0);
+
+  useEffect(() => {
+    const storedData = localStorage.getItem("loginData");
+    const parsedData = storedData ? JSON.parse(storedData) : null;
+    const currentRoleId = parsedData?.role?.id || parsedData?.roleId || 0;
+    setRoleId(currentRoleId);
+  }, []);
+
+  useEffect(() => {
+    let options: ServiceOption[] = [];
+    let data: { title: string; roles: string[] }[] = [];
+
+    switch(roleId) {
+      case 3: // Security Professional
+        data = securityProfessionals;
+        break;
+      case 5: // Security Company
+        data = securityServices;
+        break;
+      case 6: // Training Provider
+        data = trainingProviders;
+        break;
+      default:
+        data = [];
+    }
+
+    data.forEach(category => {
+      category.roles.forEach(role => {
+        options.push({
+          value: role,
+          label: role,
+          group: category.title
+        });
+      });
+    });
+
+    setServiceOptions(options);
+  }, [roleId]);
 
   if (!services) return null;
 
+  const selectedValues = services?.selectedServices?.map((service: string) => {
+    const option = serviceOptions.find(opt => opt.value === service);
+    return {
+      value: service,
+      label: service,
+      group: option?.group || ''
+    };
+  }) || [];
+
   const [formData, setFormData] = useState({
-    selectedServices: services?.selectedServices?.join(", ") || "",
+    selectedServices: selectedValues,
     otherService: services?.otherService || "",
   });
 
   const [updatedData, setUpdatedData] = useState({ ...formData });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleChange = (name: string, value: any) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSave = async () => {
@@ -31,10 +89,7 @@ const ServicesSection = ({ services, id }: { services: any; id: any }) => {
 
       const payload = {
         profileData: {
-          selectedServices: formData.selectedServices
-            .split(",")
-            .map((service: string) => service.trim())
-            .filter((service: string) => service.length > 0),
+          selectedServices: formData.selectedServices.map((service: ServiceOption) => service.value),
           otherService: formData.otherService,
         },
       };
@@ -79,13 +134,20 @@ const ServicesSection = ({ services, id }: { services: any; id: any }) => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Specializations (comma-separated)
               </label>
-              <input
-                type="text"
+              <Select
+                isMulti
                 name="selectedServices"
                 value={formData.selectedServices}
-                onChange={handleChange}
-                className="w-full border px-3 py-2 rounded text-gray-700"
-                placeholder="e.g., Web Development, Graphic Design"
+                onChange={(newValue) => handleChange('selectedServices', newValue)}
+                options={serviceOptions}
+                className="text-gray-700"
+                classNamePrefix="select"
+                placeholder="Select services..."
+                formatGroupLabel={(group) => (
+                  <div className="font-semibold">{group.label}</div>
+                )}
+                getOptionLabel={(option) => option.label}
+                getOptionValue={(option) => option.value}
               />
             </div>
             <div>
@@ -95,7 +157,7 @@ const ServicesSection = ({ services, id }: { services: any; id: any }) => {
               <textarea
                 name="otherService"
                 value={formData.otherService}
-                onChange={handleChange}
+                onChange={(e) => handleChange('otherService', e.target.value)}
                 className="w-full border px-3 py-2 rounded text-gray-700"
                 rows={4}
                 placeholder="Describe other services you offer"
@@ -123,16 +185,12 @@ const ServicesSection = ({ services, id }: { services: any; id: any }) => {
             <div className="mb-4">
               <h4 className="font-medium text-gray-800 mb-2">Specializations</h4>
               <div className="flex flex-wrap gap-2">
-                {updatedData.selectedServices
-                  .split(",")
-                  .map((service: string) => service.trim())
-                  .filter((service: string) => service.length > 0)
-                  .map((service: string, index: number) => (
+                {updatedData.selectedServices.map((service: ServiceOption, index: number) => (
                     <span
                       key={index}
                       className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full"
                     >
-                      {service}
+                      {service.value}
                     </span>
                   ))}
               </div>
@@ -159,41 +217,3 @@ const ServicesSection = ({ services, id }: { services: any; id: any }) => {
 };
 
 export default ServicesSection;
-
-
-
-
-
-
-
-// import React from "react";
-// import Section from "./Section";
-
-// const ServicesSection = ({ services , id}: { services: any , id :any}) => {
-//   if (!services) return null;
-
-//   return (
-//     <Section title="Services">
-//       {services.selectedServices?.length > 0 && (
-//         <div className="mb-4">
-//           <h4 className="font-medium text-gray-800 mb-2">Specializations</h4>
-//           <div className="flex flex-wrap gap-2">
-//             {services.selectedServices.map((service: string, index: number) => (
-//               <span key={index} className="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-//                 {service}
-//               </span>
-//             ))}
-//           </div>
-//         </div>
-//       )}
-//       {services.otherService && (
-//         <div>
-//           <h4 className="font-medium text-gray-800">Other Services</h4>
-//           <p className="text-gray-700">{services.otherService}</p>
-//         </div>
-//       )}
-//     </Section>
-//   );
-// };
-
-// export default ServicesSection;
