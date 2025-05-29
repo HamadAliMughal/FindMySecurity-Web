@@ -4,15 +4,27 @@ import { useState, useRef, useEffect } from 'react'
 import { ArrowLeft, Send } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import ChatMessage from '@/sections/components/chat-message'
 import TypingIndicator from '@/sections/components/typing-indicator'
+import toast from 'react-hot-toast'
 
 export default function ChatbotUI() {
+  const router = useRouter();
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'bot'; content: string }>>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('authToken')?.replace(/^"|"$/g, '');
+    if (!token) {
+      toast.error('Please login to use the chatbot');
+      router.push('/signin');
+      return;
+    }
+  }, [router]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -23,6 +35,13 @@ export default function ChatbotUI() {
   }, [messages, isTyping]);
 
   const handleSendMessage = async () => {
+    const token = localStorage.getItem('authToken')?.replace(/^"|"$/g, '');
+    if (!token) {
+      toast.error('Please login to use the chatbot');
+      router.push('/signin');
+      return;
+    }
+
     if (!input.trim()) return;
 
     const userMessage = input.trim();
@@ -35,7 +54,8 @@ export default function ChatbotUI() {
       const response = await fetch('https://fmschatbot.duckdns.org/ask', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ question: userMessage }),
       });

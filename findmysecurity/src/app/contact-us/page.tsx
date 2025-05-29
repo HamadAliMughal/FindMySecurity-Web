@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Mail, MapPin } from 'lucide-react';
+import { Mail, MapPin, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ContactUs() {
@@ -24,7 +24,7 @@ export default function ContactUs() {
 
       {/* Contact Cards Section */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Email Card */}
           <div 
             className="bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-shadow duration-300 cursor-pointer"
@@ -38,7 +38,7 @@ export default function ContactUs() {
               For any inquiries, feel free to drop us an email. We typically respond within 24 hours.
             </p>
             <p className="text-lg font-medium text-black">
-            info@findmysecurity.co.uk
+              info@findmysecurity.co.uk
             </p>
           </div>
 
@@ -52,13 +52,31 @@ export default function ContactUs() {
               Our main office is located in the heart of London.
             </p>
             <address className="text-lg font-medium text-black not-italic">
-            FindMySecurity Ltd <br />
-            Suite 5763, Unit 3A, 34-35 <br />
-            Hatton Garden Holborn, <br />
-            London, <br />
-            EC1N 8DX
+              FindMySecurity Ltd <br />
+              Suite 5763, Unit 3A, 34-35 <br />
+              Hatton Garden Holborn, <br />
+              London, <br />
+              EC1N 8DX
             </address>
           </div>
+
+          {/* AI Chatbot Card */}
+          <Link 
+            href="/chatbot-ui"
+            className="bg-white rounded-2xl shadow-xl p-8 hover:shadow-2xl transition-shadow duration-300 cursor-pointer group"
+          >
+            <div className="flex items-center mb-6">
+              <MessageSquare className="h-8 w-8 text-black mr-4 group-hover:scale-110 transition-transform duration-200" />
+              <h3 className="text-2xl font-semibold text-gray-900">AI Assistant</h3>
+            </div>
+            <p className="text-lg text-gray-600 mb-4">
+              Get instant help from our AI chatbot. Available 24/7 for your questions and support needs.
+            </p>
+            <div className="flex items-center">
+              <span className="text-lg font-medium text-black">Chat Now</span>
+              <div className="ml-2 w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            </div>
+          </Link>
         </div>
       </section>
     </div>

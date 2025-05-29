@@ -174,8 +174,14 @@ export default function JobPostingForm() {
             onSubmit={handleSubmit}
             sx={{
               display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+              gridTemplateColumns: { xs: '1fr', sm: '1fr', md: '1fr 1fr' },
               gap: 2,
+              '& > *': {
+                gridColumn: { xs: 'span 1', sm: 'span 1', md: 'span 1' }
+              },
+              '& > button[type="submit"]': {
+                gridColumn: { xs: 'span 1', sm: 'span 1', md: 'span 2' }
+              }
             }}
           >
             <div className="relative w-full">
