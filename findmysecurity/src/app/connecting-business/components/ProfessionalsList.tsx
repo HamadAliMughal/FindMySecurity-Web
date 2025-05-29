@@ -292,35 +292,43 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
       </AnimateOnScrollProvider>
 
       {showModal && (
-        <GenericModal
-          visible={showModal}
-          onClose={handleCloseModal}
-          widthClass="max-w-4xl"
-        >
-          <div className="p-4">
-            <h2 className="text-xl font-semibold mb-2">
-              {getDisplayName(professional)}'s Profile
-            </h2>
-            <p>{professional.profileData?.basicInfo?.profileHeadline}</p>
-            <p>More profile details...</p>
-          </div>
-        </GenericModal>
-      )}
+  <GenericModal
+    show={showModal}
+    onClose={handleCloseModal}
+    icon={null}
+    title={`${getDisplayName(professional)}'s Profile`}
+    message={professional.profileData?.basicInfo?.profileHeadline || "More profile details..."}
+    buttonText="Close"
+  />
+)}
 
-      {showLoginPrompt && (
-        <GenericModal visible={true} onClose={handleCloseLoginPrompt}>
-          <div className="p-4">
-            <h2 className="text-xl font-semibold mb-4">Login Required</h2>
-            <p>You need to be logged in to perform this action.</p>
-            <button
-              className="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md px-4 py-2"
-              onClick={handleCloseLoginPrompt}
-            >
-              Go to Login
-            </button>
-          </div>
-        </GenericModal>
-      )}
+{showLoginPrompt && (
+  <GenericModal
+    show={true}
+    onClose={handleCloseLoginPrompt}
+    icon={
+      <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
+        <svg
+          className="h-6 w-6 text-blue-600"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+      </div>
+    }
+    title="Login Required"
+    message="You need to be logged in to perform this action."
+    buttonText="Go to Login"
+  />
+)}
+
     </>
   );
 };

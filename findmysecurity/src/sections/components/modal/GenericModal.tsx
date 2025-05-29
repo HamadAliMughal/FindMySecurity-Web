@@ -1,29 +1,37 @@
-import { ReactNode } from "react";
+// components/GenericModal.tsx
+import React from "react";
 
-export interface GenericModalProps {
-  visible: boolean;
+interface GenericModalProps {
+  show: boolean;
+  icon?: React.ReactNode;
+  title: string;
+  message: string;
+  buttonText?: string;
   onClose: () => void;
-  widthClass?: string;
-  children: ReactNode; // ✅ Add this line
 }
+
 const GenericModal: React.FC<GenericModalProps> = ({
-  visible,
+  show,
+  icon,
+  title,
+  message,
+  buttonText = "Got it!",
   onClose,
-  widthClass = "max-w-md",
-  children,
 }) => {
-  if (!visible) return null;
+  if (!show) return null;
 
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
-      onClick={onClose}
-    >
-      <div
-        className={`bg-white rounded-lg shadow-lg p-6 ${widthClass}`}
-        onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
-      >
-        {children}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white p-6 rounded-lg max-w-md w-full shadow-lg text-center">
+        <div className="flex justify-center">{icon}</div>
+        <h3 className="mt-4 text-lg font-medium text-gray-900">{title}</h3>
+        <p className="mt-2 text-sm text-gray-600">{message}</p>
+        <button
+          onClick={onClose}
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+        >
+          {buttonText}
+        </button>
       </div>
     </div>
   );
