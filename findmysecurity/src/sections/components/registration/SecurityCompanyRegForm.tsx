@@ -10,6 +10,7 @@ import TextField from '@mui/material/TextField';
 import companiesList from "@/sections/data/secuirty_services.json";
 import providersList from "@/sections/data/training_providers.json";
 import toast from "react-hot-toast";
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 interface ClientGeneralFormProps {
   id: number;
@@ -60,6 +61,12 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
     hasSpecial: false,
     isValid: false
   });
+  const [phoneNumberInfo, setPhoneNumberInfo] = useState<{
+    isValid: boolean;
+    country?: string;
+    formatInternational?: string;
+    error?: string;
+  }>({ isValid: false });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isFormValid, setIsFormValid] = useState(false);
   const [showAllErrors, setShowAllErrors] = useState(false);
@@ -111,7 +118,22 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
     validations.isValid = Object.values(validations).slice(0, 5).every(Boolean);
     return validations;
   };
+  const validatePhoneNumber = (phone: string) => {
+    if (!phone.trim()) {
+      return { isValid: false, error: "Phone number is required" };
+    }
 
+    const phoneNumber = parsePhoneNumberFromString(phone);
+    if (!phoneNumber || !phoneNumber.isValid()) {
+      return { isValid: false, error: "Invalid phone number" };
+    }
+
+    return {
+      isValid: true,
+      country: phoneNumber.country,
+      formatInternational: phoneNumber.formatInternational(),
+    };
+  };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type, checked } = e.target as HTMLInputElement;
 
@@ -161,6 +183,13 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
       isValid = false;
     } else if (!validateEmail(formData.email)) {
       errors.email = "Please enter a valid email";
+      isValid = false;
+    }
+    if (!formData.phone.trim()) {
+      errors.phone = "Phone number is required";
+      isValid = false;
+    } else if (!phoneNumberInfo.isValid) {
+      errors.phone = phoneNumberInfo.error || "Invalid phone number";
       isValid = false;
     }
 
@@ -316,7 +345,27 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
     setFormSubmissionData(formattedData);
     setShowMembershipDialog(true);
   };
-
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setFormData(prev => ({ ...prev, phoneNumber: value }));
+    
+    // Clear previous errors - fix the type issue here
+    setFormErrors(prev => ({ ...prev, phoneNumber: "" }));
+    
+    if (value) {
+      const validation = validatePhoneNumber(value);
+      setPhoneNumberInfo(validation);
+      
+      if (!validation.isValid) {
+        setFormErrors(prev => ({ 
+          ...prev, 
+          phoneNumber: validation.error || "Invalid phone number" 
+        }));
+      }
+    } else {
+      setPhoneNumberInfo({ isValid: false });
+    }
+  };
   const handlePlanSelected = (plan: string) => {
     const finalData = {
       ...formSubmissionData,
@@ -762,6 +811,54 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
 
           {/* Phone */}
           <div className="relative flex items-center">
+        <FaPhone className="absolute left-3 top-3 text-gray-500" />
+        <TextField
+          type="text"
+          name="phoneNumber"
+          value={formData.phone}
+          onChange={handlePhoneNumberChange}
+          id="outlined-basic"
+          variant="outlined"
+          label="Phone Number"
+          className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
+            showAllErrors && formErrors.phoneNumber ? "border-red-500" : "border-gray-300"
+          } focus:border-black`}
+          InputLabelProps={{
+            style: { color: 'gray' },
+          }}
+          inputProps={{
+            className: "focus:outline-none"
+          }}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: showAllErrors && formErrors.phone ? "red" : "gray",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "black",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              color: "gray",
+            },
+            "& .Mui-focused .MuiInputLabel-root": {
+              color: "black",
+            },
+          }}
+        />
+        {(formData.phone && phoneNumberInfo.country) && (
+          <div className="mt-1 text-xs text-gray-500">
+            Country: {phoneNumberInfo.country}
+            {phoneNumberInfo.formatInternational && (
+              <span className="ml-2">({phoneNumberInfo.formatInternational})</span>
+            )}
+          </div>
+        )}
+        {(showAllErrors && formErrors.phoner) && (
+          <p className="mt-1 text-xs text-red-500">{formErrors.phone}</p>
+        )}
+      </div>
+          {/* <div className="relative flex items-center">
             <FaPhone className="absolute left-3 text-gray-700" />
             <TextField
               type="text" 
@@ -799,7 +896,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
               // className="w-full pl-10 pr-3 py-3 border border-gray-500 rounded-md bg-gray-100 focus-within:ring-2 focus-within:ring-black"
               required
             />
-          </div>
+          </div> */}
 
           {/* Website */}
           <div className="relative flex items-center">
