@@ -124,6 +124,7 @@ try {
 
     toast.success( response.data.message || "Favorite added successfully!");
   } catch (error: any) {
+    toast.error('Failed to add favorite:Already added')
     console.error("Failed to add favorite:", error?.response?.data || error.message);
     throw error;
   }

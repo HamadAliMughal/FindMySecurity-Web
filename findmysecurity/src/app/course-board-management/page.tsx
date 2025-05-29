@@ -175,7 +175,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     // Add other params here if needed
   });
 
-  const url = `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course/course-ads/?${params.toString()}`;
+  const url = ` https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/course/course-ads/postedBy/${userId}?${params.toString()}`;
 
   const response = await axios.get<CourseResponse>(url, {
     headers: {

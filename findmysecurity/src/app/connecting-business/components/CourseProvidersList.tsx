@@ -4,6 +4,8 @@ import GenericModal from "@/sections/components/modal/GenericModal";
 import { useRouter } from "next/navigation";
 import AnimateOnScrollProvider from "@/sections/components/animation/AnimateOnScrollProvider";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 interface CourseProvidersListProps {
   apiData: CourseProvidersApiResponse | null;
@@ -69,12 +71,38 @@ const CourseProviderCard = ({ provider }: { provider: CourseProvider }) => {
     }
   };
 
-  const handleFavorite = () => {
+  const handleFavorite = async (targetId : any) => {
     if (!token) {
       setShowLoginPrompt(true);
       return;
     }
+try {
+    const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
+    const userId = JSON.parse(localStorage.getItem("loginData") || "{}").id;
 
+    if (!token || !userId) {
+      throw new Error("Missing token or user ID");
+    }
+
+    const response = await axios.post(
+      "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/favorites",
+      {
+        userId,
+        targetUserId:targetId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    toast.success( response.data.message || "Favorite added successfully!");
+  } catch (error: any) {
+    console.error("Failed to add favorite:", error?.response?.data || error.message);
+    throw error;
+  }
     setIsFavorited((prev) => !prev); // Toggle favorited state
     // Optionally, add API call here to persist the favorite status
   };
@@ -139,7 +167,7 @@ const CourseProviderCard = ({ provider }: { provider: CourseProvider }) => {
 
           <div className="flex flex-col items-end gap-2">
             <button
-              onClick={handleFavorite}
+              onClick={()=>handleFavorite(provider.id)}
               className="px-4 py-2 rounded-lg text-sm font-medium transition-all shadow flex items-center gap-2"
               title={token ? (isFavorited ? "Remove from Favorites" : "Add to Favorites") : "Please login to favorite"}
             >
