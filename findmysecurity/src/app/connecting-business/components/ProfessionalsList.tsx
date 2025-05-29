@@ -162,9 +162,9 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
       setShowLoginPrompt(true);
       return;
     }
-    setShowModal(true);
+    router.push(`/public-profile/${professional.userId}`);
   };
-
+  
   const handleCloseModal = () => setShowModal(false);
   const handleCloseLoginPrompt = () => {
     setShowLoginPrompt(false);
