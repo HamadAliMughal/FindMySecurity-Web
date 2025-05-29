@@ -135,10 +135,15 @@ const menuItems = [
     label: roleId !== 3 ? "My Job Applicants" : "Visitors",
     route: roleId !== 3 ? "/my-job-applicants" : "/visitors",
   },
+  ...((roleId === 3 || roleId === 6) ?[]:[ {
+    icon: <FaUserShield />,
+    label:  "My Job Applicants" ,
+    route: "/my-job-applicants",
+  }]),
 
-  ...(roleId !== 3 && isSubscriber && subscriptionTier !== "Basic"
-    ? [{ icon: <FaCogs />, label: "My Ads", route: "/my-ads" }]
-    : []),
+  ...((roleId === 3|| roleId === 6) && isSubscriber && subscriptionTier !== "Basic"
+    ? []
+    : [{ icon: <FaCogs />, label: "My Ads", route: "/my-ads" }]),
 
   ...(roleId === 5 || roleId === 6 || roleId === 7
     ? [{ icon: <FaSearch />, label: "Tender Board", route:"/tender-board-listing" }]
@@ -161,12 +166,13 @@ const menuItems = [
       ]
     : []),
 
-  ...(roleId !== 3
-    ? isSubscriber && subscriptionTier !== "Basic"
-      ? [{ icon: <FaAd />, label: "Post Free Ad", route: "/post-ad" }]
-      : []
-    : [{ icon: <FaAd />, label: "View Jobs", route: "/view-ads" }]),
-
+  ...((roleId === 3|| roleId === 6)
+   
+      ? []
+      : [{ icon: <FaAd />, label: "Post Free Ad", route: "/post-ad" }]
+  ),
+...(roleId === 3 || roleId === 6
+    ? [{ icon: <FaAd />, label: "View Jobs", route: "/view-ads" }]    :[]),
   ...(shouldShowCreateProfile
     ? [
         {
