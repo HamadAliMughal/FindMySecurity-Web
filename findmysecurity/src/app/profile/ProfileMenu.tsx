@@ -130,11 +130,7 @@ const menuItems = [
   { icon: <FaList />, label: "Courses", route: "/course-listing" },
   { icon: <FaHeart />, label: "My Favourites", route:'/my-favourites' },
 
-  {
-    icon: <FaUserShield />,
-    label: roleId !== 3 ? "My Job Applicants" : "Visitors",
-    route: roleId !== 3 ? "/my-job-applicants" : "/visitors",
-  },
+
   ...((roleId === 3 || roleId === 6) ?[]:[ {
     icon: <FaUserShield />,
     label:  "My Job Applicants" ,
