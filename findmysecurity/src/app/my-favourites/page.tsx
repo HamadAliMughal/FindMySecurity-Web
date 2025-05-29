@@ -9,9 +9,7 @@ interface TargetUser {
   firstName: string;
   lastName: string;
   screenName: string;
-  profile: {
-    image?: string;
-  } | null;
+  profile: string| null;
 }
 
 interface FavoriteItem {
@@ -99,8 +97,9 @@ const FavoriteListPage = () => {
         <div className="grid gap-6">
           {favorites.map((item) => {
             const profileImage =
-              item.targetUser.profile?.image ||
-              "/images/profile.png";
+              item.targetUser.profile
+                ? item.targetUser.profile
+                : "/images/profile.png";
 
             return (
               <div
