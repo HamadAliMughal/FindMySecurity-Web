@@ -31,6 +31,7 @@ export interface MarkerData {
   }
   
   export interface ProfileData {
+    experience: any;
     basicInfo?: {
       screenName?: string;
       profileHeadline?: string;
