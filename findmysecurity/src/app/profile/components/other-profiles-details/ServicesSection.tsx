@@ -31,6 +31,7 @@ interface Props {
 
 const ServicesSection = ({ profile, userId, roleId }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
     selectedRoles: [] as RoleSelection[],
     otherService: "",
@@ -51,6 +52,77 @@ const ServicesSection = ({ profile, userId, roleId }: Props) => {
     }
   };
 
+  // Transform backend data to match expected format
+  const transformBackendData = (profileData: any) => {
+    const services = profileData?.securityServicesOfferings || profileData?.serviceRequirements || [];
+    const selectedRoles = services.map((service: string) => {
+      const category = getRoleList().find((cat: any) => cat.roles.includes(service));
+      return {
+        title: category?.title.replace(" (Coming Soon)", "") || "Unknown Category",
+        role: service,
+      };
+    });
+    return {
+      selectedRoles,
+      otherService: profileData?.otherService || "",
+    };
+  };
+
+  // Fetch data from backend on mount
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
+        if (!token) {
+          toast.error("Authorization token not found.");
+          return;
+        }
+
+        let endpoint = "";
+        switch (roleId) {
+          case 5:
+            endpoint = `${API_URL}/users/security-companies/${userId}`;
+            break;
+          case 6:
+            endpoint = `${API_URL}/users/course-providers/${userId}`;
+            break;
+          case 7:
+            endpoint = `${API_URL}/users/corporate-clients/${userId}`;
+            break;
+          default:
+            toast.error("Unknown role type.");
+            return;
+        }
+
+        const response = await axios.get(endpoint, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        const profileData = response.data?.profile || response.data || {};
+        const transformedData = transformBackendData(profileData);
+        setFormData(transformedData);
+        setUpdatedData(transformedData);
+      } catch (error: any) {
+        toast.error("Failed to fetch services.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Initialize with profile prop if available
+    if (profile?.securityServicesOfferings || profile?.serviceRequirements || profile?.otherService) {
+      const transformedData = transformBackendData(profile);
+      setFormData(transformedData);
+      setUpdatedData(transformedData);
+      setIsLoading(false);
+    } else {
+      fetchServices();
+    }
+  }, [profile, userId, roleId]);
+
   // Create role options from the appropriate list
   const roleOptions: RoleOption[] = getRoleList().flatMap((category: any) =>
     category.roles.map((role: string) => ({
@@ -66,26 +138,6 @@ const ServicesSection = ({ profile, userId, roleId }: Props) => {
     acc[option.group].push(option);
     return acc;
   }, {} as Record<string, RoleOption[]>);
-
-  useEffect(() => {
-    if (profile) {
-      // Initialize form data from profile
-      const selectedServices = profile.serviceRequirements || profile.securityServicesOfferings || [];
-      const selectedRoles = selectedServices.map((service: string) => ({
-        title: service, // This might need adjustment based on your data structure
-        role: service,
-      }));
-
-      setFormData({
-        selectedRoles,
-        otherService: profile.otherService || "",
-      });
-      setUpdatedData({
-        selectedRoles,
-        otherService: profile.otherService || "",
-      });
-    }
-  }, [profile]);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -112,38 +164,35 @@ const ServicesSection = ({ profile, userId, roleId }: Props) => {
       }
 
       const selectedServices = formData.selectedRoles.map((item) => item.role);
-
       const payloadData: any = {
         otherService: formData.otherService,
       };
 
-      if (roleId === 5 || roleId === 6) { // Security Company or Course Provider
+      if (roleId === 5 || roleId === 6) {
         payloadData.securityServicesOfferings = selectedServices;
       }
 
-      if (roleId === 6 || roleId === 7) { // Course Provider or Corporate Client
+      if (roleId === 6 || roleId === 7) {
         payloadData.serviceRequirements = selectedServices;
       }
 
       let endpoint = "";
       switch (roleId) {
         case 5:
-          endpoint = `${API_URL}/profile/security-companies/${userId}`;
+          endpoint = `${API_URL}/users/security-companies/${userId}`;
           break;
         case 6:
-          endpoint = `${API_URL}/profile/course-providers/${userId}`;
+          endpoint = `${API_URL}/users/course-providers/${userId}`;
           break;
         case 7:
-          endpoint = `${API_URL}/profile/corporate-clients/${userId}`;
+          endpoint = `${API_URL}/users/corporate-clients/${userId}`;
           break;
         default:
           toast.error("Unknown role type.");
           return;
       }
 
-      const payload = { ...profile, ...payloadData };
-
-      await axios.put(endpoint, payload, {
+      await axios.put(endpoint, payloadData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -164,7 +213,13 @@ const ServicesSection = ({ profile, userId, roleId }: Props) => {
     setIsEditing(false);
   };
 
-  if (!profile) return null;
+  if (isLoading) {
+    return <Section title="Services"><p>Loading services...</p></Section>;
+  }
+
+  if (!profile && !updatedData.selectedRoles.length && !updatedData.otherService) {
+    return <Section title="Services"><p>No services available.</p></Section>;
+  }
 
   return (
     <Section
@@ -176,7 +231,6 @@ const ServicesSection = ({ profile, userId, roleId }: Props) => {
     >
       {isEditing ? (
         <>
-          {/* Multi-Select Security Services */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {roleId === 5 ? "Security Services" : 
@@ -184,7 +238,6 @@ const ServicesSection = ({ profile, userId, roleId }: Props) => {
                "Business Services"}*{" "}
               <span className="ml-1 text-xs text-gray-500">(Select multiple if applicable)</span>
             </label>
-
             <Select
               isMulti
               options={Object.entries(groupedOptions).map(([label, options]) => ({
@@ -204,9 +257,6 @@ const ServicesSection = ({ profile, userId, roleId }: Props) => {
                   borderRadius: "8px",
                   borderColor: state.isFocused ? "#6366f1" : "#d1d5db",
                   boxShadow: state.isFocused ? "0 0 0 1px #6366f1" : "none",
-                  "&:hover": {
-                    borderColor: state.isFocused ? "#6366f1" : "#9ca3af"
-                  },
                   padding: "2px 4px",
                 }),
                 option: (provided, state) => ({
@@ -219,11 +269,6 @@ const ServicesSection = ({ profile, userId, roleId }: Props) => {
                     : state.isFocused
                     ? "#f3f4f6"
                     : "white",
-                  "&:active": {
-                    backgroundColor: "#e0e7ff"
-                  },
-                  display: "flex",
-                  alignItems: "center"
                 }),
                 multiValue: (provided, state) => ({
                   ...provided,
@@ -261,11 +306,6 @@ const ServicesSection = ({ profile, userId, roleId }: Props) => {
                   border: "1px solid #e5e7eb",
                   boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                 }),
-                placeholder: (provided) => ({
-                  ...provided,
-                  color: "#9ca3af",
-                  fontSize: "14px"
-                })
               }}
               formatGroupLabel={(group) => (
                 <div className="flex items-center justify-between">
@@ -281,8 +321,19 @@ const ServicesSection = ({ profile, userId, roleId }: Props) => {
                 <div className="flex items-center">
                   {option.isComingSoon && (
                     <span className="mr-2 text-gray-400">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
                     </span>
                   )}
@@ -295,12 +346,25 @@ const ServicesSection = ({ profile, userId, roleId }: Props) => {
               hideSelectedOptions={false}
               placeholder={
                 <div className="flex items-center text-gray-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
                   </svg>
-                  {roleId === 5 ? "Select security services..." : 
-                   roleId === 6 ? "Select training services..." : 
-                   "Select business services..."}
+                  {roleId === 5
+                    ? "Select security services..."
+                    : roleId === 6
+                    ? "Select training services..."
+                    : "Select business services..."}
                 </div>
               }
               noOptionsMessage={() => "No services found"}
@@ -308,14 +372,24 @@ const ServicesSection = ({ profile, userId, roleId }: Props) => {
                 IndicatorSeparator: () => null,
                 DropdownIndicator: () => (
                   <div className="pr-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </div>
                 ),
               }}
             />
-
             {formData.selectedRoles.length > 0 && (
               <p className="mt-2 text-xs text-gray-500">
                 Selected: {formData.selectedRoles.length} service(s)
@@ -336,17 +410,23 @@ const ServicesSection = ({ profile, userId, roleId }: Props) => {
           </div>
 
           <div className="flex gap-3 mt-4 justify-end">
-            <button onClick={handleSave} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+            <button
+              onClick={handleSave}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            >
               Save
             </button>
-            <button onClick={handleCancel} className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">
+            <button
+              onClick={handleCancel}
+              className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+            >
               Cancel
             </button>
           </div>
         </>
       ) : (
         <>
-          {updatedData.selectedRoles?.length > 0 && (
+          {updatedData.selectedRoles?.length > 0 ? (
             <div className="mb-4">
               <h4 className="font-medium text-gray-800 mb-2">Specializations</h4>
               <div className="flex flex-wrap gap-2">
@@ -360,6 +440,8 @@ const ServicesSection = ({ profile, userId, roleId }: Props) => {
                 ))}
               </div>
             </div>
+          ) : (
+            <p className="text-gray-500">No services selected.</p>
           )}
           {updatedData.otherService && (
             <div>
@@ -367,14 +449,12 @@ const ServicesSection = ({ profile, userId, roleId }: Props) => {
               <p className="text-gray-700 whitespace-pre-wrap">{updatedData.otherService}</p>
             </div>
           )}
-          {!isEditing && (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="text-sm px-5 py-2 mt-5 bg-black text-white rounded hover:bg-gray-800 transition"
-            >
-              Edit
-            </button>
-          )}
+          <button
+            onClick={() => setIsEditing(true)}
+            className="text-sm px-5 py-2 mt-5 bg-black text-white rounded hover:bg-gray-800 transition"
+          >
+            Edit
+          </button>
         </>
       )}
     </Section>
@@ -382,6 +462,8 @@ const ServicesSection = ({ profile, userId, roleId }: Props) => {
 };
 
 export default ServicesSection;
+
+
 
 
 
