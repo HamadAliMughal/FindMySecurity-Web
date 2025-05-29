@@ -7,7 +7,7 @@ export default function TypingIndicator() {
     <div className="flex items-end gap-2">
       <div className="w-8 h-8 rounded-full bg-slate-800 flex-shrink-0 flex items-center justify-center overflow-hidden">
         <Image
-          src="/icons/logo.jpg"
+          src="/pro-icons/FMS_logo_with_padding.png"
           alt="FindMySecurity Logo"
           width={32}
           height={32}

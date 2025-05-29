@@ -35,6 +35,9 @@ const securityCompanies = [
   { name: "security global", src: "/pro-icons/security-global.png" },
   { name: "Streetwise Security Services", src: "/pro-icons/Streetwise-Security-Services.svg" },
   { name: "Total Task Consultansy", src: "/pro-icons/Total-Task-Consultansy.webp" },
+  { name: "Partner from KSA", src: "/pro-icons/KSA Company.jpeg" },
+  { name: "Bengal tigers", src: "/pro-icons/Bengal tigers.jpeg" },
+  { name: "Insync insurance", src: "/pro-icons/Insync partner.jpeg" },
 ];
 
 const TrustedCompanies = () => {
