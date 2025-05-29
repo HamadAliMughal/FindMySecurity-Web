@@ -830,7 +830,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Security Services*
+            Security Services required*
             <span className="ml-1 text-xs text-gray-500">(Select multiple if applicable)</span>
           </label>
 
