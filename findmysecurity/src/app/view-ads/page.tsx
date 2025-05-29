@@ -74,7 +74,7 @@ const PostAdLister: React.FC = () => {
     const currentId = data?.id || data?.user?.id;
 
     try {
-      const res = await axios.get(`${API_URL}/security-jobs`, {
+      const res = await axios.get(`${API_URL}/security-jobs?keyword=${keyword}&location=${location}&minSalary=${rateFilter}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -220,7 +220,7 @@ const PostAdLister: React.FC = () => {
           </div>
         </div>
         <div>
-          <label className="text-sm font-semibold">Max Pay Rate</label>
+          <label className="text-sm font-semibold">Min Pay Rate</label>
           <div className="flex items-center space-x-2">
             <FaMoneyBillWave className="text-gray-500" />
             <input
