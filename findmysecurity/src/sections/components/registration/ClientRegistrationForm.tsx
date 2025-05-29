@@ -299,7 +299,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-md">
       <h2 className="text-2xl font-bold text-center my-4 text-black">
-  Free {roleid === 3 ? "Registration - " : "Individuals Seeking Security For"}  {title}
+  Free {roleid === 3 ? "Registration - " : "Registration"}  {title}
 </h2>
 
       {/* <h2 className="text-2xl font-bold text-center my-4 text-black">Free Registration For {title}</h2> */}
