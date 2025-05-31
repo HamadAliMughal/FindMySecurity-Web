@@ -14,12 +14,12 @@ interface ProfessionalsListProps {
 }
 
 const getDisplayName = (professional: Professional) =>
-  professional.profileData?.basicInfo?.screenName ||
+  professional?.profile?.screenName ||
   `${professional.user.firstName} ${professional.user.lastName}`;
 
 const getHourlyRate = (professional: Professional) =>
-  professional.profileData?.fees?.hourlyRate
-    ? `£${professional.profileData.fees.hourlyRate}/hr`
+  professional.profile?.hourlyRate
+    ? `£${professional.profile?.hourlyRate}/hr`
     : "Rate not specified";
 
 export default function ProfessionalsList({
@@ -181,9 +181,9 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
           {/* Profile Content */}
           <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-4">
             <div className="flex-shrink-0">
-              {professional.profileData?.profilePhoto ? (
+              {professional.profile?.profilePhoto || professional.user.profile? (
                 <img
-                  src={professional.profileData.profilePhoto}
+                  src={professional?.profile?.profilePhoto? professional?.profile.profilePhoto : professional.user.profile}
                   alt="Profile"
                   className={`w-20 h-20 rounded-full object-cover border-2 border-indigo-200 shadow-sm ${
                     token ? "" : "blur-sm"
@@ -205,19 +205,19 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
                 >
                   {getDisplayName(professional)}
                 </h3>
-                {professional.profileData?.basicInfo?.profileHeadline && (
+                {professional.profile?.profileHeadline && (
                   <p
                     className={`text-gray-500 mt-1 text-sm ${
                       token ? "" : "blur-sm"
                     }`}
                   >
-                    {professional.profileData.basicInfo.profileHeadline}
+                    {professional.profile?.profileHeadline}
                   </p>
                 )}
               </div>
 
               <div className={`mt-3 flex flex-wrap gap-2 ${token ? "" : "blur-sm"}`}>
-                {professional.profileData?.services?.selectedServices?.slice(0, 3).map((service, index) => (
+                {professional.profile?.securityServicesOfferings.slice(0, 3).map((service, index) => (
                   <span
                     key={index}
                     className="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full border border-indigo-200"
@@ -225,9 +225,9 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
                     {service}
                   </span>
                 ))}
-                {(professional.profileData?.services?.selectedServices?.length ?? 0) > 3 && (
+                {(professional.profile?.serviceRequirements.length ?? 0) > 3 && (
                   <span className="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full border border-indigo-200">
-                    +{(professional.profileData?.services?.selectedServices?.length ?? 0) - 3} more
+                    +{(professional.profile?.serviceRequirements.length ?? 0) - 3} more
                   </span>
                 )}
               </div>
@@ -254,13 +254,13 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
                 >
                   {getHourlyRate(professional)}
                 </span>
-                {professional.profileData?.experience?.years && (
+                {professional.profile?.experience && (
                   <span
                     className={`text-gray-500 text-sm ${
                       token ? "" : "blur-sm"
                     }`}
                   >
-                    {professional.profileData.experience.years} years exp.
+                    {professional.profile.experience} years exp.
                   </span>
                 )}
               </div>
@@ -297,7 +297,7 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
     onClose={handleCloseModal}
     icon={null}
     title={`${getDisplayName(professional)}'s Profile`}
-    message={professional.profileData?.basicInfo?.profileHeadline || "More profile details..."}
+    message={professional.profile?.profileHeadline || "More profile details..."}
     buttonText="Close"
   />
 )}

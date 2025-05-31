@@ -49,6 +49,7 @@ const ClientGeneralForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSubm
     phoneNumber: "",
     dateOfBirth: { day: "", month: "", year: "" },
     address: "",
+    terms:false,
     postcode: "",
   });
 
@@ -389,9 +390,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           color: "black", // Label color when focused
         },
       }}
-      // className={`w-full pl-10 pr-10 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
-      //   (showAllErrors && formErrors.password) ? "border-red-500" : "border-gray-300"
-      // }`}
+    
     />
     <button
       type="button"
@@ -515,9 +514,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             color: "black", // Label color when focused
           },
         }}
-        // className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
-        //   (showAllErrors && formErrors.lastName) ? "border-red-500" : "border-gray-300"
-        // }`}
+      
       />
       {(showAllErrors && formErrors.lastName) && (
         <p className="mt-1 text-xs text-red-500">{formErrors.lastName}</p>
@@ -614,47 +611,6 @@ const handleSubmit = async (e: React.FormEvent) => {
           <p className="mt-1 text-xs text-red-500">{formErrors.phoneNumber}</p>
         )}
       </div>
-
-  {/* <div className="relative">
-    <FaPhone className="absolute left-3 top-3 text-gray-500" />
-    <TextField
-      type="text"
-      name="phoneNumber"
-      value={formData.phoneNumber}
-      onChange={handleChange}
-            id="outlined-basic"
-      variant="outlined"
-      label="Phone Number"
-      className={`w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black ${
-        showAllErrors && formErrors.email ? "border-red-500" : "border-gray-300"
-      } focus:border-black`} // Ensuring black border on focus
-      InputLabelProps={{
-        style: { color: 'gray' }, // Default label color
-      }}
-      inputProps={{
-        className: "focus:outline-none" // Optional to remove outline when focused
-      }}
-      sx={{
-        "& .MuiOutlinedInput-root": {
-          "& fieldset": {
-            borderColor: showAllErrors && formErrors.email ? "red" : "gray", // Border color for normal state
-          },
-          "&.Mui-focused fieldset": {
-            borderColor: "black", // Black border when focused
-          },
-        },
-        "& .MuiInputLabel-root": {
-          color: "gray", // Default label color
-        },
-        "& .Mui-focused .MuiInputLabel-root": {
-          color: "black", // Label color when focused
-        },
-      }}
-      // className="w-full pl-10 pr-3 py-2 border rounded-md bg-gray-100 focus:ring-2 focus:ring-black"
-    />
-  </div> */}
-
-  {/* Date of Birth */}
   <div>
     <label className="block text-sm font-medium">Date of Birth</label>
     <div className="grid grid-cols-3 gap-2">
@@ -792,6 +748,23 @@ const handleSubmit = async (e: React.FormEvent) => {
       <p className="mt-1 text-xs text-red-500">{formErrors.address}</p>
     )}
   </div>
+<div className="flex items-start space-x-2">
+  <input
+    type="checkbox"
+    id="terms"
+    name="terms"
+    checked={formData.terms}
+    onChange={handleChange}
+    required
+    className="mt-1"
+  />
+  <label htmlFor="terms" className="text-sm text-gray-700">
+    I agree to the&nbsp;
+    <a href="/legal/terms" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+      Terms and Conditions
+    </a>
+  </label>
+</div>
 
   {/* Submit Button */}
   <button 

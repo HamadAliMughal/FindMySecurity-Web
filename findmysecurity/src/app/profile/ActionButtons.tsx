@@ -465,9 +465,15 @@ if (isSubscriber && tier !== 'Basic') {
               : "Mr. Y"}
           </h2>
           <h2 className="text-xl text-gray-600">{formData?.screenName ?? "Mr."}</h2>
+          {roleId === 3 ? ( <p className="text-gray-500">
+            
+            {"Security Professional"}</p>):(
+          
           <p className="text-gray-500">
+            
             {loginData?.role?.name ?? loginData?.role ?? "Security Officer"}
           </p>
+            )}
           <span className="text-sm text-yellow-500">
             ✅ Usually responds within 1 hour
           </span>

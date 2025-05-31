@@ -35,15 +35,15 @@ const UserProfile: React.FC = () => {
       localStorage.setItem("loginData", JSON.stringify(data));
       setLoginData(data);
       if (
-        data?.role?.id === 3 &&
-        !(data?.user?.individualProfessional || data?.individualProfessional)
+        (data?.role?.id === 3|| data?.roleId===3) &&
+        !(data?.user?.individualProfessional || data?.individualProfessional?.profile?.weeklySchedule) 
       ) {
-        const interval = setInterval(() => {
-          if (window.confirm("Make your public profile?")) {
-            clearInterval(interval); // Clear immediately after confirmation
-            router.push("/public-profile");
-          }
-        }, 5000);
+           if (typeof window !== "undefined" && window.location.pathname === "/profile") {
+      const interval = setInterval(() => {
+        toast.error("You have not created your public profile yet. Please do so to enhance your visibility.");
+        // Show only once
+      }, 5000);
+    }
       }
       // if (
       //   data?.role?.id === 3 &&

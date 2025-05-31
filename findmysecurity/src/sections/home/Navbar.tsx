@@ -17,7 +17,7 @@ export default function Navbar() {
   const router = useRouter();
 
   useEffect(() => {
-    const storedData = localStorage.getItem("loginData");
+    const storedData = localStorage.getItem("authToken");
     if (storedData) {
       setProfileData(JSON.parse(storedData)); // Parse JSON data
     }
@@ -32,7 +32,7 @@ export default function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
 
-  }, [router]);
+  });
   const handleLogout = () => {
     localStorage.removeItem("loginData"); // Remove user session
     localStorage.removeItem("profileData"); // Remove user session

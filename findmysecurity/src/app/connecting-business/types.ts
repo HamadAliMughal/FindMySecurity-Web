@@ -28,39 +28,41 @@ export interface MarkerData {
     address: string;
     email: string;
     validated: boolean;
+     profile: string;
   }
   
-  export interface ProfileData {
-    experience: any;
-    basicInfo?: {
-      screenName?: string;
-      profileHeadline?: string;
-    };
-    about?: {
-      aboutMe?: string;
-      experience?: string;
-      qualifications?: string;
-    };
-    services?: {
-      selectedServices?: string[];
-    };
-    fees?: {
-      hourlyRate?: number;
-    };
-    contact?: {
-      website?: string;
-      homeTelephone?: string;
-      mobileTelephone?: string;
-    };
-    profilePhoto?: string;
-  }
+
+ export interface Profile {
+  id: number;
+  individualProfessionalId: number;
+  hourlyRate: string;
+  feesDescription: string | null;
+  aboutMe: string;
+  experience: string;
+  qualifications: string;
+  website: string;
+  homeTelephone: string;
+  mobileTelephone: string;
+  otherService: string;
+  serviceRequirements: string[];
+  securityServicesOfferings: string[];
+  gender: string;
+  postcode: string;
+  screenName: string;
+  profilePhoto: string;
+  profileHeadline: string;
+  availabilityDescription: string | null;
+
+  createdAt: string; // ISO 8601 Date string
+  updatedAt: string; // ISO 8601 Date string
+}
   export interface Professional {
     permissions: boolean;
     name: any;
     id: number;
     userId: number;
     user: User;
-    profileData?: ProfileData;
+    profile?: Profile;
     createdAt: string;
   }
   
