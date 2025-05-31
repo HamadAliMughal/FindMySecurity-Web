@@ -563,12 +563,15 @@ const UserProfileCard = ({ user }: UserProfileCardProps) => {
           </div>
         </div>
       </div>
+      {role != "IndividualProfessional" && (
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-10 mt-10 bg-white rounded-lg shadow p-6">
         <Section label="Date of Birth" value={dateOfBirth} />
         <Section label="Address" value={address} />
         {postcode && <Section label="Postcode" value={postcode} />}
         {screenName && <Section label="Screen Name" value={profileData?.screenName || screenName} />}
       </div>
+      )}
+
       <ProfileGroup title="Basic Info" data={basicInfo} />
       <ProfileGroup title="About" data={aboutMe} />
       <ProfileGroup title="Fees" data={fee} />
