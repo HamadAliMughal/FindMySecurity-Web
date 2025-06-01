@@ -1092,7 +1092,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               className={`w-4 h-4 ${(showAllErrors && formErrors.acceptTerms) ? "border-red-500" : ""}`}
             />
             <span>
-              Agree to <a href="#" className="underline">Terms & Conditions</a>
+              Agree to <a href="/legal/terms" target="_blank" rel="noopener noreferrer" className="underline">Terms & Conditions</a>
             </span>
             {(showAllErrors && formErrors.acceptTerms) && (
               <p className="mt-1 text-xs text-red-500">{formErrors.acceptTerms}</p>
