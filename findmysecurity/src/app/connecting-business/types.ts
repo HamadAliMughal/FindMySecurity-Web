@@ -65,13 +65,57 @@ export interface MarkerData {
     profile?: Profile;
     createdAt: string;
   }
-  
-  export interface ApiResponse {
-    totalCount: number;
-    page: number;
-    pageSize: number;
-    professionals: Professional[];
-  }
+  // types.ts
+export interface ApiResponse {
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  count: number;
+  lastPage: number;
+  professionals: Professional[];
+}
+
+export interface Professional {
+  id: number;
+  individualProfessionalId: number;
+  hourlyRate: string;
+  aboutMe?: string;
+  availabilityDescription?: string | null;
+  createdAt: string;
+  experience?: string;
+  feesDescription?: string | null;
+  gender?: string;
+  homeTelephone?: string;
+  mobileTelephone?: string;
+  otherService?: string;
+  postcode?: string;
+  profileHeadline?: string;
+  profilePhoto?: string;
+  qualifications?: string;
+  screenName?: string;
+  securityServicesOfferings: string[];
+  serviceRequirements?: string[];
+  updatedAt: string;
+  website?: string;
+  weeklySchedule?: {
+    Evening?: Record<string, boolean>;
+    Afternoon?: Record<string, boolean>;
+    Morning?: Record<string, boolean>;
+    Overnight?: Record<string, boolean>;
+  };
+  individualProfessional: {
+    id: number;
+    userId: number;
+    permissions: Record<string, any>;
+    createdAt: string;
+    updatedAt: string;
+    user?: {
+      firstName?: string;
+      lastName?: string;
+      address?: string;
+    };
+  };
+}
   
 
 

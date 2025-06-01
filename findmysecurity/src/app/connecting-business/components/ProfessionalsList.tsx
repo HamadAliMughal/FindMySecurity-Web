@@ -1,26 +1,90 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { ApiResponse, Professional } from "../types";
-import GenericModal from "@/sections/components/modal/GenericModal";
 import { useRouter } from "next/navigation";
+import GenericModal from "@/sections/components/modal/GenericModal";
 import AnimateOnScrollProvider from "@/sections/components/animation/AnimateOnScrollProvider";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import axios from "axios";
 import toast from "react-hot-toast";
 
+interface Professional {
+  id: number;
+  individualProfessionalId: number;
+  hourlyRate: string;
+  aboutMe?: string;
+  availabilityDescription?: string | null;
+  createdAt: string;
+  experience?: string;
+  feesDescription?: string | null;
+  gender?: string;
+  homeTelephone?: string;
+  mobileTelephone?: string;
+  otherService?: string;
+  postcode?: string;
+  profileHeadline?: string;
+  profilePhoto?: string;
+  qualifications?: string;
+  screenName?: string;
+  securityServicesOfferings: string[];
+  serviceRequirements?: string[];
+  updatedAt: string;
+  website?: string;
+  weeklySchedule?: {
+    Evening?: Record<string, boolean>;
+    Afternoon?: Record<string, boolean>;
+    Morning?: Record<string, boolean>;
+    Overnight?: Record<string, boolean>;
+  };
+  individualProfessional: {
+    id: number;
+    userId: number;
+    permissions: Record<string, any>;
+    createdAt: string;
+    updatedAt: string;
+    user?: {
+      firstName?: string;
+      lastName?: string;
+      address?: string;
+    };
+  };
+}
+
 interface ProfessionalsListProps {
-  apiData: ApiResponse | null;
+  apiData: {
+    totalCount: number;
+    page: number;
+    pageSize: number;
+    count: number;
+    lastPage: number;
+    professionals: Professional[];
+  } | null;
   loading: boolean;
   error: string | null;
 }
 
-const getDisplayName = (professional: Professional) =>
-  professional?.profile?.screenName ||
-  `${professional.user.firstName} ${professional.user.lastName}`;
-
-const getHourlyRate = (professional: Professional) =>
-  professional.profile?.hourlyRate
-    ? `£${professional.profile?.hourlyRate}/hr`
-    : "Rate not specified";
+// const LocationIcon = () => (
+//   <svg
+//     xmlns="http://www.w3.org/2000/svg"
+//     className="h-4 w-4"
+//     fill="none"
+//     viewBox="0 0 24 24"
+//     stroke="currentColor"
+//   >
+//     <path
+//       strokeLinecap="round"
+//       strokeLinejoin="round"
+//       strokeWidth={2}
+//       d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+//     />
+//     <path
+//       strokeLinecap="round"
+//       strokeLinejoin="round"
+//       strokeWidth={2}
+//       d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+//     />
+//   </svg>
+// );
 
 export default function ProfessionalsList({
   apiData,
@@ -67,6 +131,7 @@ export default function ProfessionalsList({
     </div>
   );
 }
+
 const ProfessionalCard = ({ professional }: { professional: Professional }) => {
   const [showModal, setShowModal] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
@@ -83,7 +148,7 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
       ? JSON.parse(localStorage.getItem("loginData") || "{}").id
       : null;
 
-  const isFavorited = favorites.includes(professional.userId);
+  const isFavorited = favorites.includes(professional.individualProfessional.userId);
 
   useEffect(() => {
     if (!token || !userId) return;
@@ -162,7 +227,7 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
       setShowLoginPrompt(true);
       return;
     }
-    router.push(`/public-profile/${professional.userId}`);
+    router.push(`/public-profile/${professional.individualProfessional.userId}`);
   };
   
   const handleCloseModal = () => setShowModal(false);
@@ -170,6 +235,14 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
     setShowLoginPrompt(false);
     router.push("/signin");
   };
+
+  const getDisplayName = () => 
+    professional?.screenName || 
+    `${professional.individualProfessional?.user?.firstName || ''} ${professional.individualProfessional?.user?.lastName || ''}`.trim() || 
+    'No name provided';
+
+  const getHourlyRate = () =>
+    professional?.hourlyRate ? `£${professional.hourlyRate}/hr` : "Rate not specified";
 
   return (
     <>
@@ -181,9 +254,9 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
           {/* Profile Content */}
           <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-4">
             <div className="flex-shrink-0">
-              {professional.profile?.profilePhoto || professional.user.profile? (
+              {professional?.profilePhoto ? (
                 <img
-                  src={professional?.profile?.profilePhoto? professional?.profile.profilePhoto : professional.user.profile}
+                  src={professional.profilePhoto}
                   alt="Profile"
                   className={`w-20 h-20 rounded-full object-cover border-2 border-indigo-200 shadow-sm ${
                     token ? "" : "blur-sm"
@@ -198,26 +271,18 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
 
             <div className="flex flex-col justify-between">
               <div>
-                <h3
-                  className={`text-xl font-semibold text-gray-900 ${
-                    token ? "" : "blur-sm"
-                  }`}
-                >
-                  {getDisplayName(professional)}
+                <h3 className={`text-xl font-semibold text-gray-900 ${token ? "" : "blur-sm"}`}>
+                  {getDisplayName()}
                 </h3>
-                {professional.profile?.profileHeadline && (
-                  <p
-                    className={`text-gray-500 mt-1 text-sm ${
-                      token ? "" : "blur-sm"
-                    }`}
-                  >
-                    {professional.profile?.profileHeadline}
+                {professional?.profileHeadline && (
+                  <p className={`text-gray-500 mt-1 text-sm ${token ? "" : "blur-sm"}`}>
+                    {professional.profileHeadline}
                   </p>
                 )}
               </div>
 
               <div className={`mt-3 flex flex-wrap gap-2 ${token ? "" : "blur-sm"}`}>
-                {professional.profile?.securityServicesOfferings.slice(0, 3).map((service, index) => (
+                {professional?.securityServicesOfferings?.slice(0, 3).map((service, index) => (
                   <span
                     key={index}
                     className="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full border border-indigo-200"
@@ -225,9 +290,9 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
                     {service}
                   </span>
                 ))}
-                {(professional.profile?.serviceRequirements.length ?? 0) > 3 && (
+                {(professional?.securityServicesOfferings?.length ?? 0) > 3 && (
                   <span className="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full border border-indigo-200">
-                    +{(professional.profile?.serviceRequirements.length ?? 0) - 3} more
+                    +{(professional.securityServicesOfferings?.length ?? 0) - 3} more
                   </span>
                 )}
               </div>
@@ -236,31 +301,19 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
 
           <div className="grid md:grid-cols-[1fr_auto] gap-4 mt-6 items-start">
             <div className="flex flex-col gap-2">
-              {professional.user.address && (
-                <p
-                  className={`text-sm text-gray-400 flex items-center gap-1 ${
-                    token ? "" : "blur-sm"
-                  }`}
-                >
+              {professional?.individualProfessional?.user?.address && (
+                <p className={`text-sm text-gray-400 flex items-center gap-1 ${token ? "" : "blur-sm"}`}>
                   <LocationIcon />
-                  {professional.user.address}
+                  {professional.individualProfessional.user.address}
                 </p>
               )}
               <div className="flex items-center gap-4">
-                <span
-                  className={`text-lg font-bold text-gray-900 ${
-                    token ? "" : "blur-sm"
-                  }`}
-                >
-                  {getHourlyRate(professional)}
+                <span className={`text-lg font-bold text-gray-900 ${token ? "" : "blur-sm"}`}>
+                  {getHourlyRate()}
                 </span>
-                {professional.profile?.experience && (
-                  <span
-                    className={`text-gray-500 text-sm ${
-                      token ? "" : "blur-sm"
-                    }`}
-                  >
-                    {professional.profile.experience} years exp.
+                {professional?.experience && (
+                  <span className={`text-gray-500 text-sm ${token ? "" : "blur-sm"}`}>
+                    {professional.experience} years exp.
                   </span>
                 )}
               </div>
@@ -268,70 +321,410 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
 
             <div className="flex gap-4 items-center justify-end">
               <button
-                className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-md px-4 py-2 text-sm font-semibold"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-md px-4 py-2 text-sm font-semibold cursor-pointer"
                 onClick={handleViewProfile}
               >
                 View Profile
               </button>
               <button
-                className="text-2xl text-indigo-600 hover:text-indigo-800 transition"
-                onClick={() => handleFavorite(professional.userId)}
-                title={
-                  isFavorited ? "Remove from favorites" : "Add to favorites"
-                }
-              >
-                {isFavorited ? (
-                  <FaHeart className="text-indigo-600" />
-                ) : (
-                  <FaRegHeart />
-                )}
-              </button>
+  className="text-2xl text-indigo-600 transition hover:scale-110 cursor-pointer"
+  onClick={() => handleFavorite(professional.individualProfessional.userId)}
+  title={isFavorited ? "Remove from favorites" : "Add to favorites"}
+>
+  {isFavorited ? (
+    <FaHeart className="text-indigo-600 hover:text-red-600 transition-colors duration-200" />
+  ) : (
+    <FaRegHeart className="hover:text-indigo-800 transition-colors duration-200" />
+  )}
+</button>
+
             </div>
           </div>
         </div>
       </AnimateOnScrollProvider>
 
       {showModal && (
-  <GenericModal
-    show={showModal}
-    onClose={handleCloseModal}
-    icon={null}
-    title={`${getDisplayName(professional)}'s Profile`}
-    message={professional.profile?.profileHeadline || "More profile details..."}
-    buttonText="Close"
-  />
-)}
+        <GenericModal
+          show={showModal}
+          onClose={handleCloseModal}
+          icon={null}
+          title={`${getDisplayName()}'s Profile`}
+          message={professional.profileHeadline || "More profile details..."}
+          buttonText="Close"
+        />
+      )}
 
-{showLoginPrompt && (
-  <GenericModal
-    show={true}
-    onClose={handleCloseLoginPrompt}
-    icon={
-      <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
-        <svg
-          className="h-6 w-6 text-blue-600"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-          />
-        </svg>
-      </div>
-    }
-    title="Login Required"
-    message="You need to be logged in to perform this action."
-    buttonText="Go to Login"
-  />
-)}
-
+      {showLoginPrompt && (
+        <GenericModal
+          show={true}
+          onClose={handleCloseLoginPrompt}
+          icon={
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
+              <svg
+                className="h-6 w-6 text-blue-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+            </div>
+          }
+          title="Login Required"
+          message="You need to be logged in to perform this action."
+          buttonText="Go to Login"
+        />
+      )}
     </>
   );
 };
+
+
+
+
+
+
+
+
+// import { useEffect, useState } from "react";
+// import { ApiResponse, Professional } from "../types";
+// import GenericModal from "@/sections/components/modal/GenericModal";
+// import { useRouter } from "next/navigation";
+// import AnimateOnScrollProvider from "@/sections/components/animation/AnimateOnScrollProvider";
+// import { FaHeart, FaRegHeart } from "react-icons/fa";
+// import axios from "axios";
+// import toast from "react-hot-toast";
+
+// interface ProfessionalsListProps {
+//   apiData: ApiResponse | null;
+//   loading: boolean;
+//   error: string | null;
+// }
+
+// const getDisplayName = (professional: Professional) =>
+//   professional?.profile?.screenName ||
+//   `${professional.user.firstName} ${professional.user.lastName}`;
+
+// const getHourlyRate = (professional: Professional) =>
+//   professional.profile?.hourlyRate
+//     ? `£${professional.profile?.hourlyRate}/hr`
+//     : "Rate not specified";
+
+// export default function ProfessionalsList({
+//   apiData,
+//   loading,
+//   error,
+// }: ProfessionalsListProps) {
+//   return (
+//     <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-5xl mx-auto my-20">
+//       <div className="flex justify-between items-center mb-4">
+//         <h2 className="text-lg md:text-xl font-semibold">
+//           Available Professionals{" "}
+//           {apiData && `(${apiData.totalCount} found)`}
+//         </h2>
+//       </div>
+
+//       {loading && (
+//         <div className="flex justify-center items-center py-10">
+//           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black"></div>
+//         </div>
+//       )}
+
+//       {error && (
+//         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+//           {error}
+//         </div>
+//       )}
+
+//       {!loading && apiData && (
+//         apiData.professionals.length > 0 ? (
+//           <div className="grid grid-cols-1 gap-6">
+//             {apiData.professionals.map((professional) => (
+//               <ProfessionalCard
+//                 key={professional.id}
+//                 professional={professional}
+//               />
+//             ))}
+//           </div>
+//         ) : (
+//           <div className="text-center py-10 text-gray-500 bg-white rounded-lg border border-gray-200">
+//             No professionals found matching your criteria.
+//           </div>
+//         )
+//       )}
+//     </div>
+//   );
+// }
+// const ProfessionalCard = ({ professional }: { professional: Professional }) => {
+//   const [showModal, setShowModal] = useState(false);
+//   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+//   const [favorites, setFavorites] = useState<number[]>([]);
+//   const router = useRouter();
+
+//   const token =
+//     typeof window !== "undefined"
+//       ? localStorage.getItem("authToken")?.replace(/^"|"$/g, "")
+//       : null;
+
+//   const userId =
+//     typeof window !== "undefined"
+//       ? JSON.parse(localStorage.getItem("loginData") || "{}").id
+//       : null;
+
+//   const isFavorited = favorites.includes(professional.userId);
+
+//   useEffect(() => {
+//     if (!token || !userId) return;
+
+//     const fetchFavorites = async () => {
+//       try {
+//         const response = await axios.get(
+//           `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/favorites/${userId}`,
+//           { headers: { Authorization: `Bearer ${token}` } }
+//         );
+
+//         const favoritesArray = Array.isArray(response.data)
+//           ? response.data
+//           : response.data.data || response.data.favorites || [];
+
+//         setFavorites(favoritesArray.map((fav: any) => fav.targetUserId));
+//       } catch (err) {
+//         console.error("Failed to fetch favorites:", err);
+//       }
+//     };
+
+//     fetchFavorites();
+//   }, [token, userId]);
+
+//   const handleFavorite = async (targetId: number) => {
+//     if (!token) {
+//       setShowLoginPrompt(true);
+//       return;
+//     }
+
+//     const alreadyFavorited = favorites.includes(targetId);
+
+//     try {
+//       if (alreadyFavorited) {
+//         // REMOVE from favorites
+//         await axios.delete(
+//           "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/favorites",
+//           {
+//             data: { userId, targetUserId: targetId },
+//             headers: {
+//               Authorization: `Bearer ${token}`,
+//               "Content-Type": "application/json",
+//             },
+//           }
+//         );
+
+//         toast.success("Favorite successfully removed!");
+//         setFavorites((prev) => prev.filter((id) => id !== targetId));
+//       } else {
+//         // ADD to favorites
+//         const response = await axios.post(
+//           "https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/favorites",
+//           { userId, targetUserId: targetId },
+//           {
+//             headers: {
+//               Authorization: `Bearer ${token}`,
+//               "Content-Type": "application/json",
+//             },
+//           }
+//         );
+
+//         toast.success(response.data.message || "Favorite added!");
+//         setFavorites((prev) => [...prev, targetId]);
+//       }
+//     } catch (error: any) {
+//       toast.error(
+//         error?.response?.data?.message ||
+//           "Something went wrong with favorite action"
+//       );
+//       console.error(error?.response?.data || error.message);
+//     }
+//   };
+
+//   const handleViewProfile = () => {
+//     if (!token) {
+//       setShowLoginPrompt(true);
+//       return;
+//     }
+//     router.push(`/public-profile/${professional.userId}`);
+//   };
+  
+//   const handleCloseModal = () => setShowModal(false);
+//   const handleCloseLoginPrompt = () => {
+//     setShowLoginPrompt(false);
+//     router.push("/signin");
+//   };
+
+//   return (
+//     <>
+//       <AnimateOnScrollProvider>
+//         <div
+//           className="relative rounded-2xl p-6 bg-white hover:shadow-xl transition-all border border-gray-100 hover:border-transparent hover:ring-2 hover:ring-indigo-400"
+//           data-aos="fade-up"
+//         >
+//           {/* Profile Content */}
+//           <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-4">
+//             <div className="flex-shrink-0">
+//               {professional.profile?.profilePhoto || professional.user.profile? (
+//                 <img
+//                   src={professional?.profile?.profilePhoto? professional?.profile.profilePhoto : professional.user.profile}
+//                   alt="Profile"
+//                   className={`w-20 h-20 rounded-full object-cover border-2 border-indigo-200 shadow-sm ${
+//                     token ? "" : "blur-sm"
+//                   }`}
+//                 />
+//               ) : (
+//                 <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 text-sm border border-gray-200">
+//                   N/A
+//                 </div>
+//               )}
+//             </div>
+
+//             <div className="flex flex-col justify-between">
+//               <div>
+//                 <h3
+//                   className={`text-xl font-semibold text-gray-900 ${
+//                     token ? "" : "blur-sm"
+//                   }`}
+//                 >
+//                   {getDisplayName(professional)}
+//                 </h3>
+//                 {professional.profile?.profileHeadline && (
+//                   <p
+//                     className={`text-gray-500 mt-1 text-sm ${
+//                       token ? "" : "blur-sm"
+//                     }`}
+//                   >
+//                     {professional.profile?.profileHeadline}
+//                   </p>
+//                 )}
+//               </div>
+
+//               <div className={`mt-3 flex flex-wrap gap-2 ${token ? "" : "blur-sm"}`}>
+//                 {professional.profile?.securityServicesOfferings.slice(0, 3).map((service, index) => (
+//                   <span
+//                     key={index}
+//                     className="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full border border-indigo-200"
+//                   >
+//                     {service}
+//                   </span>
+//                 ))}
+//                 {(professional.profile?.serviceRequirements.length ?? 0) > 3 && (
+//                   <span className="bg-indigo-50 text-indigo-700 text-xs px-3 py-1 rounded-full border border-indigo-200">
+//                     +{(professional.profile?.serviceRequirements.length ?? 0) - 3} more
+//                   </span>
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+
+//           <div className="grid md:grid-cols-[1fr_auto] gap-4 mt-6 items-start">
+//             <div className="flex flex-col gap-2">
+//               {professional.user.address && (
+//                 <p
+//                   className={`text-sm text-gray-400 flex items-center gap-1 ${
+//                     token ? "" : "blur-sm"
+//                   }`}
+//                 >
+//                   <LocationIcon />
+//                   {professional.user.address}
+//                 </p>
+//               )}
+//               <div className="flex items-center gap-4">
+//                 <span
+//                   className={`text-lg font-bold text-gray-900 ${
+//                     token ? "" : "blur-sm"
+//                   }`}
+//                 >
+//                   {getHourlyRate(professional)}
+//                 </span>
+//                 {professional.profile?.experience && (
+//                   <span
+//                     className={`text-gray-500 text-sm ${
+//                       token ? "" : "blur-sm"
+//                     }`}
+//                   >
+//                     {professional.profile.experience} years exp.
+//                   </span>
+//                 )}
+//               </div>
+//             </div>
+
+//             <div className="flex gap-4 items-center justify-end">
+//               <button
+//                 className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-md px-4 py-2 text-sm font-semibold"
+//                 onClick={handleViewProfile}
+//               >
+//                 View Profile
+//               </button>
+//               <button
+//                 className="text-2xl text-indigo-600 hover:text-indigo-800 transition"
+//                 onClick={() => handleFavorite(professional.userId)}
+//                 title={
+//                   isFavorited ? "Remove from favorites" : "Add to favorites"
+//                 }
+//               >
+//                 {isFavorited ? (
+//                   <FaHeart className="text-indigo-600" />
+//                 ) : (
+//                   <FaRegHeart />
+//                 )}
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       </AnimateOnScrollProvider>
+
+//       {showModal && (
+//   <GenericModal
+//     show={showModal}
+//     onClose={handleCloseModal}
+//     icon={null}
+//     title={`${getDisplayName(professional)}'s Profile`}
+//     message={professional.profile?.profileHeadline || "More profile details..."}
+//     buttonText="Close"
+//   />
+// )}
+
+// {showLoginPrompt && (
+//   <GenericModal
+//     show={true}
+//     onClose={handleCloseLoginPrompt}
+//     icon={
+//       <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
+//         <svg
+//           className="h-6 w-6 text-blue-600"
+//           fill="none"
+//           viewBox="0 0 24 24"
+//           stroke="currentColor"
+//         >
+//           <path
+//             strokeLinecap="round"
+//             strokeLinejoin="round"
+//             strokeWidth={2}
+//             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+//           />
+//         </svg>
+//       </div>
+//     }
+//     title="Login Required"
+//     message="You need to be logged in to perform this action."
+//     buttonText="Go to Login"
+//   />
+// )}
+
+//     </>
+//   );
+// };
 
 // const ProfessionalCard = ({ professional }: { professional: Professional }) => {
 //   const [showModal, setShowModal] = useState(false);
