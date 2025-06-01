@@ -282,43 +282,126 @@ const TenderBoard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [totalPages, setTotalPages] = useState(1);
 
-  const fetchJobs = async (
-    page: number,
-    limit: number,
-    searchTerm: string
-  ) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams();
-      params.append("page", page.toString());
-      params.append("pageSize", limit.toString());
-      if (searchTerm.trim()) {
-        params.append("industryType", searchTerm.trim());
-      }
+const fetchJobs = async (
+  page: number,
+  limit: number,
+  searchTerm: string
+) => {
+  setLoading(true);
+  setError(null);
 
-      const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
-      const url = `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/tender?${params.toString()}`;
-      const res = await fetch(url, {
+  try {
+    const params = new URLSearchParams();
+    params.append("page", page.toString());
+    params.append("pageSize", limit.toString());
+    if (searchTerm.trim()) {
+      params.append("industryType", searchTerm.trim());
+    }
+
+    const token = localStorage.getItem("token")?.replace(/^"|"$/g, "");
+    const tenderUrl = `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/tender?${params.toString()}`;
+    const altUrl = `https://ub1b171tga.execute-api.eu-north-1.amazonaws.com/dev/tender/contracts?q=${encodeURIComponent(
+      searchTerm
+    )}&page=${page}&pageSize=${limit}`;
+
+    // Fetch both APIs
+    const [res1, res2] = await Promise.all([
+      fetch(tenderUrl, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      });
+      }),
+      fetch(altUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }),
+    ]);
 
-      if (!res.ok) throw new Error("Failed to fetch jobs");
+    if (!res1.ok || !res2.ok) throw new Error("Failed to fetch data");
 
-      const data: TenderApiResponse = await res.json();
+    const data1: TenderApiResponse = await res1.json();
+    const data2 = await res2.json();
 
-      setTenders(data?.data);
-      setTotalPages(data?.totalPages || 1);
-    } catch (err) {
-      setError("Unknown error");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Normalize alt API's data (data2.releases)
+   const normalizedReleases: Tender[] = (data2?.releases || []).map(
+  (item: any, index: number): Tender => {
+    const tender = item?.tender || {};
+    const parties = item?.parties || [];
+    const publisher = item?.publisher || {};
+
+    // Try to get issuer info from the parties array
+    const issuerParty = parties.find((p: any) =>
+      (p?.roles || []).includes("buyer")
+    );
+
+    return {
+      id: index + 10000, // Generate a unique fallback ID
+      title: tender.title || "Untitled",
+      issuingAuthority:
+        issuerParty?.name || publisher?.name || "Unknown Authority",
+      industryType: tender.mainProcurementCategory || "Not specified",
+      summary: tender.description || "",
+      location:
+        tender?.items?.[0]?.deliveryLocation?.address?.locality || "", // optional
+      postCode:
+        tender?.items?.[0]?.deliveryLocation?.address?.postalCode || "",
+      contractValue:
+        tender?.value?.amount !== undefined
+          ? `£${tender.value.amount.toLocaleString()}`
+          : "",
+      procurementReference: tender.id || item.ocid || "",
+      publishedDate: item.date || "",
+      contractStartDate: tender?.contractPeriod?.startDate || "",
+      contractEndDate: tender?.contractPeriod?.endDate || "",
+      approachToMarketDate: tender?.tenderPeriod?.startDate || "",
+      suitableForSMEs: tender?.suitability?.sme === true,
+      suitableForVCSEs: tender?.suitability?.vcse === true,
+      issuerName: issuerParty?.name || publisher?.name || "",
+      issuerAddress:
+        issuerParty?.address?.streetAddress ||
+        issuerParty?.address?.region ||
+        "",
+      issuerPhone: issuerParty?.contactPoint?.telephone || "",
+      issuerEmail: issuerParty?.contactPoint?.email || "",
+      issuerWebsite: issuerParty?.identifier?.uri || "",
+      howToApply: tender?.submissionMethodDetails || "",
+      userId: 0,
+      createdAt: "",
+      updatedAt: "",
+      user: {
+        id: 0,
+        email: "",
+        firstName: "",
+        lastName: "",
+        screenName: "",
+        phoneNumber: "",
+        dateOfBirth: "",
+        address: "",
+        postcode: "",
+        roleId: 0,
+        validated: false,
+      },
+    };
+  }
+);
+
+
+    const combinedTenders = [...(data1?.data || []), ...normalizedReleases];
+
+    setTenders(combinedTenders);
+    setTotalPages(data1?.totalPages || 1); // You can customize this if second API supports pagination
+
+  } catch (err) {
+    setError("Unknown error");
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     fetchJobs(page, limit, searchTerm);
