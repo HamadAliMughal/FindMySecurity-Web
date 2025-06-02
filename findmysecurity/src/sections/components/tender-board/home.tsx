@@ -263,6 +263,7 @@ interface Tender {
   createdAt: string;
   updatedAt: string;
   user: User;
+  source?: 'FindMySecurity' | 'ContractsFinder';
 }
 
 interface TenderApiResponse {
@@ -371,6 +372,7 @@ const fetchJobs = async (
       userId: 0,
       createdAt: "",
       updatedAt: "",
+      source: 'ContractsFinder',
       user: {
         id: 0,
         email: "",
@@ -460,7 +462,7 @@ const fetchJobs = async (
                 {tender.title}
               </h2>
               <span className="ml-4 mt-2 sm:mt-0 bg-black text-white text-xs uppercase tracking-wide px-4 py-1 rounded whitespace-nowrap">
-                FINDMYSECURITY
+                {tender?.user.id===1 ? 'FindMySecurity' : tender.source}
               </span>
             </header>
 
