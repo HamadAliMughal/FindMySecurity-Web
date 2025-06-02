@@ -26,7 +26,7 @@ export default function TrainingProviders({ initialSearchMode = "basic" }: { ini
   };
 
   return (
-    <section className="relative bg-gradient-to-r from-[#0f2027] via-[#203a43] to-[#2c5364] text-white overflow-hidden py-16 px-6 sm:px-12">
+    <section className="relative bg-gradient-to-r from-[#0f2027] via-[#203a43] to-[#2c5364] text-white z-50 py-16 px-6 sm:px-12">
       {/* Header */}
       <div className="relative z-10 max-w-4xl mx-auto mb-16 text-center px-4">
   <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-wide bg-gradient-to-r from-teal-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent animate-text-glow">

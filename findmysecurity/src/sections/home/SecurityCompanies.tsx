@@ -24,7 +24,7 @@ export default function SecurityCompanies({ initialSearchMode = "basic" }: { ini
   };
 
   return (
-    <section className="relative bg-gradient-to-br from-[#10131c] via-[#0f172a] to-[#1e293b] text-white overflow-hidden py-16 px-4">
+    <section className="relative bg-gradient-to-br from-[#10131c] via-[#0f172a] to-[#1e293b] text-white z-50 py-16 px-4">
       {/* Header */}
       <div className="relative z-10 text-center max-w-3xl mx-auto mb-14 px-4">
   <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-text-glow">
