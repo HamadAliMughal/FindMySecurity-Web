@@ -181,9 +181,9 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     setLoading(true);
 
     try {
-      const uploadedUrl = await uploadToS3({ file });
+      const {fileUrl , signedUrl} = await uploadToS3({ file });
 
-      if (!uploadedUrl || typeof uploadedUrl !== "string" || !uploadedUrl.startsWith("http")) {
+      if (!fileUrl || typeof fileUrl !== "string" || !fileUrl.startsWith("http")) {
         throw new Error("Invalid S3 URL returned");
       }
 
@@ -194,7 +194,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          url: encodeURI(uploadedUrl),
+          url: encodeURI(fileUrl),
           userId: loginData?.id || loginData?.userId || 1,
         }),
       });
@@ -204,8 +204,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       if (!dbRes.ok) {
         throw new Error("DB Save Failed");
       }
-
-      const newDoc = await fetchDocumentDetails(uploadedUrl);
+console.log(signedUrl)
+      const newDoc = await fetchDocumentDetails(signedUrl);
       setDocuments((prev) => [...prev, newDoc]);
       await refreshUserData();
 
@@ -389,18 +389,22 @@ const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
   // Show preview immediately
   const imageUrl = URL.createObjectURL(file);
   setProfilePhoto(imageUrl);
-
+setLoading(true);
   try {
     // Upload to S3
-    const uploadedUrl = await uploadToS3({ file });
-
+    const {fileUrl, signedUrl} = await uploadToS3({ file });
+    console.log(fileUrl)
     // Store uploaded file URL in formData
+    if(fileUrl){
     setFormData((prev: any) => ({
       ...prev,
-      profile: uploadedUrl, // store S3 URL, not the file itself
+      profile: fileUrl, // store S3 URL, not the file itself
     }));
+    setLoading(false);
+  }
   } catch (err) {
     console.error('Image upload failed:', err);
+     setLoading(false);
     alert('Failed to upload image. Please try again.');
   }
   console.log(formData);
