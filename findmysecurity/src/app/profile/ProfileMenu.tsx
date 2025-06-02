@@ -121,7 +121,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ roleId }) => {
   };
 
   const shouldShowCreateProfile =
-    roleId === 3 && !loginData?.individualProfessional?.profileData?.availability;
+    roleId === 3 && !loginData?.individualProfessional?.profile?.weeklySchedule;
 
   const isSubscriber = loginData?.isSubscriber;
   const subscriptionTier = loginData?.subscriptionTier;
@@ -137,7 +137,7 @@ const menuItems = [
     route: "/my-job-applicants",
   }]),
 
-  ...((roleId === 3|| roleId === 6) && isSubscriber && subscriptionTier !== "Basic"
+  ...((roleId === 3|| roleId === 6) || isSubscriber && subscriptionTier !== "Basic"
     ? []
     : [{ icon: <FaCogs />, label: "My Ads", route: "/my-ads" }]),
 
