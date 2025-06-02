@@ -65,7 +65,7 @@ export default function ProfessionalsPage() {
       if (selectedRole) queryParamsArray.push(`subcategory=${encodeURIComponent(selectedRole)}`);
       if (pc) queryParamsArray.push(`pc=${encodeURIComponent(pc)}`);
       if (distance) queryParamsArray.push(`distance=${encodeURIComponent(distance)}`);
-      if (experience) queryParamsArray.push(`experience=${encodeURIComponent(experience)}`);
+      if (experience) queryParamsArray.push(`exp=${encodeURIComponent(experience)}`);
       if (minHr) queryParamsArray.push(`minHr=${encodeURIComponent(minHr)}`);
       if (maxHr) queryParamsArray.push(`maxHr=${encodeURIComponent(maxHr)}`);
       if (page) queryParamsArray.push(`page=${encodeURIComponent(page.toString())}`);
@@ -83,15 +83,17 @@ export default function ProfessionalsPage() {
       const data: ApiResponse = await response.json();
       setApiData1(data);
 
-      // Apply client-side filtering for day and time slot
       if (selectedDay && selectedTimeSlot) {
         const filteredProfessionals = data.professionals.filter((professional) => {
           const schedule = professional?.weeklySchedule;
-          if (schedule && selectedTimeSlot in schedule && schedule[selectedTimeSlot]) {
-            return schedule[selectedTimeSlot][selectedDay] === true;
-          }
-          return false;
+
+      
+          const available = schedule?.[selectedTimeSlot]?.[selectedDay] === true;
+      
+          return available;
         });
+      
+      
         setFilteredData({
           ...data,
           professionals: filteredProfessionals,
@@ -101,13 +103,16 @@ export default function ProfessionalsPage() {
       } else if (selectedDay) {
         const filteredProfessionals = data.professionals.filter((professional) => {
           const schedule = professional?.weeklySchedule;
-          if (!schedule) return false;
-          return Object.keys(schedule).some(
-            (timeSlot) =>
-              timeSlot in schedule &&
-              schedule[timeSlot as TimeSlot]?.[selectedDay] === true
-          );
+          const available = Object.keys(schedule || {}).some((timeSlot) => {
+            const isAvailable = schedule?.[timeSlot as TimeSlot]?.[selectedDay] === true;
+            console.log(`  TimeSlot ${timeSlot} → ${selectedDay}:`, isAvailable);
+            return isAvailable;
+          });
+      
+          return available;
         });
+      
+      
         setFilteredData({
           ...data,
           professionals: filteredProfessionals,
@@ -117,11 +122,14 @@ export default function ProfessionalsPage() {
       } else if (selectedTimeSlot) {
         const filteredProfessionals = data.professionals.filter((professional) => {
           const schedule = professional?.weeklySchedule;
-          if (schedule && selectedTimeSlot in schedule && schedule[selectedTimeSlot]) {
-            return Object.values(schedule[selectedTimeSlot]).some((available) => available === true);
-          }
-          return false;
+      
+          const available = Object.values(schedule?.[selectedTimeSlot] || {}).some(
+            (available) => available === true
+          );
+      
+          return available;
         });
+            
         setFilteredData({
           ...data,
           professionals: filteredProfessionals,
@@ -129,8 +137,58 @@ export default function ProfessionalsPage() {
           totalCount: filteredProfessionals.length,
         });
       } else {
+        console.log("No day or time filter selected — showing all professionals.");
         setFilteredData(data);
       }
+      
+      // Apply client-side filtering for day and time slot
+      // if (selectedDay && selectedTimeSlot) {
+      //   const filteredProfessionals = data.professionals.filter((professional) => {
+      //     const schedule = professional?.weeklySchedule;
+      //     if (schedule && selectedTimeSlot in schedule && schedule[selectedTimeSlot]) {
+      //       return schedule[selectedTimeSlot][selectedDay] === true;
+      //     }
+      //     return false;
+      //   });
+      //   setFilteredData({
+      //     ...data,
+      //     professionals: filteredProfessionals,
+      //     count: filteredProfessionals.length,
+      //     totalCount: filteredProfessionals.length,
+      //   });
+      // } else if (selectedDay) {
+      //   const filteredProfessionals = data.professionals.filter((professional) => {
+      //     const schedule = professional?.weeklySchedule;
+      //     if (!schedule) return false;
+      //     return Object.keys(schedule).some(
+      //       (timeSlot) =>
+      //         timeSlot in schedule &&
+      //         schedule[timeSlot as TimeSlot]?.[selectedDay] === true
+      //     );
+      //   });
+      //   setFilteredData({
+      //     ...data,
+      //     professionals: filteredProfessionals,
+      //     count: filteredProfessionals.length,
+      //     totalCount: filteredProfessionals.length,
+      //   });
+      // } else if (selectedTimeSlot) {
+      //   const filteredProfessionals = data.professionals.filter((professional) => {
+      //     const schedule = professional?.weeklySchedule;
+      //     if (schedule && selectedTimeSlot in schedule && schedule[selectedTimeSlot]) {
+      //       return Object.values(schedule[selectedTimeSlot]).some((available) => available === true);
+      //     }
+      //     return false;
+      //   });
+      //   setFilteredData({
+      //     ...data,
+      //     professionals: filteredProfessionals,
+      //     count: filteredProfessionals.length,
+      //     totalCount: filteredProfessionals.length,
+      //   });
+      // } else {
+      //   setFilteredData(data);
+      // }
     } catch (err: any) {
       setError(err.message || "An error occurred");
       setFilteredData(null);
