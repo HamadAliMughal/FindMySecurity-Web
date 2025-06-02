@@ -55,6 +55,8 @@ const JobPosting: React.FC = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
+    const [error, setError] = useState('');
+  const [validPostcode, setValidPostcode] = useState<boolean | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const timeSlots = [
@@ -132,7 +134,7 @@ const JobPosting: React.FC = () => {
       experience: "",
       availability: "",
       qualifications: "",
-      hourlyRate: "",
+      hourlyRate: null,
       profilePhoto: null,
       homeTelephone: "",
       mobileTelephone: "",
@@ -197,13 +199,13 @@ const JobPosting: React.FC = () => {
     try {
       if (!userId) throw new Error("User ID not found");
   
-      let profilePhotoUrl = null;
-      // Upload profile photo if it exists
-      if (formData.profilePhoto) {
-        profilePhotoUrl = await uploadToS3({
-          file: formData.profilePhoto,
-        });
-      }
+      // let profilePhotoUrl = null;
+      // // Upload profile photo if it exists
+      // if (formData.profilePhoto) {
+      //   profilePhotoUrl = await uploadToS3({
+      //     file: formData.profilePhoto,
+      //   });
+      // }
      // Get unique titles from selected roles
      const serviceRequirements = Array.from(
       new Set(formData.selectedRoles.map(item => item.title))
@@ -225,7 +227,7 @@ const JobPosting: React.FC = () => {
   
       const apiData = {
         profileData: {
-          profilePhoto: profilePhotoUrl,
+          profilePhoto: "",
             screenName: formData.screenName,
             postcode: formData.postcode,
             profileHeadline: formData.profileHeadline,
@@ -245,33 +247,43 @@ const JobPosting: React.FC = () => {
         },
       };
   
-      const response = await fetch(
-        `${API_URL}/profile/individual/${userId}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify(apiData),
-        }
-      );
-  
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Request failed (${response.status})`);
-      }
-  
-      const result = await response.json();
-      safeLocalStorageSet("loginData", JSON.stringify(result?.user));
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setShowModal(true);
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error((error as Error).message || "Submission failed. Try again.");
-    } finally {
-      setIsSubmitting(false);
+const response = await axios.put(
+  `${API_URL}/profile/individual/${userId}`,
+  apiData, // <-- This is the request body
+  {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
     }
+  }
+);
+  
+
+
+  // axios returns response data directly under `response.data`
+  if (!response.data.ok) {
+    throw new Error(response.data.message || `Request failed (${response.status})`);
+  }
+
+  // Access the parsed result directly
+  const result = response.data;
+  safeLocalStorageSet("loginData", JSON.stringify(result?.user));
+
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  setShowModal(true);
+
+} catch (error) {
+  console.error("Error:", error);
+  const errorMessage =
+    axios.isAxiosError(error)
+      ? error.response?.data?.message || "Submission failed. Try again."
+      : (error as Error).message;
+
+  toast.error(errorMessage);
+} finally {
+  setIsSubmitting(false);
+}
+
   };
 
   const handleInputChange = <K extends keyof FormData>(field: K, value: FormData[K]) => {
@@ -279,6 +291,10 @@ const JobPosting: React.FC = () => {
       ...prev,
       [field]: value
     }));
+    if(field === 'postcode') {
+      validatePostcode(value)
+    }
+    setValidPostcode(null);
   };
 
   // const handleRoleSelection = (selectedOptions: any) => {
@@ -298,7 +314,27 @@ const JobPosting: React.FC = () => {
       }
     }));
   };
+  const validatePostcode = async (postcode:any) => {
+   // const postcode = formData.postcode.trim();
 
+    if (!postcode) return;
+
+    try {
+      const response = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`);
+      const data = await response.json();
+
+      if (data.status === 200) {
+        setValidPostcode(true);
+        setError('');
+      } else {
+        setValidPostcode(false);
+        setError('Invalid postcode');
+      }
+    } catch (err) {
+      setError('Failed to validate postcode');
+      setValidPostcode(false);
+    }
+  };
   const closeModalAndRedirect = () => {
     setShowModal(false);
     router.push("/profile");
@@ -348,16 +384,20 @@ const JobPosting: React.FC = () => {
         </div>
 
         {/* Postcode */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Postcode*</label>
-          <input
-            type="text"
-            value={formData?.postcode}
-            onChange={(e) => handleInputChange('postcode', e.target.value)}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
-          />
-        </div>
+          <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">Postcode*</label>
+      <input
+        type="text"
+        value={formData.postcode}
+        onChange={(e) => handleInputChange('postcode', e.target.value)}
+        required
+        className={`mt-1 block w-full rounded-md border ${
+          validPostcode === false ? 'border-red-500' : 'border-gray-300'
+        } shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3`}
+      />
+      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+      {validPostcode && <p className="text-green-600 text-sm mt-1">Valid postcode ✅</p>}
+    </div>
 
         {/* Profile Headline */}
         <div>
@@ -365,6 +405,7 @@ const JobPosting: React.FC = () => {
           <input
             type="text"
             value={formData.profileHeadline}
+            required
             onChange={(e) => handleInputChange('profileHeadline', e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-3 border"
           />
