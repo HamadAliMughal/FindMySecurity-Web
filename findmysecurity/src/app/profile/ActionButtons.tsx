@@ -430,7 +430,7 @@ if (isSubscriber && tier !== 'Basic') {
     setIsEditing(false);
   };
 
-  const profileData = loginData?.individualProfessional?.profile?.profilePhoto || loginData.profile || '';
+  const profileData = loginData.profile|| loginData?.individualProfessional?.profile?.profilePhoto || '';
   const finalImage = profilePhoto || profileData || "/images/profile.png";
   
   return (
