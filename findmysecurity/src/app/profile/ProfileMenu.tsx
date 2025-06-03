@@ -149,7 +149,9 @@ const menuItems = [
   { icon: <FaCogs />, label: "Customer Support", route: "/contact-us" },
 ...(roleId === 6
   ?[{ icon: <FaPlus />, label: "Course Board Management", route:'/course-board-management' }]:[]),
-  ...(isSubscriber && subscriptionTier !== "Basic"
+  ...(
+    // isSubscriber && subscriptionTier !== "Basic"
+    true
     ? [{ icon: <FaBell />, label: "Notifications", isNotification: true }]
     : []),
 
