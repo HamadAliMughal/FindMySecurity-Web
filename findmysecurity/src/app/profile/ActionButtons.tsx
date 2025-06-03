@@ -579,28 +579,28 @@ if (isSubscriber && tier !== 'Basic') {
             </Button>
           </>
         ) : (
-          <></>
-          // <Button
-          //   onClick={() => setIsEditing(true)}
-          //   fullWidth
-          //   variant="contained"
-          //   sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
-          // >
-          //   Update Profile
-          // </Button>
+          <Button
+            onClick={() => setIsEditing(true)}
+            fullWidth
+            variant="contained"
+            sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+          >
+            Update Profile
+          </Button>
         )}
       </div>
 
       {/* Upgrade Button */}
       {!isEditing &&  !loginData.isSubscriber &&(
-        <Button
-          fullWidth
-           onClick={() => setOpen(true)}
-          variant="contained"
-          sx={{ bgcolor: "#f97316", ":hover": { bgcolor: "#ea580c" } }}
-        >
-          Upgrade My Membership
-        </Button>
+        <></>
+        // <Button
+        //   fullWidth
+        //    onClick={() => setOpen(true)}
+        //   variant="contained"
+        //   sx={{ bgcolor: "#f97316", ":hover": { bgcolor: "#ea580c" } }}
+        // >
+        //   Upgrade My Membership
+        // </Button>
       )}
              {loginData.isSubscriber && (
     
