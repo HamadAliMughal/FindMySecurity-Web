@@ -347,7 +347,7 @@ const SecurityCompanyForm: React.FC<ClientGeneralFormProps> = ({ id, title, onSu
   };
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    setFormData(prev => ({ ...prev, phoneNumber: value }));
+    setFormData(prev => ({ ...prev, phone: value }));
     
     // Clear previous errors - fix the type issue here
     setFormErrors(prev => ({ ...prev, phoneNumber: "" }));
