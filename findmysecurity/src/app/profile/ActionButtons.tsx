@@ -400,13 +400,14 @@ setLoading(true);
       ...prev,
       profile: fileUrl, // store S3 URL, not the file itself
     }));
-    setLoading(false);
+  
   }
   } catch (err) {
     console.error('Image upload failed:', err);
      setLoading(false);
     alert('Failed to upload image. Please try again.');
   }
+    setLoading(false);
   console.log(formData);
 };
 const isSubscriber = loginData?.isSubscriber;
@@ -578,14 +579,15 @@ if (isSubscriber && tier !== 'Basic') {
             </Button>
           </>
         ) : (
-          <Button
-            onClick={() => setIsEditing(true)}
-            fullWidth
-            variant="contained"
-            sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
-          >
-            Update Profile
-          </Button>
+          <></>
+          // <Button
+          //   onClick={() => setIsEditing(true)}
+          //   fullWidth
+          //   variant="contained"
+          //   sx={{ bgcolor: "black", ":hover": { bgcolor: "#333" } }}
+          // >
+          //   Update Profile
+          // </Button>
         )}
       </div>
 

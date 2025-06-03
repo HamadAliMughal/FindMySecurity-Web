@@ -137,7 +137,8 @@ const menuItems = [
     route: "/my-job-applicants",
   }]),
 
-  ...((roleId === 3|| roleId === 6) || isSubscriber && subscriptionTier !== "Basic"
+  ...((roleId === 3|| roleId === 6)
+  //  || isSubscriber && subscriptionTier !== "Basic"
     ? []
     : [{ icon: <FaCogs />, label: "My Ads", route: "/my-ads" }]),
 
@@ -152,7 +153,8 @@ const menuItems = [
     ? [{ icon: <FaBell />, label: "Notifications", isNotification: true }]
     : []),
 
-  ...(roleId === 3 && isSubscriber && subscriptionTier !== "Basic"
+  ...(roleId === 3 
+    // && isSubscriber && subscriptionTier !== "Basic"
     ? [
         {
           icon: <FiFileText />,
