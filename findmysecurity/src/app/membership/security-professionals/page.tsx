@@ -7,32 +7,48 @@ type Tier = "Basic" | "Standard" | "Premium";
 type FeatureKey =
   | "Search Visibility"
   | "Profile Badge"
-  | "New internal Job Alerts"
-  | "New internal Course Alerts"
   | "Internal Notifications"
-  | "Ads Displayed"
-  | "AI Matching (coming soon)"
+  | "Advertisements Displayed"
+  | "AI Matching (Coming Soon)"
   | "Dedicated Support"
-  | "Apply/ receive jobs & courses"
-  | "Messaging (coming soon)"
-  | "Verification badge (DBS & SIA Licence)"
-  | "Job Board"
-  | "Course Board";
+  | "Apply / Receive Jobs & Courses"
+  | "Messaging (Coming Soon)"
+  | "Verification Badge (DBS & SIA Licence)"
+  | "Job Board Access"
+  | "Course Board Access"
+  | "Security Company Profiles"
+  | "Training Provider Profiles";
 
 const tableData: Record<FeatureKey, string[]> = {
   "Search Visibility": ["Standard", "Enhanced", "Top Priority"],
   "Profile Badge": ["None", "Silver + “Standard”", "Gold + “Premium”"],
-  "New internal Job Alerts": ["❌", "✅", "✅ First Access + Alerts"],
-  "New internal Course Alerts": ["❌", "✅", "✅"],
-  "Internal Notifications": ["❌", "✅", "✅"],
-  "Ads Displayed": ["✅", "❌", "❌"],
-  "AI Matching (coming soon)": ["❌", "❌", "✅"],
-  "Dedicated Support": ["❌", "❌", "✅"],
-  "Apply/ receive jobs & courses": ["✅", "✅", "✅"],
-  "Messaging (coming soon)": ["❌", "✅", "✅"],
-  "Verification badge (DBS & SIA Licence)": ["❌", "❌", "✅"],
-  "Job Board": ["✅", "✅", "✅"],
-  "Course Board": ["✅", "✅", "✅"],
+  "Internal Notifications": [
+    "❌ 3 free per month; further access via Credit Bundles or upgrade",
+    "✅ Included",
+    "✅ Included",
+  ],
+  "Advertisements Displayed": ["✅ Yes", "❌ No", "❌ No"],
+  "AI Matching (Coming Soon)": ["❌ Not available", "✅ Limited", "✅ Full access"],
+  "Dedicated Support": ["❌ Not available", "❌ Not available", "✅ Included"],
+  "Apply / Receive Jobs & Courses": ["✅ Included", "✅ Included", "✅ Included"],
+  "Messaging (Coming Soon)": [
+    "❌ Inbound only; replies via Credit Bundle or upgrade",
+    "✅ Included",
+    "✅ Included",
+  ],
+  "Verification Badge (DBS & SIA Licence)": [
+    "❌ Not included",
+    "✅ Included",
+    "✅ Included",
+  ],
+  "Job Board Access": ["✅ Included", "✅ Included", "✅ Included"],
+  "Course Board Access": ["✅ Included", "✅ Included", "✅ Included"],
+  "Security Company Profiles": [
+    "❌ 5 free views per month; further access via Credit Bundles or upgrade",
+    "✅ Unlimited",
+    "✅ Unlimited",
+  ],
+  "Training Provider Profiles": ["✅ Unlimited", "✅ Unlimited", "✅ Unlimited"],
 };
 
 const tierDescriptions = [
@@ -40,45 +56,66 @@ const tierDescriptions = [
     title: "Basic (Free)",
     color: "border-gray-300",
     features: [
-      "Appears in standard search results",
-      "Can apply for and receive job and course offers",
-      "No alerts for new job or course listings",
-      "Advertisements displayed",
-      "No AI features",
-      "No access to direct messaging",
-      "Notifications: Not available",
-      "Cost: Free of charge",
+      "Visibility:",
+      " Appears in standard search results",
+      "Features:",
+      " Receive 5 free credits (worth £11) upon successful completion of their public profile",
+      " Ability to apply for and receive job and course offers",
+      " No alerts for newly listed jobs or courses",
+      " Advertisements will be displayed",
+      " AI features not included",
+      " Access to 3 free notifications per month for successful job applications and other updates",
+      " Further notifications viewable via Credit Bundles or by upgrading the subscription tier",
+      " View training provider profiles and apply for courses",
+      " Access to 5 security company profile views per month; additional views available via Credit Bundles or by upgrading tier",
+      "General Notifications:",
+      " Accessible through Credit Bundles or upgraded subscription",
+      "Direct Messaging:",
+      " Inbound messages only; replying requires Credit Bundles or an upgraded subscription",
+      "AI Features:",
+      " Not available",
+      "Cost:",
+      " Free of charge",
     ],
   },
   {
     title: "Standard (£9.99/mo)",
     color: "border-blue-400",
     features: [
-      "Enhanced visibility with silver badge",
-      "Dashboard alerts for job and course matches",
-      "Internal notifications when users search for you",
-      "Alerts for newly added jobs and courses",
-      "Direct messaging (coming soon)",
-      "No advertisements",
-      "AI Matching: Not included",
-      "All relevant notifications included",
-      "Cost: £9.99/month or £107.89/year",
+      "Visibility:",
+      " Enhanced visibility, marked with a silver circle and “Standard” badge",
+      "Features:",
+      " Receive dashboard alerts for relevant job and course matches",
+      " Internal notifications when users search for your profile or services",
+      " Alerts for newly added job roles and training courses",
+      " Access to direct messaging (coming soon)",
+      " No third-party advertisements",
+      " Verification badge (DBS and SIA Licence) to enhance professional credibility",
+      "AI Matching:",
+      " Limited functionality",
+      "Notifications:",
+      " All relevant alerts and updates included",
+      "Cost:",
+      " £9.99 per month or £107.89 per year",
     ],
   },
   {
     title: "Premium (£14.99/mo)",
     color: "border-yellow-500",
     features: [
-      "Top priority in search results with gold badge",
-      "First access to job and course alerts",
-      "Internal notifications",
-      "Full access to all features",
-      "Dedicated customer support",
-      "Verification badge for DBS & SIA",
-      "Full AI matching (coming soon)",
-      "No advertisements",
-      "Direct messaging access (coming soon)",
-      "Cost: £14.99/month or £161.89/year",
+      "Visibility:",
+      " Highest priority in search results, displayed with a gold circle and “Premium” badge",
+      "Features:",
+      " Early access to job and course alerts",
+      " Internal platform notifications",
+      " Full access to all platform tools and features",
+      " Priority customer support",
+      " Verification badge (DBS and SIA Licence) to strengthen credibility",
+      " Full AI matching capabilities (coming soon)",
+      " No advertisements",
+      " Access to direct messaging (coming soon)",
+      "Cost:",
+      " £14.99 per month or £161.89 per year",
     ],
   },
 ];
@@ -106,11 +143,23 @@ export default function SecurityAccessGuidelines() {
               <h2 className="text-xl font-bold text-center text-[#0f766e] mb-4">
                 {tier.title}
               </h2>
-              <ul className="list-disc text-sm text-gray-700 pl-5 space-y-2">
-                {tier.features.map((feature, i) => (
-                  <li key={i}>{feature}</li>
-                ))}
-              </ul>
+              <div className="text-sm text-gray-700 space-y-2">
+                {tier.features.map((feature, i) => {
+                  if (feature.endsWith(":")) {
+                    return (
+                      <h3 key={i} className="font-bold mt-4">
+                        {feature}
+                      </h3>
+                    );
+                  }
+                  return (
+                    <div key={i} className="pl-5 flex">
+                      <span className="mr-2">•</span>
+                      {feature}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           ))}
         </div>

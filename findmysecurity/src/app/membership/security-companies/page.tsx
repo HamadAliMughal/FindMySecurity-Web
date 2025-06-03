@@ -6,33 +6,51 @@ type FeatureKey =
   | "Search Visibility"
   | "Profile Badge"
   | "Notifications"
-  | "Contact Access"
+  | "Contact Access to Security Professionals"
   | "Post Jobs"
-  | "Ads Displayed"
-  | "AI Matching (coming soon)"
+  | "Advertisements Displayed"
+  | "AI Matching (Coming soon)"
   | "Dedicated Support"
-  | "Messaging (coming soon)"
-  | "Tender Board"
-  | "Course Board"
-  | "Job Board";
+  | "Messaging (Coming soon)"
+  | "Tender Board Access"
+  | "Course Board Access"
+  | "Job Board Access"
+  | "Promotional Feature for Security Services";
 
 const tableData: Record<FeatureKey, string[]> = {
   "Search Visibility": ["Standard", "Enhanced", "Top Priority"],
   "Profile Badge": ["None", "Silver + “Standard”", "Gold + “Premium”"],
   "Notifications": [
-    "❌ Only Own Posted Job Applicants",
-    "✅",
-    "✅",
+    "❌ 3 free per month; additional access via Credit Bundles or tier upgrade",
+    "✅ Included",
+    "✅ Included",
   ],
-  "Contact Access": ["❌", "✅ Unlimited", "✅ Unlimited"],
-  "Post Jobs": ["✅10 Jobs PM", "✅ Unlimited", "✅ Unlimited"],
-  "Ads Displayed": ["✅", "❌", "❌"],
-  "AI Matching (coming soon)": ["❌", "❌", "✅"],
-  "Dedicated Support": ["❌", "❌", "✅"],
-  "Messaging (coming soon)": ["❌", "✅", "✅"],
-  "Tender Board": ["❌", "✅", "✅"],
-  "Course Board": ["✅", "✅", "✅"],
-  "Job Board": ["✅", "✅", "✅"],
+  "Contact Access to Security Professionals": [
+    "❌ 5 free profile views; further access via Credit Bundles or upgrade",
+    "✅ Unlimited",
+    "✅ Unlimited",
+  ],
+  "Post Jobs": ["✅ Unlimited", "✅ Unlimited", "✅ Unlimited"],
+  "Advertisements Displayed": ["✅ Yes", "❌ No", "❌ No"],
+  "AI Matching (Coming soon)": ["❌ Not available", "✅ Limited", "✅ Full access"],
+  "Dedicated Support": ["❌ Not available", "❌ Not available", "✅ Included"],
+  "Messaging (Coming soon)": [
+    "❌ Free inbound only; outbound via Credit Bundles or upgrade",
+    "✅ Included",
+    "✅ Included",
+  ],
+  "Tender Board Access": [
+    "❌ 1 free per month; additional access via Credit Bundles or tier upgrade",
+    "✅ Included",
+    "✅ Included",
+  ],
+  "Course Board Access": ["✅ Included", "✅ Included", "✅ Included"],
+  "Job Board Access": ["✅ Included", "✅ Included", "✅ Included"],
+  "Promotional Feature for Security Services": [
+    "❌ Not available",
+    "❌ Available via Credit Bundles or upgrade",
+    "✅ Included",
+  ],
 };
 
 const tierDescriptions = [
@@ -40,47 +58,61 @@ const tierDescriptions = [
     title: "Basic (Free)",
     color: "border-gray-300",
     features: [
-      "Listed in search results with standard marketing exposure",
-      "10 job postings per month",
-      "Cannot view contact details of professionals or access tender board",
-      "Can contact training companies",
-      "Full visibility of course board and course details",
-      "Notifications only for applicants to your posted jobs",
-      "No AI functionality",
-      "No access to direct messaging",
-      "Advertisements displayed",
-      "Cost: Free of charge",
+      "Visibility:",
+      " Listed in search results with standard marketing exposure",
+      "Features:",
+      " Unlimited job postings",
+      " 5 free profile views of security professionals per month — more via Credit Bundles or upgrade",
+      " 1 free tender view per month — more via Credit Bundles or upgrade",
+      " Unlimited access to contact training providers",
+      " Full access to the course board and course details",
+      " 3 free notifications/month — more via Credit Bundles or upgrade",
+      " No access to AI functionality",
+      " Free to receive messages — replies require credits or upgrade",
+      " Advertising:",
+      " External ads will be displayed",
+      "Cost:",
+      " Free of charge",
     ],
   },
   {
     title: "Standard (£24.99/mo)",
     color: "border-blue-400",
     features: [
-      "Enhanced visibility with silver badge and better exposure",
-      "Unlimited job postings",
-      "Full contact access to professionals & training companies",
-      "Access to all alerts and internal notifications",
-      "Access to job, tender, and course boards",
-      "Direct messaging (coming soon)",
-      "No advertisements",
-      "No AI functionality",
-      "All relevant notifications included",
-      "Cost: £24.99/month or £269.89/year",
+      "Visibility:",
+      " Enhanced visibility marked by a silver circle and “Standard” badge",
+      "Features:",
+      " Unlimited job postings",
+      " Full access to contact details of security professionals and training providers",
+      " Access to all alerts and internal notifications",
+      " Full access to the job board, tender board, and course board",
+      " Direct messaging functionality (coming soon)",
+      " Limited access to AI features",
+      " No external advertisements",
+      " Special promotional feature for security services — via Credit Bundles or upgrade",
+      " Notifications:",
+      " All alerts and updates included",
+      "Cost:",
+      " £24.99/month or £269.89/year",
     ],
   },
   {
     title: "Premium (£49.99/mo)",
     color: "border-yellow-500",
     features: [
-      "Top priority in search results with gold badge",
-      "All Standard features included",
-      "Full AI integration (coming soon)",
-      "Internal alerts and notifications",
-      "Dedicated customer support",
-      "Direct messaging (coming soon)",
-      "Complete access to all platform features",
-      "No advertisements displayed",
-      "Cost: £49.99/month or £539.89/year",
+      "Visibility:",
+      " Highest priority in search results with gold circle and “Premium” badge",
+      "Features:",
+      " Includes all features from the Standard plan",
+      " Full AI integration (coming soon)",
+      " Access to internal alerts and notifications",
+      " Priority customer support",
+      " Direct messaging functionality (coming soon)",
+      " Complete access to all platform tools and features",
+      " Full access to promotional feature for security services",
+      " No external advertisements",
+      "Cost:",
+      " £49.99/month or £539.89/year",
     ],
   },
 ];
@@ -108,11 +140,23 @@ export default function SecurityCompanyAccessGuidelines() {
               <h2 className="text-xl font-bold text-center text-[#0f766e] mb-4">
                 {tier.title}
               </h2>
-              <ul className="list-disc text-sm text-gray-700 pl-5 space-y-2">
-                {tier.features.map((feature, i) => (
-                  <li key={i}>{feature}</li>
-                ))}
-              </ul>
+              <div className="text-sm text-gray-700 space-y-2">
+                {tier.features.map((feature, i) => {
+                  if (feature.endsWith(":")) {
+                    return (
+                      <h3 key={i} className="font-bold mt-4">
+                        {feature}
+                      </h3>
+                    );
+                  }
+                  return (
+                    <div key={i} className="pl-5 flex">
+                      <span className="mr-2">•</span>
+                      {feature}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           ))}
         </div>

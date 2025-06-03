@@ -77,9 +77,9 @@ export default function Navbar() {
           <DynamicDropdown jsonFile="secuirty_services.json" title="Security Services" basePath="/services/" />
           <DynamicDropdown jsonFile="training_providers.json" title="Training Providers" basePath="/providers/" />
 
-          <Link href="/insurance" className="text-md font-semibold hover:text-gray-400">
+          <a href="https://insyncinsurance.co.uk/findmysecurity-ltd/" target="_blank" rel="noopener noreferrer" className="text-md font-semibold hover:text-gray-400">
             Insurance Cover
-          </Link>
+          </a>
           <ResourcesDropdown />
 
         </div>

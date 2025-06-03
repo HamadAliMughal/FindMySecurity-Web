@@ -2,52 +2,95 @@
 
 import React from "react";
 
-const tableData:{
-    [key: string]: string[]
+const tableData: {
+  [key: string]: string[];
 } = {
-  "Post Jobs": ["✅ Unlimited", "✅ Unlimited"],
-  "Post Tenders": ["✅ Unlimited", "✅ Unlimited"],
-  "View & Contact": ["✅ Unlimited", "✅ Unlimited"],
-  "Receive Suggestions": ["✅", "✅ Priority-Based"],
-  "Profile Visibility": ["Hidden", "Hidden"],
-  "Ads Displayed": ["❌", "❌"],
-  "AI Matching (coming soon)": ["❌", "✅"],
-  "Dedicated Support": ["❌", "✅"],
-  "Special Assistance for bespoke security Solution (Contact for further details)": ["❌", "✅"],
-  "Messaging (coming soon)": ["✅", "✅"],
-  "Job board": ["✅", "✅"],
-  "Tender Board": ["✅", "✅"],
-  "Course Board": ["✅", "✅"],
+  "Post Jobs": ["✅ Unlimited", "✅ Unlimited", "✅ Unlimited"],
+  "Post Tenders (For Businesses Only)": ["✅ Unlimited", "✅ Unlimited", "✅ Unlimited"],
+  "View & Contact (Security Professionals, Companies, & Training Providers)": [
+    "✅ Limited",
+    "✅ Unlimited",
+    "✅ Unlimited",
+  ],
+  "Receive Suggestions": ["❌ Not available", "✅ Included", "✅ Priority-based suggestions"],
+  "Profile Visibility": [
+    "Hidden from Public Access",
+    "Hidden from Public Access",
+    "Hidden from Public Access",
+  ],
+  "External Ads Displayed": ["✅ Yes", "❌ No", "❌ No"],
+  "AI Matching (coming soon)": ["❌ Not available", "✅ Limited access", "✅ Full access"],
+  "Dedicated Support": ["❌ Not available", "❌ Not available", "✅ Included"],
+  "Special Assistance for Bespoke Security Solutions": [
+    "❌ Not included",
+    "❌ Available via Credit Bundles or upgrade",
+    "✅ Included",
+  ],
+  "Messaging (coming soon)": ["✅ Included", "✅ Included", "✅ Included"],
+  "Job Board Access": ["✅ Included", "✅ Included", "✅ Included"],
+  "Tender Board Access (For Businesses Only)": ["✅ Included", "✅ Included", "✅ Included"],
+  "Course Board Access": ["✅ Included", "✅ Included", "✅ Included"],
 };
 
 const tiers = [
   {
+    title: "Basic (Free)",
+    color: "border-gray-300",
+    features: [
+      "Profile Visibility:",
+      " Hidden from public view",
+      "Features:",
+      " Unlimited job postings",
+      " Unlimited tender postings (for businesses only)",
+      " Free access to 10 profiles/month across professionals, companies, and trainers",
+      " Access to the job board",
+      " Access to the course board",
+      " Access to the tender board (for businesses only)",
+      " All relevant notifications and alerts included",
+      " Free messaging",
+      " No access to AI features",
+      "Advertising: External advertisements will be displayed",
+      "Cost: Free of charge",
+    ],
+  },
+  {
     title: "Standard (£24.99/mo)",
     color: "border-blue-400",
     features: [
-      "Profile hidden from public view",
-      "Unlimited job and tender postings",
-      "Full access to professionals, companies, and training providers",
-      "Access to job board, course board, and tender board (businesses only)",
-      "All relevant notifications & alerts",
-      "Direct messaging (coming soon)",
-      "No advertisements",
-      "No AI features (coming soon)",
-      "Cost: £24.99/month or £269.89/year",
+      "Profile Visibility:",
+      " Hidden from public view",
+      "Features:",
+      " Unlimited job postings",
+      " Unlimited tender postings (for businesses only)",
+      " Full access to profiles of professionals, companies, and trainers",
+      " Access to job, course, and tender boards (for businesses only)",
+      " All relevant notifications and alerts included",
+      " Direct messaging functionality (coming soon)",
+      " Limited AI features (coming soon)",
+      " Special assistance for bespoke solutions — via Credit Bundles or upgrade",
+      "Advertising:",
+      " No external advertisements",
+      "Cost:",
+      " £24.99/month or £269.89/year",
     ],
   },
   {
     title: "Premium (£49.99/mo)",
     color: "border-yellow-500",
     features: [
-      "All Standard plan features included",
-      "AI-powered matching for enhanced service recommendations",
-      "Priority visibility and tailored provider suggestions",
-      "Dedicated customer support",
-      "Full access to all platform features",
-      "Special assistance for bespoke security solutions",
-      "No advertisements",
-      "Cost: £49.99/month or £539.89/year",
+      "Profile Visibility:",
+      " Hidden from public view",
+      "Features:",
+      " All features included in the Standard plan",
+      " AI-powered matching for enhanced service recommendations",
+      " Priority visibility and tailored provider suggestions",
+      " Dedicated customer support",
+      " Full access to all platform features",
+      " Special assistance for bespoke security solutions included",
+      "Advertising:",
+      " No external advertisements",
+      "Cost:",
+      " £49.99/month or £539.89/year",
     ],
   },
 ];
@@ -66,7 +109,7 @@ export default function BusinessAccessGuidelines() {
         </p>
 
         {/* Tiers */}
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-2 mb-20">
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-3 mb-20">
           {tiers.map((tier, idx) => (
             <div
               key={idx}
@@ -75,11 +118,23 @@ export default function BusinessAccessGuidelines() {
               <h2 className="text-xl font-bold text-center text-[#0f766e] mb-4">
                 {tier.title}
               </h2>
-              <ul className="list-disc text-sm text-gray-700 pl-5 space-y-2">
-                {tier.features.map((feature, i) => (
-                  <li key={i}>{feature}</li>
-                ))}
-              </ul>
+              <div className="text-sm text-gray-700 space-y-2">
+                {tier.features.map((feature, i) => {
+                  if (feature.endsWith(":")) {
+                    return (
+                      <h3 key={i} className="font-bold mt-4">
+                        {feature}
+                      </h3>
+                    );
+                  }
+                  return (
+                    <div key={i} className="pl-5 flex">
+                      <span className="mr-2">•</span>
+                      {feature}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           ))}
         </div>
@@ -94,6 +149,7 @@ export default function BusinessAccessGuidelines() {
               <thead className="bg-gray-100 text-left">
                 <tr>
                   <th className="px-4 py-3">Feature</th>
+                  <th className="px-4 py-3 text-center">Basic</th>
                   <th className="px-4 py-3 text-center">Standard</th>
                   <th className="px-4 py-3 text-center">Premium</th>
                 </tr>

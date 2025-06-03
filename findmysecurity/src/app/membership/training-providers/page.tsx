@@ -6,33 +6,49 @@ type FeatureKey =
   | "Search Visibility"
   | "Profile Badge"
   | "Notifications"
-  | "Contact Access"
+  | "Contact Access (Security Professionals & Companies)"
   | "Post Courses"
-  | "Ads Displayed"
-  | "AI Matching (coming soon)"
+  | "External Ads Displayed"
+  | "AI Matching (Coming Soon)"
   | "Dedicated Support"
-  | "Messaging (coming soon)"
-  | "Course Board"
-  | "Job Board"
+  | "Messaging (Coming Soon)"
+  | "Course Board Access"
+  | "Job Board Access"
   | "Course Promotional Feature";
 
 const tableData: Record<FeatureKey, string[]> = {
   "Search Visibility": ["Standard", "Enhanced", "Top Priority"],
   "Profile Badge": ["None", "Silver + “Standard”", "Gold + “Premium”"],
   "Notifications": [
-    "❌ Only Own Posted Course Applicants",
-    "✅",
-    "✅",
+    "❌ 3 free notifications per month; additional available via Credit Bundles or upgrade",
+    "✅ Included",
+    "✅ Included",
   ],
-  "Contact Access": ["❌", "✅ Unlimited", "✅ Unlimited"],
-  "Post Courses": ["✅ 5 Courses PM", "✅ Unlimited", "✅ Unlimited"],
-  "Ads Displayed": ["✅", "❌", "❌"],
-  "AI Matching (coming soon)": ["❌", "❌", "✅"],
-  "Dedicated Support": ["❌", "❌", "✅"],
-  "Messaging (coming soon)": ["❌", "✅", "✅"],
-  "Course Board": ["✅", "✅", "✅"],
-  "Job Board": ["❌", "✅", "✅"],
-  "Course Promotional Feature": ["❌", "❌", "✅"],
+  "Contact Access (Security Professionals & Companies)": [
+    "❌ 5 free profile views per month; additional access via Credit Bundles or upgrade",
+    "✅ Unlimited",
+    "✅ Unlimited",
+  ],
+  "Post Courses": [
+    "❌ 1 free course post per month; more accessible via Credit Bundles or upgrade",
+    "✅ Unlimited",
+    "✅ Unlimited",
+  ],
+  "External Ads Displayed": ["✅ Yes", "❌ No", "❌ No"],
+  "AI Matching (Coming Soon)": ["❌ Not included", "✅ Limited access", "✅ Full access"],
+  "Dedicated Support": ["❌ Not available", "❌ Not available", "✅ Included"],
+  "Messaging (Coming Soon)": [
+    "❌ Free to receive; replying requires Credit Bundles or upgrade",
+    "✅ Included",
+    "✅ Included",
+  ],
+  "Course Board Access": ["✅ Included", "✅ Included", "✅ Included"],
+  "Job Board Access": ["✅ Included", "✅ Included", "✅ Included"],
+  "Course Promotional Feature": [
+    "❌ Not included",
+    "❌ Available via Credit Bundles or upgrade",
+    "✅ Included",
+  ],
 };
 
 const tierDescriptions = [
@@ -40,47 +56,58 @@ const tierDescriptions = [
     title: "Basic (Free)",
     color: "border-gray-300",
     features: [
-      "Listed in search results with standard marketing exposure",
-      "5 course postings per month",
-      "Cannot view contact details of professionals or companies",
-      "No access to the job board",
-      "Full access to the course board and its listings",
-      "Notifications only for applicants to your posted courses",
-      "No AI functionality",
-      "No direct messaging capability",
-      "Advertisements displayed",
-      "Cost: Free of charge",
+      "Visibility:",
+      " Listed in search results with standard marketing exposure",
+      "Features:",
+      " 1 free course posting per month; more via Credit Bundles or upgrade",
+      " 5 free profile views of security professionals and 5 of security companies per month",
+      " Full access to the course board and its listings",
+      " 3 free notifications per month; more via Credit Bundles or upgrade",
+      " No access to AI functionality",
+      " Free inbound messaging; outbound requires Credit Bundles or upgrade",
+      "Advertising:",
+      " External advertisements will be displayed",
+      "Cost:",
+      " Free of charge",
     ],
   },
   {
     title: "Standard (£24.99/mo)",
     color: "border-blue-400",
     features: [
-      "Enhanced visibility with silver badge and better exposure",
-      "Unlimited course postings",
-      "Full contact access to professionals and companies",
-      "Internal alerts for user interactions",
-      "Full access to job and course boards",
-      "Direct messaging (coming soon)",
-      "No advertisements",
-      "AI features not yet available",
-      "All relevant notifications included",
-      "Cost: £24.99/month or £269.89/year",
+      "Visibility:",
+      " Enhanced visibility with silver badge and improved exposure",
+      "Features:",
+      " Unlimited course postings",
+      " Full access to contact details of professionals and companies",
+      " Internal alerts for user activity and interactions",
+      " Direct messaging (coming soon)",
+      " Limited access to AI features",
+      " No external advertisements displayed",
+      " Promotional feature for courses — via Credit Bundles or upgrade",
+      "Notifications:",
+      " All alerts and updates included",
+      "Cost:",
+      " £24.99/month or £269.89/year",
     ],
   },
   {
     title: "Premium (£49.99/mo)",
     color: "border-yellow-500",
     features: [
-      "Top priority in search results with gold badge",
-      "All Standard features included",
-      "AI-powered features (coming soon)",
-      "Internal alerts and notifications",
-      "Dedicated customer support",
-      "Special promotional feature for courses",
-      "Complete access to all platform features",
-      "No advertisements displayed",
-      "Cost: £49.99/month or £539.89/year",
+      "Visibility:",
+      " Top priority in search results with gold badge",
+      "Features:",
+      " All features from the Standard plan",
+      " Access to AI-powered features (coming soon)",
+      " Full access to internal alerts and notifications",
+      " Dedicated customer support",
+      " Full access to the promotional feature for courses",
+      " Complete access to all platform tools and features",
+      "Advertising:",
+      " No external advertisements displayed",
+      "Cost:",
+      " £49.99/month or £539.89/year",
     ],
   },
 ];
@@ -108,11 +135,23 @@ export default function TrainingAccessGuidelines() {
               <h2 className="text-xl font-bold text-center text-[#0f766e] mb-4">
                 {tier.title}
               </h2>
-              <ul className="list-disc text-sm text-gray-700 pl-5 space-y-2">
-                {tier.features.map((feature, i) => (
-                  <li key={i}>{feature}</li>
-                ))}
-              </ul>
+              <div className="text-sm text-gray-700 space-y-2">
+                {tier.features.map((feature, i) => {
+                  if (feature.endsWith(":")) {
+                    return (
+                      <h3 key={i} className="font-bold mt-4">
+                        {feature}
+                      </h3>
+                    );
+                  }
+                  return (
+                    <div key={i} className="pl-5 flex">
+                      <span className="mr-2">•</span>
+                      {feature}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           ))}
         </div>
