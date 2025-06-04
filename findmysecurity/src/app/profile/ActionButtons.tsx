@@ -774,7 +774,7 @@ if (isSubscriber && tier !== 'Basic') {
  
           )}
 
-      {/* Documents Section */}
+      {/* Documents Section Block */}
 
       {shouldShowDocuments && (
   <AnimateOnScrollProvider>
