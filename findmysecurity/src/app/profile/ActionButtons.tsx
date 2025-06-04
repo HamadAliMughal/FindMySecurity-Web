@@ -272,7 +272,57 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
   }
 };
 
+useEffect(() => {
+  const loadDocuments = async () => {
+    const rawDocuments = loginData?.individualProfessional?.documents || [];
+    setLoadingDocuments(true);
+    const initialDocuments = rawDocuments.map((doc: any) => ({
+      id: doc.id,
+      url: doc.url,
+      signedUrl: doc.url, // Temporary placeholder
+      name: decodeURIComponent(doc.url?.split("/").pop() || "Document"),
+      type: doc.url?.split(".").pop()?.toUpperCase() || "FILE",
+      size: "Loading...",
+      uploadedAt: doc.uploadedAt,
+      status: doc.status,
+      loading: true,
+    }));
+    setDocuments(initialDocuments);
 
+    try {
+      const token = localStorage.getItem("authToken")?.replace(/^"|"$/g, "");
+      const response = await fetch(`${API_URL}/document/generate-presigned-urls`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ documentIds: rawDocuments.map((doc: any) => doc.id) }),
+      });
+      const { urls } = await response.json();
+      if (!response.ok) {
+        throw new Error("Failed to fetch pre-signed URLs");
+      }
+
+      console.log("Pre-signed URLs:", urls);
+      const detailedDocuments = await Promise.all(
+        urls.map((item: { signedUrl: string }) => fetchDocumentDetails(item.signedUrl))
+      );
+      const mergedDocuments = initialDocuments.map((doc: { id: string; url: string }) => {
+        const detail = detailedDocuments.find((d) => d.url === doc.url);
+        return detail ? { ...doc, ...detail, id: doc.id, loading: false } : doc;
+      });
+      setDocuments(mergedDocuments);
+    } catch (err) {
+      console.error("Error loading document details:", err);
+    } finally {
+      setLoadingDocuments(false);
+    }
+  };
+  if (loginData?.individualProfessional?.documents) {
+    loadDocuments();
+  }
+}, [loginData]);
   // const fetchDocumentDetails = async (url: string): Promise<Document> => {
   //   try {
   //     const response = await fetch(url, { method: 'HEAD' });
@@ -725,194 +775,206 @@ if (isSubscriber && tier !== 'Basic') {
           )}
 
       {/* Documents Section */}
-      {shouldShowDocuments && 
-        <AnimateOnScrollProvider>
-          <div className="space-y-6 mt-5">
-            <Divider className="my-4">
-              <Chip 
-                label={
-                  <div className="flex items-center space-x-2">
-                    <CloudDownload />
-                    <span>My Documents ({documents.length})</span>
-                  </div>
-                } 
-                color="primary" 
-              />
-            </Divider>
-            <div className="flex flex-col md:flex-row justify-between gap-4 mt-3">
-              <div className="flex items-center gap-2 w-full">
-                <TextField
-                  size="small"
-                  placeholder="Search documents..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <FaSearch className="text-gray-400" />
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{ flex: 1, maxWidth: 400 }}
-                />
-                <>
-                  <input
-                    type="file"
-                    accept="*/*"
-                    ref={inputRef}
-                    onChange={handleFileChange}
-                    style={{ display: "none" }}
-                  />
-                  <Button
-                    variant="contained"
-                    startIcon={<FaPlus />}
-                    onClick={handleClick}
-                    sx={{
-                      bgcolor: 'primary.main',
-                      whiteSpace: 'nowrap',
-                      minWidth: 'fit-content',
-                    }}
-                  >
-                    Add Documents
-                  </Button>
-                  <Backdrop open={loading} sx={{ zIndex: 9999, color: '#fff' }}>
-                    <CircularProgress color="inherit" />
-                  </Backdrop>
-                  <Snackbar
-                    open={snackbar.open}
-                    autoHideDuration={4000}
-                    onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-                  >
-                    <Alert onClose={() => setSnackbar(prev => ({ ...prev, open: false }))} severity={snackbar.severity} sx={{ width: '100%' }}>
-                      {snackbar.message}
-                    </Alert>
-                  </Snackbar>
-                </>
-              </div>
+
+      {shouldShowDocuments && (
+  <AnimateOnScrollProvider>
+    <div className="space-y-6 mt-5">
+      <Divider className="my-4">
+        <Chip
+          label={
+            <div className="flex items-center space-x-2">
+              <CloudDownload />
+              <span>My Documents ({documents.length})</span>
+            </div>
+          }
+          color="primary"
+        />
+      </Divider>
+      <div className="flex flex-col md:flex-row justify-between gap-4 mt-3">
+        <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
+          <TextField
+            size="small"
+            placeholder="Search documents..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <FaSearch className="text-gray-400" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ flex: 1, maxWidth: { xs: "100%", sm: 400 } }}
+          />
+          <>
+            <input
+              type="file"
+              accept="*/*"
+              ref={inputRef}
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+            />
+            <Button
+              variant="contained"
+              startIcon={<FaPlus />}
+              onClick={handleClick}
+              sx={{
+                bgcolor: "primary.main",
+                whiteSpace: "nowrap",
+                minWidth: "fit-content",
+                width: { xs: "100%", sm: "auto" },
+              }}
+            >
+              Add Documents
+            </Button>
+            <Backdrop open={loading} sx={{ zIndex: 9999, color: "#fff" }}>
+              <CircularProgress color="inherit" />
+            </Backdrop>
+            <Snackbar
+              open={snackbar.open}
+              autoHideDuration={4000}
+              onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+              <Alert
+                onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+                severity={snackbar.severity}
+                sx={{ width: "100%" }}
+              >
+                {snackbar.message}
+              </Alert>
+            </Snackbar>
+          </>
+        </div>
+      </div>
+
+      {loadingDocuments && (
+        <div className="flex justify-center items-center py-8">
+          <FaSpinner className="animate-spin text-2xl text-gray-400 mr-2" />
+          <Typography variant="body1" className="text-gray-500">
+            Loading documents...
+          </Typography>
+        </div>
+      )}
+
+      {!loadingDocuments &&
+        Object.entries(documentGroups).map(([type, docs]) => (
+          <div key={type} className="space-y-6">
+            <div className="flex justify-between items-center px-2">
+              <Typography variant="h6" className="font-semibold text-gray-700">
+                {type} Files ({docs.length})
+              </Typography>
+              <Typography variant="body2" className="text-gray-500">
+                {docs.length} items
+              </Typography>
             </div>
 
-            {loadingDocuments && (
-              <div className="flex justify-center items-center py-8">
-                <FaSpinner className="animate-spin text-2xl text-gray-400 mr-2" />
-                <Typography variant="body1" className="text-gray-500">
-                  Loading documents...
-                </Typography>
-              </div>
-            )}
+            <div className="space-y-4">
+              {docs.map((doc, index) => {
+                const docName = doc.name.split("-").slice(1).join(" ").replace(/\.[^/.]+$/, "");
+                const chipStyles =
+                  doc.status === "PENDING"
+                    ? { color: "#D97706", bgcolor: "#FEF3C7" }
+                    : doc.status === "APPROVED"
+                    ? { color: "#16A34A", bgcolor: "#DCFCE7" }
+                    : doc.status === "REJECTED"
+                    ? { color: "#DC2626", bgcolor: "#FEE2E2" }
+                    : { color: "#6B7280", bgcolor: "#F3F4F6" };
 
-            {!loadingDocuments && Object.entries(documentGroups).map(([type, docs]) => (
-              <div key={type} className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <Typography variant="h6" className="font-semibold text-gray-700">
-                    {type} Files ({docs.length})
-                  </Typography>
-                  <Typography variant="body2" className="text-gray-500">
-                    {docs.length} items
-                  </Typography>
-                </div>
-
-                <div className="space-y-6">
-                  {docs.map((doc, index) => {
-                    const docName = doc.name.split('-').slice(1).join(' ').replace(/\.[^/.]+$/, '');
-                    const chipStyles = doc.status === 'PENDING' 
-                      ? { color: '#D97706', bgcolor: '#FEF3C7' } // Tailwind: text-yellow-500, bg-yellow-100
-                      : doc.status === 'APPROVED' 
-                      ? { color: '#16A34A', bgcolor: '#DCFCE7' } // Tailwind: text-green-500, bg-green-100
-                      : doc.status === 'REJECTED' 
-                      ? { color: '#DC2626', bgcolor: '#FEE2E2' } // Tailwind: text-red-500, bg-red-100
-                      : { color: '#6B7280', bgcolor: '#F3F4F6' }; // Tailwind: text-gray-500, bg-gray-100
-
-                    return (
-                      <div key={index} className="flex justify-between items-center p-4 bg-white border border-gray-300 rounded-lg shadow-sm transition-all duration-200" data-aos="fade-up">
-                        <div className="flex items-center space-x-4">
-                          <Avatar className="w-14 h-14 bg-gray-200">
-                            {fileTypeIcons[doc.type.toLowerCase()] || <FaFileAlt className="text-gray-600" />}
-                          </Avatar>
-
-                          <div className="flex flex-col">
-                            <Typography variant="subtitle1" className="font-medium text-gray-800">
-                              {docName}
-                            </Typography>
-                            <Typography variant="body2" className="text-gray-500">
-                              {doc.loading ? (
-                                <span className="flex items-center">
-                                  <FaSpinner className="animate-spin mr-1" size={12} />
-                                  Loading details...
-                                </span>
-                              ) : (
-                                <>
-                                  {doc.size} • {doc.uploadedAt}
-                                </>
-                              )}
-                            </Typography>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center space-x-4">
-                          {!doc.loading && (
-                            <Chip
-                              size="small"
-                              label={doc.status || 'UNKNOWN'}
-                              sx={{
-                                fontWeight: 'bold',
-                                borderRadius: '12px',
-                                padding: '2px 8px',
-                                ...chipStyles,
-                              }}
-                            />
+                return (
+                  <div
+                    key={index}
+                    className="flex flex-col sm:flex-row sm:items-center gap-2 p-3 bg-white border border-gray-300 rounded-lg shadow-sm transition-all duration-200 max-w-full overflow-hidden"
+                    data-aos="fade-up"
+                  >
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <Avatar className="w-10 h-10 bg-gray-200 flex-shrink-0">
+                        {fileTypeIcons[doc.type.toLowerCase()] || <FaFileAlt className="text-gray-600" />}
+                      </Avatar>
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <Typography
+                          variant="subtitle1"
+                          className="font-medium text-gray-800 truncate"
+                          title={docName} // Show full name on hover
+                        >
+                          {docName}
+                        </Typography>
+                        <Typography variant="body2" className="text-gray-500 truncate">
+                          {doc.loading ? (
+                            <span className="flex items-center">
+                              <FaSpinner className="animate-spin mr-1" size={12} />
+                              Loading details...
+                            </span>
+                          ) : (
+                            <>
+                              {doc.size} • {doc.uploadedAt}
+                            </>
                           )}
-                          <Tooltip title="Download">
-                            <IconButton
-                              size="small"
-                              onClick={() => window.open(doc.url, "_blank")}
-                              sx={{
-                                color: 'primary.main',
-                                '&:hover': { color: 'blue.500' }
-                              }}
-                            >
-                              <FaDownload />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Delete">
-                            <IconButton
-                              size="small"
-                              onClick={() => doc.id && handleDeleteDocument(doc.id)}
-                              disabled={deletingId === doc.id}
-                              sx={{
-                                color: deletingId === doc.id ? 'gray.500' : 'red.500',
-                                '&:hover': { 
-                                  color: deletingId === doc.id ? 'gray.500' : 'red.700',
-                                  backgroundColor: deletingId === doc.id ? 'transparent' : 'rgba(255, 0, 0, 0.08)'
-                                }
-                              }}
-                            >
-                              {deletingId === doc.id ? (
-                                <FaSpinner className="animate-spin" />
-                              ) : (
-                                <FaTrash />
-                              )}
-                            </IconButton>
-                          </Tooltip>
-                        </div>
+                        </Typography>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-
-            {!loadingDocuments && filteredDocuments.length === 0 && (
-              <div className="text-center py-8">
-                <FaFileAlt className="mx-auto text-4xl text-gray-300 mb-2" />
-                <Typography variant="body1" className="text-gray-500">
-                  {searchQuery ? "No matching documents found" : "No documents uploaded yet"}
-                </Typography>
-              </div>
-            )}
+                    </div>
+                    <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 pt-2 sm:pt-0">
+                      {!doc.loading && (
+                        <Chip
+                          size="small"
+                          label={doc.status || "UNKNOWN"}
+                          sx={{
+                            fontWeight: "bold",
+                            borderRadius: "12px",
+                            padding: "2px 8px",
+                            ...chipStyles,
+                            minWidth: "80px",
+                          }}
+                        />
+                      )}
+                      <Tooltip title="Download">
+                        <IconButton
+                          size="small"
+                          onClick={() => window.open(doc.signedUrl, "_blank")} // Use signedUrl
+                          sx={{
+                            color: "primary.main",
+                            "&:hover": { color: "blue.500" },
+                          }}
+                        >
+                          <FaDownload />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Delete">
+                        <IconButton
+                          size="small"
+                          onClick={() => doc.id && handleDeleteDocument(doc.id)}
+                          disabled={deletingId === doc.id}
+                          sx={{
+                            color: deletingId === doc.id ? "gray.500" : "red.500",
+                            "&:hover": {
+                              color: deletingId === doc.id ? "gray.500" : "red.700",
+                              backgroundColor: deletingId === doc.id ? "transparent" : "rgba(255, 0, 0, 0.08)",
+                            },
+                          }}
+                        >
+                          {deletingId === doc.id ? <FaSpinner className="animate-spin" /> : <FaTrash />}
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </AnimateOnScrollProvider>
-      }
+        ))}
+
+      {!loadingDocuments && filteredDocuments.length === 0 && (
+        <div className="text-center py-8">
+          <FaFileAlt className="mx-auto text-4xl text-gray-300 mb-2" />
+          <Typography variant="body1" className="text-gray-500">
+            {searchQuery ? "No matching documents found" : "No documents uploaded yet"}
+          </Typography>
+        </div>
+      )}
+    </div>
+  </AnimateOnScrollProvider>
+)}
+  
 
       <Menu
         anchorEl={anchorEl}
@@ -946,7 +1008,194 @@ export default ActionButtons;
 
 
 
+// {shouldShowDocuments && 
+//   <AnimateOnScrollProvider>
+//     <div className="space-y-6 mt-5">
+//       <Divider className="my-4">
+//         <Chip 
+//           label={
+//             <div className="flex items-center space-x-2">
+//               <CloudDownload />
+//               <span>My Documents ({documents.length})</span>
+//             </div>
+//           } 
+//           color="primary" 
+//         />
+//       </Divider>
+//       <div className="flex flex-col md:flex-row justify-between gap-4 mt-3">
+//         <div className="flex items-center gap-2 w-full">
+//           <TextField
+//             size="small"
+//             placeholder="Search documents..."
+//             value={searchQuery}
+//             onChange={(e) => setSearchQuery(e.target.value)}
+//             InputProps={{
+//               startAdornment: (
+//                 <InputAdornment position="start">
+//                   <FaSearch className="text-gray-400" />
+//                 </InputAdornment>
+//               ),
+//             }}
+//             sx={{ flex: 1, maxWidth: 400 }}
+//           />
+//           <>
+//             <input
+//               type="file"
+//               accept="*/*"
+//               ref={inputRef}
+//               onChange={handleFileChange}
+//               style={{ display: "none" }}
+//             />
+//             <Button
+//               variant="contained"
+//               startIcon={<FaPlus />}
+//               onClick={handleClick}
+//               sx={{
+//                 bgcolor: 'primary.main',
+//                 whiteSpace: 'nowrap',
+//                 minWidth: 'fit-content',
+//               }}
+//             >
+//               Add Documents
+//             </Button>
+//             <Backdrop open={loading} sx={{ zIndex: 9999, color: '#fff' }}>
+//               <CircularProgress color="inherit" />
+//             </Backdrop>
+//             <Snackbar
+//               open={snackbar.open}
+//               autoHideDuration={4000}
+//               onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+//               anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+//             >
+//               <Alert onClose={() => setSnackbar(prev => ({ ...prev, open: false }))} severity={snackbar.severity} sx={{ width: '100%' }}>
+//                 {snackbar.message}
+//               </Alert>
+//             </Snackbar>
+//           </>
+//         </div>
+//       </div>
 
+//       {loadingDocuments && (
+//         <div className="flex justify-center items-center py-8">
+//           <FaSpinner className="animate-spin text-2xl text-gray-400 mr-2" />
+//           <Typography variant="body1" className="text-gray-500">
+//             Loading documents...
+//           </Typography>
+//         </div>
+//       )}
+
+//       {!loadingDocuments && Object.entries(documentGroups).map(([type, docs]) => (
+//         <div key={type} className="space-y-6">
+//           <div className="flex justify-between items-center">
+//             <Typography variant="h6" className="font-semibold text-gray-700">
+//               {type} Files ({docs.length})
+//             </Typography>
+//             <Typography variant="body2" className="text-gray-500">
+//               {docs.length} items
+//             </Typography>
+//           </div>
+
+//           <div className="space-y-6">
+//             {docs.map((doc, index) => {
+//               const docName = doc.name.split('-').slice(1).join(' ').replace(/\.[^/.]+$/, '');
+//               const chipStyles = doc.status === 'PENDING' 
+//                 ? { color: '#D97706', bgcolor: '#FEF3C7' } // Tailwind: text-yellow-500, bg-yellow-100
+//                 : doc.status === 'APPROVED' 
+//                 ? { color: '#16A34A', bgcolor: '#DCFCE7' } // Tailwind: text-green-500, bg-green-100
+//                 : doc.status === 'REJECTED' 
+//                 ? { color: '#DC2626', bgcolor: '#FEE2E2' } // Tailwind: text-red-500, bg-red-100
+//                 : { color: '#6B7280', bgcolor: '#F3F4F6' }; // Tailwind: text-gray-500, bg-gray-100
+
+//               return (
+//                 <div key={index} className="flex justify-between items-center p-4 bg-white border border-gray-300 rounded-lg shadow-sm transition-all duration-200" data-aos="fade-up">
+//                   <div className="flex items-center space-x-4">
+//                     <Avatar className="w-14 h-14 bg-gray-200">
+//                       {fileTypeIcons[doc.type.toLowerCase()] || <FaFileAlt className="text-gray-600" />}
+//                     </Avatar>
+
+//                     <div className="flex flex-col">
+//                       <Typography variant="subtitle1" className="font-medium text-gray-800">
+//                         {docName}
+//                       </Typography>
+//                       <Typography variant="body2" className="text-gray-500">
+//                         {doc.loading ? (
+//                           <span className="flex items-center">
+//                             <FaSpinner className="animate-spin mr-1" size={12} />
+//                             Loading details...
+//                           </span>
+//                         ) : (
+//                           <>
+//                             {doc.size} • {doc.uploadedAt}
+//                           </>
+//                         )}
+//                       </Typography>
+//                     </div>
+//                   </div>
+
+//                   <div className="flex items-center space-x-4">
+//                     {!doc.loading && (
+//                       <Chip
+//                         size="small"
+//                         label={doc.status || 'UNKNOWN'}
+//                         sx={{
+//                           fontWeight: 'bold',
+//                           borderRadius: '12px',
+//                           padding: '2px 8px',
+//                           ...chipStyles,
+//                         }}
+//                       />
+//                     )}
+//                     <Tooltip title="Download">
+//                       <IconButton
+//                         size="small"
+//                         onClick={() => window.open(doc.url, "_blank")}
+//                         sx={{
+//                           color: 'primary.main',
+//                           '&:hover': { color: 'blue.500' }
+//                         }}
+//                       >
+//                         <FaDownload />
+//                       </IconButton>
+//                     </Tooltip>
+//                     <Tooltip title="Delete">
+//                       <IconButton
+//                         size="small"
+//                         onClick={() => doc.id && handleDeleteDocument(doc.id)}
+//                         disabled={deletingId === doc.id}
+//                         sx={{
+//                           color: deletingId === doc.id ? 'gray.500' : 'red.500',
+//                           '&:hover': { 
+//                             color: deletingId === doc.id ? 'gray.500' : 'red.700',
+//                             backgroundColor: deletingId === doc.id ? 'transparent' : 'rgba(255, 0, 0, 0.08)'
+//                           }
+//                         }}
+//                       >
+//                         {deletingId === doc.id ? (
+//                           <FaSpinner className="animate-spin" />
+//                         ) : (
+//                           <FaTrash />
+//                         )}
+//                       </IconButton>
+//                     </Tooltip>
+//                   </div>
+//                 </div>
+//               );
+//             })}
+//           </div>
+//         </div>
+//       ))}
+
+//       {!loadingDocuments && filteredDocuments.length === 0 && (
+//         <div className="text-center py-8">
+//           <FaFileAlt className="mx-auto text-4xl text-gray-300 mb-2" />
+//           <Typography variant="body1" className="text-gray-500">
+//             {searchQuery ? "No matching documents found" : "No documents uploaded yet"}
+//           </Typography>
+//         </div>
+//       )}
+//     </div>
+//   </AnimateOnScrollProvider>
+// }
 
 
 // "use client";
