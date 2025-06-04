@@ -20,7 +20,6 @@ export async function uploadToS3({
       fileType: file.type,
     }),
   });
-
   if (!res.ok) {
     throw new Error('Failed to get signed URL');
   }
