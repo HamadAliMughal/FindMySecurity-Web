@@ -46,6 +46,7 @@ interface Professional {
       firstName?: string;
       lastName?: string;
       address?: string;
+      profile?:string;
     };
   };
 }
@@ -246,9 +247,9 @@ const ProfessionalCard = ({ professional }: { professional: Professional }) => {
         >
           <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-4">
             <div className="flex-shrink-0">
-              {professional?.profilePhoto ? (
+              {professional?.individualProfessional?.user?.profile ? (
                 <img
-                  src={professional.profilePhoto}
+                  src={professional?.individualProfessional?.user?.profile}
                   alt="Profile"
                   className={`w-20 h-20 rounded-full object-cover border-2 border-indigo-200 shadow-sm ${
                     token ? "" : "blur-sm"
