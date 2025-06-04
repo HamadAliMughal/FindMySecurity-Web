@@ -79,13 +79,7 @@ const BasicInfo = ({ profileData , id }: { profileData: any , id:any }) => {
         }
       >
         <div className="flex items-start gap-6 mt-2">
-          {profilePhoto && (
-            <img
-              src={profilePhoto}
-              alt="Profile"
-              className="w-24 h-24 rounded-full object-cover border shadow-sm"
-            />
-          )}
+
           
           <div className="flex-1 space-y-4">
             {isEditing ? (
